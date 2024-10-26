@@ -2,6 +2,9 @@ package com.javazerozahar.stock_exchange;
 
 import com.javazerozahar.stock_exchange.model.entity.*;
 import com.javazerozahar.stock_exchange.repository.AccountRepository;
+import com.javazerozahar.stock_exchange.repository.StockHistoryRepository;
+import com.javazerozahar.stock_exchange.repository.StockRepository;
+import com.javazerozahar.stock_exchange.repository.TransactionRepository;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.AccountRepositoryImpl;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.StockHistoryRepositoryImpl;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.StockRepositoryImpl;
@@ -15,10 +18,10 @@ public class StockExchangeApplication {
 
 	public static void main(String[] args) {
 		// Create repository instances
-		StockRepositoryImpl stockRepo = new StockRepositoryImpl();
-		StockHistoryRepositoryImpl stockHistoryRepo = new StockHistoryRepositoryImpl();
-		TransactionRepositoryImpl transactionRepo = new TransactionRepositoryImpl();
-		AccountRepositoryImpl accountRepo = new AccountRepositoryImpl();
+		StockRepository stockRepo = new StockRepositoryImpl();
+		StockHistoryRepository stockHistoryRepo = new StockHistoryRepositoryImpl();
+		TransactionRepository transactionRepo = new TransactionRepositoryImpl();
+		AccountRepository accountRepo = new AccountRepositoryImpl();
 
 		// Adding some Stock entries
 		Stock stock1 = Stock.builder().symbol("AAPL").price(150.0).quantity(100).build();

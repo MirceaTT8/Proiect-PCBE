@@ -4,12 +4,13 @@ import com.javazerozahar.stock_exchange.model.entity.StockHistory;
 import com.javazerozahar.stock_exchange.repository.StockHistoryRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class StockHistoryRepositoryImpl implements StockHistoryRepository {
-    private final Map<Long, List<StockHistory>> stockHistories = new HashMap<>();
+    private final Map<Long, List<StockHistory>> stockHistories = new ConcurrentHashMap<>();
 
     @Override
-    public void save(StockHistory stockHistory) {
+    public synchronized void save(StockHistory stockHistory) {
         stockHistories.computeIfAbsent(stockHistory.getStockId(), k -> new ArrayList<>()).add(stockHistory);
     }
 

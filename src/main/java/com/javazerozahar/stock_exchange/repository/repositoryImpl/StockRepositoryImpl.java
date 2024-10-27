@@ -3,14 +3,16 @@ import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.StockRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class StockRepositoryImpl implements StockRepository {
-    private final Map<Long, Stock> stocks = new HashMap<>();
-    private long currentId = 1;
+    private final Map<Long, Stock> stocks = new ConcurrentHashMap<>();
+    private final AtomicLong currentId = new AtomicLong(1);
 
     @Override
     public void save(Stock stock) {
-        stock.setId(currentId++);
+        stock.setId(currentId.getAndIncrement());
         stocks.put(stock.getId(), stock);
     }
 

@@ -3,14 +3,16 @@ import com.javazerozahar.stock_exchange.model.entity.Transaction;
 import com.javazerozahar.stock_exchange.repository.TransactionRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class TransactionRepositoryImpl implements TransactionRepository {
-    private final Map<Long, Transaction> transactions = new HashMap<>();
-    private long currentId = 1;
+    private final Map<Long, Transaction> transactions = new ConcurrentHashMap<>();
+    private final AtomicLong currentId = new AtomicLong(1);
 
     @Override
     public void save(Transaction transaction) {
-        transaction.setId(currentId++);
+        transaction.setId(currentId.getAndIncrement());
         transactions.put(transaction.getId(), transaction);
     }
 
@@ -26,24 +28,17 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     @Override
     public List<Transaction> findAllByStockId(Long stockId) {
-        List<Transaction> result = new ArrayList<>();
-        for (Transaction transaction : transactions.values()) {
-            if (transaction.getStockId().equals(stockId)) {
-                result.add(transaction);
-            }
-        }
-        return result;
+        return this.transactions.values().stream()
+                .filter(transaction -> transaction.getStockId().equals(stockId))
+                .toList();
     }
 
     @Override
     public List<Transaction> findAllByUserId(Long userId) {
-        List<Transaction> result = new ArrayList<>();
-        for (Transaction transaction : transactions.values()) {
-            if (transaction.getBuyerId().equals(userId) || transaction.getSellerId().equals(userId)) {
-                result.add(transaction);
-            }
-        }
-        return result;
+        return this.transactions.values().stream()
+                .filter(transaction -> transaction.getBuyerId().equals(userId)
+                        || transaction.getSellerId().equals(userId))
+                .toList();
     }
 
     @Override

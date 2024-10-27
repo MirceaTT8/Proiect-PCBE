@@ -1,17 +1,13 @@
 package com.javazerozahar.stock_exchange.model.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
 public class UserDTO {
     private Long id;
-
-    public UserDTO(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private List<PortfolioDTO> portfolioDTOs;
 }

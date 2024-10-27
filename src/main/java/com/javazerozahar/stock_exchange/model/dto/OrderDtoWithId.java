@@ -2,15 +2,13 @@ package com.javazerozahar.stock_exchange.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PortfolioDTO {
-    private Long id;
-    private Long stockId;
-    private Double quantity;
-    private Long userId;
-    private String stockName;
+public class OrderDtoWithId extends OrderDTO {
+    private Long orderId;
 }

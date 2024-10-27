@@ -8,7 +8,8 @@ import java.util.Optional;
 public interface PortfolioRepository {
     void save(Portfolio portfolio);
     Optional<Portfolio> findById(Long id);
-    List<Portfolio> findAllByAccountId(Long accountId);
+    List<Portfolio> findAllByUserId(Long accountId);
     void update(Portfolio portfolio);
     void deleteById(Long id);
+    List<Portfolio> findAll();
 }

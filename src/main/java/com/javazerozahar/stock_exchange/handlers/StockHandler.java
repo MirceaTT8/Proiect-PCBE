@@ -1,7 +1,6 @@
 package com.javazerozahar.stock_exchange.handlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javazerozahar.stock_exchange.converters.StockConverter;
 import com.javazerozahar.stock_exchange.model.dto.StockDTO;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.StockRepositoryImpl;
@@ -17,7 +16,6 @@ import java.util.Optional;
 public class StockHandler implements HttpHandler {
     private final StockRepositoryImpl stockRepository = new StockRepositoryImpl();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final StockConverter stockConverter = new StockConverter();
 
     public void handle(HttpExchange exchange) throws IOException {
         String response;
@@ -45,7 +43,6 @@ public class StockHandler implements HttpHandler {
             case "POST" -> {
                 if ("/stocks".equals(requestURI)) {
                     StockDTO stockDTO = readRequestBody(exchange);
-                    stockRepository.save(stockConverter.toStock(stockDTO));
                     response = "Received stock: " + stockDTO.getId();
                     statusCode = 201; // Created
                 } else {

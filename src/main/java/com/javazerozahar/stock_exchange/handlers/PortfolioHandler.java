@@ -1,22 +1,24 @@
 package com.javazerozahar.stock_exchange.handlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javazerozahar.stock_exchange.converters.AccountConverter;
-import com.javazerozahar.stock_exchange.model.dto.AccountDTO;
-import com.javazerozahar.stock_exchange.model.entity.Account;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.AccountRepositoryImpl;
+import com.javazerozahar.stock_exchange.model.dto.PortfolioDTO;
+import com.javazerozahar.stock_exchange.model.entity.Portfolio;
+import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
+import com.javazerozahar.stock_exchange.repository.repositoryImpl.PortfolioRepositoryImpl;
+import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
 
-public class AccountHandler implements HttpHandler {
-    private final AccountRepositoryImpl accountRepository = new AccountRepositoryImpl();
+public class PortfolioHandler implements HttpHandler {
+    
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final AccountConverter accountConverter = new AccountConverter();
+    private final PortfolioRepository portfolioRepository = SingletonFactory.getInstance(PortfolioRepositoryImpl.class);
 
     public void handle(HttpExchange exchange) throws IOException {
         String response;
@@ -27,14 +29,14 @@ public class AccountHandler implements HttpHandler {
 
         switch (requestMethod) {
             case "GET" -> {
-                if ("/accounts".equals(requestURI)) {
-                    List<Account> accounts = accountRepository.findAll();
-                    response = objectMapper.writeValueAsString(accounts);
+                if ("/portfolios".equals(requestURI)) {
+                    List<Portfolio> portfolios = portfolioRepository.findAll();
+                    response = objectMapper.writeValueAsString(portfolios);
                     statusCode = 200;
-                } else if (requestURI.startsWith("/accounts/")) {
+                } else if (requestURI.startsWith("/portfolios/")) {
                     String id = requestURI.substring(requestURI.lastIndexOf('/') + 1);
-                    Optional<Account> account = accountRepository.findById(Long.parseLong(id));
-                    response = objectMapper.writeValueAsString(account);
+                    Optional<Portfolio> portfolio = portfolioRepository.findById(Long.parseLong(id));
+                    response = objectMapper.writeValueAsString(portfolio);
                     statusCode = 200;
                 } else {
                     response = "Not Found";
@@ -42,10 +44,9 @@ public class AccountHandler implements HttpHandler {
                 }
             }
             case "POST" -> {
-                if ("/accounts".equals(requestURI)) {
-                    AccountDTO accountDTO = readRequestBody(exchange);
-                    accountRepository.save(accountConverter.toAccount(accountDTO));
-                    response = "Received account: " + accountDTO.getId();
+                if ("/portfolios".equals(requestURI)) {
+                    PortfolioDTO portfolioDTO = readRequestBody(exchange);
+                    response = "Received portfolio: " + portfolioDTO.getId();
                     statusCode = 201; // Created
                 } else {
                     response = "Not Found";
@@ -53,15 +54,15 @@ public class AccountHandler implements HttpHandler {
                 }
             }
             case "PUT" -> {
-                if ("/accounts/".equals(requestURI)) {
+                if ("/portfolios/".equals(requestURI)) {
                     String id = requestURI.substring(requestURI.lastIndexOf('/') + 1);
-                    Optional<Account> account = accountRepository.findById(Long.parseLong(id));
-                    if (account.isPresent()) {
-                        account.ifPresent(accountRepository::update);
-                        response = "Updated account: " + Long.parseLong(id);
+                    Optional<Portfolio> portfolio = portfolioRepository.findById(Long.parseLong(id));
+                    if (portfolio.isPresent()) {
+                        portfolio.ifPresent(portfolioRepository::update);
+                        response = "Updated portfolio: " + Long.parseLong(id);
                         statusCode = 200;
                     } else {
-                        response = "Account Not Found";
+                        response = "portfolio Not Found";
                         statusCode = 404;
                     }
                 } else {
@@ -70,10 +71,10 @@ public class AccountHandler implements HttpHandler {
                 }
             }
             case "DELETE" -> {
-                if ("/accounts/".equals(requestURI)) {
+                if ("/portfolios/".equals(requestURI)) {
                     String id = requestURI.substring(requestURI.lastIndexOf('/') + 1);
-                    accountRepository.deleteById(Long.parseLong(id));
-                    response = "Deleted account: " + Long.parseLong(id);
+                    portfolioRepository.deleteById(Long.parseLong(id));
+                    response = "Deleted portfolio: " + Long.parseLong(id);
                     statusCode = 200;
                 } else {
                     response = "Not Found";
@@ -88,9 +89,9 @@ public class AccountHandler implements HttpHandler {
         sendResponse(exchange, response, statusCode);
     }
 
-    private AccountDTO readRequestBody(HttpExchange exchange) throws IOException {
+    private PortfolioDTO readRequestBody(HttpExchange exchange) throws IOException {
         InputStream inputStream = exchange.getRequestBody();
-        return objectMapper.readValue(inputStream, AccountDTO.class);
+        return objectMapper.readValue(inputStream, PortfolioDTO.class);
     }
 
     private void sendResponse(HttpExchange exchange, String response, int statusCode) throws IOException {
@@ -99,4 +100,6 @@ public class AccountHandler implements HttpHandler {
             os.write(response.getBytes());
         }
     }
+    
+
 }

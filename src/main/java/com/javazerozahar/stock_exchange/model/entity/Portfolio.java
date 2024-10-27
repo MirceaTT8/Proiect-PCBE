@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Portfolio {
     private Long id;
+    private Long userId;
     private Long stockId;
-    private Integer quantity;
+    private String stockName;
+    private Double quantity;
 }

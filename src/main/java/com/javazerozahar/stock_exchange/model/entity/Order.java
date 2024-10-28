@@ -12,9 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Order {
     private Long orderId;
-    private Portfolio portfolio;
+    private Long userId;
     private Double price;
-    private Stock stock;
+    private Stock soldStock;
+    private Stock boughtStock;
     private Double quantity;
     private OrderType orderType;
+    private Long timestamp;
 }

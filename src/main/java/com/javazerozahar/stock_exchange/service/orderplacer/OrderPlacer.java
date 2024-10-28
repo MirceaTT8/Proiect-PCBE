@@ -1,9 +1,9 @@
 package com.javazerozahar.stock_exchange.service.orderplacer;
 
-import com.javazerozahar.stock_exchange.exceptions.PortfolioNotFoundException;
 import com.javazerozahar.stock_exchange.exceptions.StockNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
-import com.javazerozahar.stock_exchange.model.entity.Portfolio;
+import com.javazerozahar.stock_exchange.model.dto.OrderDtoWithId;
+import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
 import com.javazerozahar.stock_exchange.repository.StockRepository;
@@ -16,13 +16,11 @@ import java.util.Map;
 
 public class OrderPlacer {
 
-    private final PortfolioRepository portfolioRepository;
     private final StockRepository stockRepository;
 
     private final Map<String, OrderPlacementStrategy> orderPlacementStrategies;
 
     public OrderPlacer() {
-        this.portfolioRepository = SingletonFactory.getInstance(PortfolioRepositoryImpl.class);
         this.stockRepository = SingletonFactory.getInstance(StockRepositoryImpl.class);
 
         this.orderPlacementStrategies = new HashMap<>();
@@ -34,16 +32,34 @@ public class OrderPlacer {
     /**
      * @throws com.javazerozahar.stock_exchange.exceptions.InsufficientFundsException if the criteria aren't met
      */
-    public void placeOrder(OrderDTO orderDTO, String orderPlacementStrategy) {
+    public Order placeOrder(OrderDTO orderDTO, String orderPlacementStrategy) {
 
-        Portfolio portfolio = portfolioRepository.findById(orderDTO.getPortfolioId())
-                .orElseThrow(PortfolioNotFoundException::new);
+        Stock soldStock = stockRepository.findById(orderDTO.getSoldStockId())
+                .orElseThrow(() -> new StockNotFoundException(orderDTO.getSoldStockId()));
 
-        Stock stock = stockRepository.findById(orderDTO.getStockId())
-                .orElseThrow(() -> new StockNotFoundException(orderDTO.getStockId()));
+        Stock boughtStock = stockRepository.findById(orderDTO.getBoughtStockId())
+                .orElseThrow(() -> new StockNotFoundException(orderDTO.getBoughtStockId()));
 
-        orderPlacementStrategies.get(orderPlacementStrategy).placeOrder(portfolio, stock, orderDTO);
+        return placeOrder(getOrder(orderDTO, boughtStock, soldStock), orderPlacementStrategy);
     }
 
+    public Order placeOrder(Order order, String orderPlacementStrategy) {
+        return orderPlacementStrategies.get(orderPlacementStrategy).placeOrder(order);
+    }
 
+    private Order getOrder(OrderDTO orderDTO, Stock boughtStock, Stock soldStock) {
+        Order order = new Order();
+
+        if (orderDTO instanceof OrderDtoWithId) {
+            order.setOrderType(orderDTO.getOrderType());
+        }
+
+        order.setUserId(orderDTO.getUserId());
+        order.setSoldStock(boughtStock);
+        order.setQuantity(orderDTO.getQuantity());
+        order.setPrice(orderDTO.getPrice());
+        order.setBoughtStock(soldStock);
+        order.setTimestamp(System.currentTimeMillis());
+        return order;
+    }
 }

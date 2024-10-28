@@ -14,7 +14,7 @@ public class Transaction {
     private Long stockId;
     private Long sellerId;
     private Long buyerId;
-    private Integer quantity;
+    private Double quantity;
     private Double price;
     private Long timestamp;
 }

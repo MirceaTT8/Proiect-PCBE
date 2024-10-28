@@ -14,4 +14,8 @@ public class Stock {
     private String symbol;
     private Double price;
     private Integer quantity;
+
+    public boolean isCurrency() {
+        return symbol.startsWith("$");
+    }
 }

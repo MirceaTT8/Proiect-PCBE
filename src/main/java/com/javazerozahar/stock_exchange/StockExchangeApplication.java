@@ -12,9 +12,6 @@ public class StockExchangeApplication {
 
 	public static void main(String[] args) {
 
-		OrderService orderService = new OrderService();
-		OrderHandler orderHandler = new OrderHandler();
-
 		Initialize.start();
 
 		try {

@@ -1,11 +1,8 @@
 package com.javazerozahar.stock_exchange.service.orderplacer;
 
 import com.javazerozahar.stock_exchange.exceptions.OrderNotFoundException;
-import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
-import com.javazerozahar.stock_exchange.model.dto.OrderDtoWithId;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
-import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
@@ -23,16 +20,14 @@ public class DeleteOrderPlacementStrategy implements OrderPlacementStrategy {
     }
 
     @Override
-    public void placeOrder(Portfolio portfolio, Stock stock, OrderDTO orderDTO) {
+    public Order placeOrder(Order order) {
 
-        if (!(orderDTO instanceof OrderDtoWithId)) {
-            throw new ClassCastException("The order must be of type UpdateOrDeleteOrderDTO");
-        }
+        Portfolio portfolio = portfolioRepository.findByUserIdAndStock(order.getUserId(), order.getSoldStock());
 
-        double availableAmount = portfolio.getQuantity() * stock.getPrice();
+        double availableAmount = portfolio.getQuantity() * order.getBoughtStock().getPrice();
 
         orderRepository
-                .findById(((OrderDtoWithId) orderDTO).getOrderId())
+                .findById(order.getOrderId())
                 .ifPresentOrElse(previousOrder -> {
 
                             double previousOrderValue = previousOrder.getQuantity() * previousOrder.getPrice();
@@ -43,12 +38,9 @@ public class DeleteOrderPlacementStrategy implements OrderPlacementStrategy {
                 );
 
         portfolioRepository.save(portfolio);
-        orderRepository.remove(getOrder(orderDTO));
-    }
+        orderRepository.remove(order);
 
-    private Order getOrder(OrderDTO orderDTO) {
-        Order order = new Order();
-        order.setOrderId(((OrderDtoWithId)orderDTO).getOrderId());
         return order;
     }
+
 }

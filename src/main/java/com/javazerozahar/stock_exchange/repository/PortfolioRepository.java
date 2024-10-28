@@ -1,6 +1,7 @@
 package com.javazerozahar.stock_exchange.repository;
 
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
+import com.javazerozahar.stock_exchange.model.entity.Stock;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,4 +13,6 @@ public interface PortfolioRepository {
     void update(Portfolio portfolio);
     void deleteById(Long id);
     List<Portfolio> findAll();
+
+    Portfolio findByUserIdAndStock(Long userId, Stock stock);
 }

@@ -5,11 +5,11 @@ public class TransactionDTO {
     private Long stockId;
     private Long sellerId;
     private Long buyerId;
-    private Integer quantity;
+    private Double quantity;
     private Double price;
     private Long timestamp;
 
-    public TransactionDTO(Long id, Long stockId, Long sellerId, Long buyerId, Integer quantity, Double price, Long timestamp) {
+    public TransactionDTO(Long id, Long stockId, Long sellerId, Long buyerId, Double quantity, Double price, Long timestamp) {
         this.id = id;
         this.stockId = stockId;
         this.sellerId = sellerId;
@@ -35,7 +35,7 @@ public class TransactionDTO {
         return buyerId;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
@@ -63,7 +63,7 @@ public class TransactionDTO {
         this.buyerId = buyerId;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 

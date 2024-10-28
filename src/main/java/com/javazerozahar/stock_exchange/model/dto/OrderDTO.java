@@ -5,9 +5,10 @@ import lombok.Data;
 @Data
 public class OrderDTO {
     private Long userId;
-    private Long portfolioId;
-    private Long stockId;
+    private Long soldStockId;
+    private Long boughtStockId;
     private Double price;
     private Double quantity;
     private OrderType orderType;
+    private Long timestamp;
 }

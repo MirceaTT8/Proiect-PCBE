@@ -1,10 +1,8 @@
 package com.javazerozahar.stock_exchange.service.orderplacer;
 
 import com.javazerozahar.stock_exchange.exceptions.InsufficientFundsException;
-import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
-import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
@@ -22,28 +20,23 @@ public class CreateOrderPlacementStrategy implements OrderPlacementStrategy {
     }
 
     @Override
-    public void placeOrder(Portfolio portfolio, Stock stock, OrderDTO orderDTO) {
+    public Order placeOrder(Order order) {
 
-        double orderValue = orderDTO.getQuantity() * orderDTO.getPrice();
-        double availableAmount = portfolio.getQuantity() * stock.getPrice();
+        Portfolio portfolio = portfolioRepository.findByUserIdAndStock(order.getUserId(), order.getSoldStock());
+
+        double orderValue = order.getQuantity() * order.getPrice();
+        double availableAmount = portfolio.getQuantity() * order.getBoughtStock().getPrice();
 
         if (orderValue > availableAmount) {
-            throw new InsufficientFundsException();
+            throw new InsufficientFundsException("Insufficient funds");
         }
 
         portfolio.setQuantity(availableAmount - orderValue);
 
-        orderRepository.save(getOrder(orderDTO, portfolio, stock));
+        orderRepository.save(order);
         portfolioRepository.save(portfolio);
-    }
 
-    private Order getOrder(OrderDTO orderDTO, Portfolio portfolio, Stock stock) {
-        Order order = new Order();
-        order.setOrderType(orderDTO.getOrderType());
-        order.setPortfolio(portfolio);
-        order.setQuantity(orderDTO.getQuantity());
-        order.setPrice(orderDTO.getPrice());
-        order.setStock(stock);
         return order;
     }
+
 }

@@ -2,11 +2,8 @@ package com.javazerozahar.stock_exchange.service.orderplacer;
 
 import com.javazerozahar.stock_exchange.exceptions.InsufficientFundsException;
 import com.javazerozahar.stock_exchange.exceptions.OrderNotFoundException;
-import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
-import com.javazerozahar.stock_exchange.model.dto.OrderDtoWithId;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
-import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
@@ -24,24 +21,22 @@ public class UpdateOrderPlacementStrategy implements OrderPlacementStrategy {
     }
 
     @Override
-    public void placeOrder(Portfolio portfolio, Stock stock, OrderDTO orderDTO) {
+    public Order placeOrder(Order order) {
 
-        if (!(orderDTO instanceof OrderDtoWithId)) {
-            throw new ClassCastException("The order must be of type UpdateOrDeleteOrderDTO");
-        }
+        Portfolio portfolio = portfolioRepository.findByUserIdAndStock(order.getUserId(), order.getSoldStock());
 
-        double orderValue = orderDTO.getQuantity() * orderDTO.getPrice();
-        double availableAmount = portfolio.getQuantity() * stock.getPrice();
+        double orderValue = order.getQuantity() * order.getPrice();
+        double availableAmount = portfolio.getQuantity() * order.getBoughtStock().getPrice();
 
         orderRepository
-                .findById(((OrderDtoWithId) orderDTO).getOrderId())
+                .findById(order.getOrderId())
                 .ifPresentOrElse(previousOrder -> {
 
                             double previousOrderValue = previousOrder.getQuantity() * previousOrder.getPrice();
                             double priceDifference = orderValue - previousOrderValue;
 
                             if (availableAmount > priceDifference) {
-                                throw new InsufficientFundsException();
+                                throw new InsufficientFundsException("Insufficient funds");
                             }
 
                             portfolio.setQuantity(availableAmount - priceDifference);
@@ -51,21 +46,13 @@ public class UpdateOrderPlacementStrategy implements OrderPlacementStrategy {
                 );
 
         if (orderValue > availableAmount) {
-            throw new InsufficientFundsException();
+            throw new InsufficientFundsException("Insufficient funds");
         }
 
         portfolioRepository.save(portfolio);
-        orderRepository.save(getOrder(orderDTO, portfolio, stock));
-    }
+        orderRepository.save(order);
 
-    private Order getOrder(OrderDTO orderDTO, Portfolio portfolio, Stock stock) {
-        Order order = new Order();
-        order.setOrderId(((OrderDtoWithId)orderDTO).getOrderId());
-        order.setOrderType(orderDTO.getOrderType());
-        order.setPortfolio(portfolio);
-        order.setQuantity(orderDTO.getQuantity());
-        order.setPrice(orderDTO.getPrice());
-        order.setStock(stock);
         return order;
     }
+
 }

@@ -1,6 +1,7 @@
 package com.javazerozahar.stock_exchange.repository.repositoryImpl;
 
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
+import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
 
 import java.util.List;
@@ -36,5 +37,10 @@ public class PortfolioRepositoryImpl implements PortfolioRepository {
     @Override
     public List<Portfolio> findAll() {
         return List.of();
+    }
+
+    @Override
+    public Portfolio findByUserIdAndStock(Long userId, Stock stock) {
+        return null;
     }
 }

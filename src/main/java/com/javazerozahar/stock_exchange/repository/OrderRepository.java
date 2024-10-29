@@ -13,5 +13,5 @@ public interface OrderRepository {
 
     void remove(Order order);
 
-    List<Order> findByStock(Stock stock);
+    List<Order> findByBoughtStock(Stock stock);
 }

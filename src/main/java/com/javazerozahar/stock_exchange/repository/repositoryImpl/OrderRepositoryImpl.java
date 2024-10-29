@@ -4,27 +4,42 @@ import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class OrderRepositoryImpl implements OrderRepository {
+
+    private final Map<Long, Order> orderStore = new ConcurrentHashMap<>();
+    private final AtomicLong idCounter = new AtomicLong(1);
+
     @Override
     public Order save(Order order) {
-        return null;
+        if (order.getOrderId() == null) {
+            order.setOrderId(idCounter.incrementAndGet());
+        }
+        orderStore.put(order.getOrderId(), order);
+        return order;
     }
 
     @Override
     public Optional<Order> findById(Long orderId) {
-        return Optional.empty();
+        return Optional.ofNullable(orderStore.get(orderId));
     }
 
     @Override
     public void remove(Order order) {
-
+        if (order.getOrderId() != null) {
+            orderStore.remove(order.getOrderId());
+        }
     }
 
     @Override
-    public List<Order> findByStock(Stock stock) {
-        return List.of();
+    public List<Order> findByBoughtStock(Stock stock) {
+        return orderStore.values().stream()
+                .filter(order -> order.getBoughtStock().equals(stock))
+                .collect(Collectors.toList());
     }
 }
+

@@ -10,7 +10,7 @@ public class StockHistoryRepositoryImpl implements StockHistoryRepository {
     private final Map<Long, List<StockHistory>> stockHistories = new ConcurrentHashMap<>();
 
     @Override
-    public synchronized void save(StockHistory stockHistory) {
+    public void save(StockHistory stockHistory) {
         stockHistories.computeIfAbsent(stockHistory.getStockId(), k -> new ArrayList<>()).add(stockHistory);
     }
 

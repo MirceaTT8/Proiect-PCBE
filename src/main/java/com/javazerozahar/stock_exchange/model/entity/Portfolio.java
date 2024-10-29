@@ -13,6 +13,5 @@ public class Portfolio {
     private Long id;
     private Long userId;
     private Long stockId;
-    private String stockName;
     private Double quantity;
 }

@@ -4,9 +4,9 @@ public class StockDTO {
     private Long id;
     private String symbol;
     private Double price;
-    private Integer quantity;
+    private Double quantity;
 
-    public StockDTO(Long id, String symbol, Double price, Integer quantity) {
+    public StockDTO(Long id, String symbol, Double price, Double quantity) {
         this.id = id;
         this.symbol = symbol;
         this.price = price;
@@ -25,7 +25,7 @@ public class StockDTO {
         return price;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
@@ -41,7 +41,7 @@ public class StockDTO {
         this.price = price;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 }

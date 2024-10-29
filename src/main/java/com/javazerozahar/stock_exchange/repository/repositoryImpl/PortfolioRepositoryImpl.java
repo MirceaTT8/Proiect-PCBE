@@ -55,11 +55,10 @@ public class PortfolioRepositoryImpl implements PortfolioRepository {
     }
 
     @Override
-    public Portfolio findByUserIdAndStock(Long userId, Stock stock) {
+    public Optional<Portfolio> findByUserIdAndStock(Long userId, Stock stock) {
         return portfolioStore.values().stream()
                 .filter(portfolio -> portfolio.getUserId().equals(userId) && portfolio.getStockId().equals(stock.getId()))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
 }

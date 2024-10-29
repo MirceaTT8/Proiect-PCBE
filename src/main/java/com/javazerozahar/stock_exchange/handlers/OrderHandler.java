@@ -58,7 +58,7 @@ public class OrderHandler implements HttpHandler {
     }
 
     private String handlePostRequest(HttpExchange exchange) throws IOException {
-        return handleRequest(exchange, OrderDTO.class, "update");
+        return handleRequest(exchange, OrderDTO.class, "create");
     }
 
     private <T extends OrderDTO> String handleRequest(HttpExchange exchange, Class<T> dtoClass, String orderStrategy) throws IOException {

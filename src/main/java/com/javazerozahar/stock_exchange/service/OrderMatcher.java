@@ -11,6 +11,7 @@ import com.javazerozahar.stock_exchange.service.orderplacer.OrderPlacer;
 import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 
+import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.TreeMap;
 
@@ -52,7 +53,7 @@ public class OrderMatcher {
         }
 
         while (!matchingQueue.isEmpty()) {
-            Order matchingOrder = matchingQueue.peek();
+            Order matchingOrder = matchingQueue.poll();
 
             if (order.getOrderType().equals(OrderType.BUY) && matchingOrder.getPrice() <= order.getPrice() ||
                     order.getOrderType().equals(OrderType.SELL) && matchingOrder.getPrice() >= order.getPrice()) {
@@ -85,10 +86,12 @@ public class OrderMatcher {
 
     private TreeMap<Double, PriorityQueue<Order>> getOrdersForStock(Stock stock) {
         TreeMap<Double, PriorityQueue<Order>> orders = new TreeMap<>();
-        orderRepository.findByStock(stock)
-                .forEach(order -> {
-                    orders.computeIfAbsent(order.getPrice(), k -> new PriorityQueue<>()).add(order);
-                });
+        orderRepository.findByBoughtStock(stock)
+                .forEach(order ->
+                    orders.computeIfAbsent(
+                            order.getPrice(),
+                            _ -> new PriorityQueue<>(Comparator.comparingLong(Order::getTimestamp))).add(order)
+                );
         return orders;
     }
 

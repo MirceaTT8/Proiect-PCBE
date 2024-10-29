@@ -9,7 +9,6 @@ public class PortfolioConverter {
                 portfolioDTO.getId(),
                 portfolioDTO.getUserId(),
                 portfolioDTO.getStockId(),
-                portfolioDTO.getStockName(),
                 portfolioDTO.getQuantity()
         );
     }
@@ -18,7 +17,7 @@ public class PortfolioConverter {
                 portfolio.getId(),
                 portfolio.getStockId(),
                 portfolio.getQuantity(),
-                portfolio.getUserId(),
-                portfolio.getStockName());
+                portfolio.getUserId()
+        );
     }
 }

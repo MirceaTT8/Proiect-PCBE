@@ -65,6 +65,7 @@ public class OrderPlacer {
         order.setQuantity(orderDTO.getQuantity());
         order.setPrice(orderDTO.getPrice());
         order.setBoughtStock(soldStock);
+        order.setOrderType(orderDTO.getOrderType());
         order.setTimestamp(System.currentTimeMillis());
         return order;
     }

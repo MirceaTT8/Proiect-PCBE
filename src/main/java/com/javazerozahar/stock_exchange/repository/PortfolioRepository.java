@@ -14,5 +14,5 @@ public interface PortfolioRepository {
     void deleteById(Long id);
     List<Portfolio> findAll();
 
-    Portfolio findByUserIdAndStock(Long userId, Stock stock);
+    Optional<Portfolio> findByUserIdAndStock(Long userId, Stock stock);
 }

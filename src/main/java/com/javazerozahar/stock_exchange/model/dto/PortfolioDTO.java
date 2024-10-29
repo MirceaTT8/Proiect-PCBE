@@ -12,5 +12,4 @@ public class PortfolioDTO {
     private Long stockId;
     private Double quantity;
     private Long userId;
-    private String stockName;
 }

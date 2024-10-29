@@ -49,7 +49,7 @@ public class OrderService {
     }
 
     private boolean stockUnitsAvailable(Long stockId, Double requiredQuantity) {
-        return orderRepository.findByStock(stockService.getStock(stockId)).stream()
+        return orderRepository.findByBoughtStock(stockService.getStock(stockId)).stream()
                 .mapToDouble(Order::getQuantity)
                 .sum() <= requiredQuantity;
     }

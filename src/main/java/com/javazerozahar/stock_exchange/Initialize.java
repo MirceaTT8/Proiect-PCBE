@@ -1,30 +1,32 @@
 package com.javazerozahar.stock_exchange;
 
-import com.javazerozahar.stock_exchange.converters.PortfolioConverter;
-import com.javazerozahar.stock_exchange.model.entity.*;
-
+import com.javazerozahar.stock_exchange.model.entity.Portfolio;
+import com.javazerozahar.stock_exchange.model.entity.Stock;
+import com.javazerozahar.stock_exchange.model.entity.StockHistory;
+import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
 import com.javazerozahar.stock_exchange.repository.StockHistoryRepository;
 import com.javazerozahar.stock_exchange.repository.StockRepository;
 import com.javazerozahar.stock_exchange.repository.TransactionRepository;
+import com.javazerozahar.stock_exchange.repository.repositoryImpl.PortfolioRepositoryImpl;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.StockHistoryRepositoryImpl;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.StockRepositoryImpl;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.TransactionRepositoryImpl;
+import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 
 import java.util.List;
-import java.util.Optional;
 
 public class Initialize {
         public static void start() {
 
             // Create repository instances
-            StockRepository stockRepo = new StockRepositoryImpl();
-            StockHistoryRepository stockHistoryRepo = new StockHistoryRepositoryImpl();
-            TransactionRepository transactionRepo = new TransactionRepositoryImpl();
-
+            StockRepository stockRepo = SingletonFactory.getInstance(StockRepositoryImpl.class);
+            StockHistoryRepository stockHistoryRepo = SingletonFactory.getInstance(StockHistoryRepositoryImpl.class);
+            TransactionRepository transactionRepo = SingletonFactory.getInstance(TransactionRepositoryImpl.class);
+            PortfolioRepository portfolioRepository = SingletonFactory.getInstance(PortfolioRepositoryImpl.class);
 
             // Adding some Stock entries
-            Stock stock1 = Stock.builder().symbol("AAPL").price(150.0).quantity(100).build();
-            Stock stock2 = Stock.builder().symbol("GOOGL").price(2800.0).quantity(50).build();
+            Stock stock1 = Stock.builder().symbol("AAPL").price(150.0).quantity(100.0).build();
+            Stock stock2 = Stock.builder().symbol("GOOGL").price(2800.0).quantity(50.0).build();
 
             stockRepo.save(stock1);
             stockRepo.save(stock2);
@@ -46,20 +48,20 @@ public class Initialize {
             stock1History.forEach(System.out::println);
 
             // Create and save some Account entries
-//            Portfolio account1 = Portfolio.builder()
-//                    .userId(1L)
-//                    .quantity(10000.0)
-//                    .portfolio(List.of(Portfolio.builder().stockId(stock1.getId()).quantity(20).build()))
-//                    .build();
-//
-//            Account account2 = Account.builder()
-//                    .userId(2L)
-//                    .balance(20000.0)
-//                    .portfolio(List.of(Portfolio.builder().stockId(stock2.getId()).quantity(10).build()))
-//                    .build();
-//
-//            accountRepo.save(account1);
-//            accountRepo.save(account2);
+            Portfolio portfolio1 = Portfolio.builder()
+                    .userId(1L)
+                    .quantity(10000.0)
+                    .stockId(2L)
+                    .build();
+
+            Portfolio portfolio2 = Portfolio.builder()
+                    .userId(1L)
+                    .quantity(20000.0)
+                    .stockId(1L)
+                    .build();
+
+            portfolioRepository.save(portfolio1);
+            portfolioRepository.save(portfolio2);
 //
 //            List<Account> allAccounts = accountRepo.findAll();
 //            System.out.println("Accounts:");

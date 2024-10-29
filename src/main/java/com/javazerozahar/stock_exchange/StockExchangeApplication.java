@@ -1,7 +1,6 @@
 package com.javazerozahar.stock_exchange;
 
 import com.javazerozahar.stock_exchange.handlers.OrderHandler;
-import com.javazerozahar.stock_exchange.service.OrderService;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 import com.sun.net.httpserver.HttpServer;
 

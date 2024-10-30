@@ -63,7 +63,9 @@ public class OrderMatcher {
                 if (order.getOrderType().equals(OrderType.BUY) && matchingOrder.getPrice() <= order.getPrice() ||
                         order.getOrderType().equals(OrderType.SELL) && matchingOrder.getPrice() >= order.getPrice()) {
 
-                    double matchedQuantity = Math.min(order.getQuantity(), matchingOrder.getQuantity() / matchingOrder.getSoldStock().getPrice());
+                    double matchedQuantity = Math.min(order.getQuantity(), order.getOrderType().equals(OrderType.SELL) ?
+                            matchingOrder.getQuantity() / matchingOrder.getSoldStock().getPrice() :
+                            matchingOrder.getQuantity() / matchingOrder.getBoughtStock().getPrice());
 
                     order.setQuantity(order.getQuantity() - matchedQuantity);
                     matchingOrder.setQuantity(

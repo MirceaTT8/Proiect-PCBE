@@ -8,7 +8,9 @@ import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
 import com.javazerozahar.stock_exchange.service.PortfolioService;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class UpdateOrderPlacementStrategy implements OrderPlacementStrategy {
 
     private final OrderRepository orderRepository;
@@ -34,7 +36,7 @@ public class UpdateOrderPlacementStrategy implements OrderPlacementStrategy {
                             double previousOrderValue = previousOrder.getQuantity() * previousOrder.getPrice();
                             double priceDifference = orderValue - previousOrderValue;
 
-                            if (availableAmount > priceDifference) {
+                            if (availableAmount < priceDifference) {
                                 throw new InsufficientFundsException("Insufficient funds");
                             }
 
@@ -50,6 +52,8 @@ public class UpdateOrderPlacementStrategy implements OrderPlacementStrategy {
 
         portfolioService.save(portfolio);
         orderRepository.save(order);
+
+        log.info("User {} updated order {}\n with value {}\nHas portfolio {}", order.getUserId(), order, orderValue, portfolio);
 
         return order;
     }

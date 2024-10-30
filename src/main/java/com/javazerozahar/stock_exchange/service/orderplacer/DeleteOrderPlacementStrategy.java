@@ -7,7 +7,9 @@ import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
 import com.javazerozahar.stock_exchange.service.PortfolioService;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class DeleteOrderPlacementStrategy implements OrderPlacementStrategy {
 
     private final OrderRepository orderRepository;
@@ -32,12 +34,15 @@ public class DeleteOrderPlacementStrategy implements OrderPlacementStrategy {
                             double previousOrderValue = previousOrder.getQuantity() * previousOrder.getPrice();
                             portfolio.setQuantity(availableAmount + previousOrderValue);
 
+                            log.info("User {} deleted order {} with value {}\nHas portfolio {}",
+                                    order.getUserId(), order, previousOrderValue, portfolio);
                         },
                         OrderNotFoundException::new
                 );
 
         portfolioService.save(portfolio);
         orderRepository.remove(order);
+
 
         return order;
     }

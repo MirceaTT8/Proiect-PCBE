@@ -24,10 +24,15 @@ public class TransactionService {
     }
 
     public void createTransaction(Order order, Order matchingOrder, double matchedQuantity) {
-        double convertedMatchedQuantity = currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity);
+        double convertedMatchedQuantity = matchingOrder.getPrice() * currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity);
 
-        portfolioService.updatePorfolio(matchingOrder, convertedMatchedQuantity);
-        portfolioService.updatePorfolio(order, matchedQuantity);
+        if (order.getOrderType().equals(OrderType.BUY)) {
+            portfolioService.updatePorfolio(matchingOrder, convertedMatchedQuantity);
+            portfolioService.updatePorfolio(order, matchedQuantity);
+        } else {
+            portfolioService.updatePorfolio(matchingOrder, matchedQuantity);
+            portfolioService.updatePorfolio(order, convertedMatchedQuantity);
+        }
 
         double transactionedQuantity;
         Long stockId;
@@ -37,12 +42,12 @@ public class TransactionService {
             transactionedQuantity = matchedQuantity;
             stockId = order.getBoughtStock().getId();
             sellerId = order.getUserId();
-            buyerId = matchingOrder.getUserId();
+            buyerId = order.getUserId();
         } else {
             transactionedQuantity = convertedMatchedQuantity;
             stockId = matchingOrder.getBoughtStock().getId();
             sellerId = matchingOrder.getUserId();
-            buyerId = order.getUserId();
+            buyerId = matchingOrder.getUserId();
         }
 
         Transaction transaction = new Transaction();

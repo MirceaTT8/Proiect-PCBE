@@ -54,7 +54,7 @@ public class PortfolioHandler implements HttpHandler {
                 }
             }
             case "PUT" -> {
-                if ("/portfolios/".equals(requestURI)) {
+                if ("/portfolios/".startsWith(requestURI)) {
                     String id = requestURI.substring(requestURI.lastIndexOf('/') + 1);
                     Optional<Portfolio> portfolio = portfolioRepository.findById(Long.parseLong(id));
                     if (portfolio.isPresent()) {
@@ -71,7 +71,7 @@ public class PortfolioHandler implements HttpHandler {
                 }
             }
             case "DELETE" -> {
-                if ("/portfolios/".equals(requestURI)) {
+                if ("/portfolios/".startsWith(requestURI)) {
                     String id = requestURI.substring(requestURI.lastIndexOf('/') + 1);
                     portfolioRepository.deleteById(Long.parseLong(id));
                     response = "Deleted portfolio: " + Long.parseLong(id);

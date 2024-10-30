@@ -51,7 +51,7 @@ public class StockHandler implements HttpHandler {
                 }
             }
             case "PUT" -> {
-                if ("/stocks/".equals(requestURI)) {
+                if ("/stocks/".startsWith(requestURI)) {
                     String id = requestURI.substring(requestURI.lastIndexOf('/') + 1);
                     Optional<Stock> stock = stockRepository.findById(Long.parseLong(id));
                     if (stock.isPresent()) {
@@ -68,7 +68,7 @@ public class StockHandler implements HttpHandler {
                 }
             }
             case "DELETE" -> {
-                if ("/stocks/".equals(requestURI)) {
+                if ("/stocks/".startsWith(requestURI)) {
                     String id = requestURI.substring(requestURI.lastIndexOf('/') + 1);
                     StockDTO stockDTO = readRequestBody(exchange);
                     stockRepository.deleteById(stockDTO.getId());

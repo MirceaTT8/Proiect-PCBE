@@ -61,7 +61,7 @@ public class TransactionHandler implements HttpHandler {
                 }
             }
             case "PUT" -> {
-                if ("/transactions/".equals(requestURI)) {
+                if ("/transactions/".startsWith(requestURI)) {
                     String id = requestURI.substring(requestURI.lastIndexOf('/') + 1);
                     Optional<Transaction> transaction = transactionRepository.findById(Long.parseLong(id));
                     if (transaction.isPresent()) {
@@ -78,7 +78,7 @@ public class TransactionHandler implements HttpHandler {
                 }
             }
             case "DELETE" -> {
-                if ("/transactions/".equals(requestURI)) {
+                if ("/transactions/".startsWith(requestURI)) {
                     String id = requestURI.substring(requestURI.lastIndexOf('/') + 1);
                     transactionRepository.deleteById(Long.parseLong(id));
                     response = "Deleted transaction: " + Long.parseLong(id);

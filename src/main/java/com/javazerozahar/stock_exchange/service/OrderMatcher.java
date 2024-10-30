@@ -5,7 +5,6 @@ import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
-import com.javazerozahar.stock_exchange.service.orderplacer.OrderPlacer;
 import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 import lombok.extern.log4j.Log4j2;
@@ -22,11 +21,8 @@ public class OrderMatcher {
     private final TransactionService transactionService;
     private final CurrencyConverter currencyConverter;
 
-    private final OrderPlacer orderPlacer;
-
     public OrderMatcher() {
         this.orderRepository = SingletonFactory.getInstance(OrderRepositoryImpl.class);
-        this.orderPlacer = SingletonFactory.getInstance(OrderPlacer.class);
         this.transactionService = SingletonFactory.getInstance(TransactionService.class);
         this.currencyConverter = SingletonFactory.getInstance(CurrencyConverter.class);
     }

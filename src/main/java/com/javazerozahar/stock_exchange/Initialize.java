@@ -25,11 +25,13 @@ public class Initialize {
             PortfolioRepository portfolioRepository = SingletonFactory.getInstance(PortfolioRepositoryImpl.class);
 
             // Adding some Stock entries
-            Stock stock1 = Stock.builder().symbol("AAPL").price(150.0).quantity(100.0).build();
-            Stock stock2 = Stock.builder().symbol("GOOGL").price(2800.0).quantity(50.0).build();
+            Stock stock1 = Stock.builder().symbol("AAPL").price(150.0).build();
+            Stock stock2 = Stock.builder().symbol("GOOGL").price(2800.0).build();
+            Stock stock3 = Stock.builder().symbol("$EUR").price(1.0).build();
 
             stockRepo.save(stock1);
             stockRepo.save(stock2);
+            stockRepo.save(stock3);
 
             // Fetch and display all stocks
             List<Stock> allStocks = stockRepo.findAll();
@@ -47,21 +49,33 @@ public class Initialize {
             System.out.println("Stock History for AAPL:");
             stock1History.forEach(System.out::println);
 
-            // Create and save some Account entries
-            Portfolio portfolio1 = Portfolio.builder()
-                    .userId(1L)
-                    .quantity(10000.0)
-                    .stockId(2L)
-                    .build();
+            List<Portfolio> portfolios = List.of(new Portfolio[]{
+                    Portfolio.builder()
+                            .userId(1L)
+                            .quantity(0.0)
+                            .stockId(1L)
+                            .build(),
 
-            Portfolio portfolio2 = Portfolio.builder()
-                    .userId(1L)
-                    .quantity(20000.0)
-                    .stockId(1L)
-                    .build();
+                    Portfolio.builder()
+                            .userId(2L)
+                            .quantity(100.0)
+                            .stockId(1L)
+                            .build(),
 
-            portfolioRepository.save(portfolio1);
-            portfolioRepository.save(portfolio2);
+                    Portfolio.builder()
+                            .userId(1L)
+                            .quantity(10000.0)
+                            .stockId(3L)
+                            .build(),
+
+                    Portfolio.builder()
+                            .userId(2L)
+                            .quantity(10000.0)
+                            .stockId(3L)
+                            .build()
+            });
+
+            portfolios.forEach(portfolioRepository::save);
 //
 //            List<Account> allAccounts = accountRepo.findAll();
 //            System.out.println("Accounts:");

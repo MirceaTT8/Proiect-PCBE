@@ -7,7 +7,9 @@ import com.javazerozahar.stock_exchange.repository.TransactionRepository;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.TransactionRepositoryImpl;
 import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class TransactionService {
 
     private final PortfolioService portfolioService;
@@ -52,6 +54,8 @@ public class TransactionService {
         transaction.setBuyerId(buyerId);
 
         transactionRepository.save(transaction);
+
+        log.info("Transaction {}", transaction);
     }
 
 

@@ -4,21 +4,21 @@ import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
-import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.PortfolioRepositoryImpl;
 import com.javazerozahar.stock_exchange.service.orderplacer.OrderPlacer;
 import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.TreeMap;
 
+@Log4j2
 public class OrderMatcher {
 
     private final OrderRepository orderRepository;
-    private final PortfolioRepository portfolioRepository;
     private final TransactionService transactionService;
     private final CurrencyConverter currencyConverter;
 
@@ -26,7 +26,6 @@ public class OrderMatcher {
 
     public OrderMatcher() {
         this.orderRepository = SingletonFactory.getInstance(OrderRepositoryImpl.class);
-        this.portfolioRepository = SingletonFactory.getInstance(PortfolioRepositoryImpl.class);
         this.orderPlacer = SingletonFactory.getInstance(OrderPlacer.class);
         this.transactionService = SingletonFactory.getInstance(TransactionService.class);
         this.currencyConverter = SingletonFactory.getInstance(CurrencyConverter.class);
@@ -43,39 +42,50 @@ public class OrderMatcher {
 
     public Order matchOrder(Order order) {
 
-        TreeMap<Double, PriorityQueue<Order>> orders = getOrdersForStock(order.getBoughtStock());
+        TreeMap<Double, PriorityQueue<Order>> orders = order.getOrderType().equals(OrderType.BUY) ?
+                getSellOrdersForStock(order.getBoughtStock()) :
+                getBuyOrdersForStock(order.getSoldStock());
 
-        PriorityQueue<Order> matchingQueue;
+        Map.Entry<Double, PriorityQueue<Order>> matchingOrders;
+
+
         if (order.getOrderType().equals(OrderType.BUY)) {
-            matchingQueue = orders.floorEntry(order.getPrice()).getValue();
+            matchingOrders = orders.floorEntry(order.getPrice());
         } else {
-            matchingQueue = orders.ceilingEntry(order.getPrice()).getValue();
+            matchingOrders = orders.ceilingEntry(order.getPrice());
         }
 
-        while (!matchingQueue.isEmpty()) {
-            Order matchingOrder = matchingQueue.poll();
+        if (matchingOrders != null) {
 
-            if (order.getOrderType().equals(OrderType.BUY) && matchingOrder.getPrice() <= order.getPrice() ||
-                    order.getOrderType().equals(OrderType.SELL) && matchingOrder.getPrice() >= order.getPrice()) {
+            log.info("MATCH {} matched \n{}", order, matchingOrders);
 
-                double matchedQuantity = Math.min(order.getQuantity(), matchingOrder.getQuantity() / matchingOrder.getPrice());
+            PriorityQueue<Order> matchingQueue = matchingOrders.getValue();
 
-                order.setQuantity(order.getQuantity() - matchedQuantity);
-                matchingOrder.setQuantity(
-                        matchingOrder.getQuantity() - (currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity)));
+            while (!matchingQueue.isEmpty()) {
+                Order matchingOrder = matchingQueue.poll();
 
-                if (matchingOrder.getQuantity() == 0) {
-                    orderRepository.remove(matchingOrder);
-                }
+                if (order.getOrderType().equals(OrderType.BUY) && matchingOrder.getPrice() <= order.getPrice() ||
+                        order.getOrderType().equals(OrderType.SELL) && matchingOrder.getPrice() >= order.getPrice()) {
 
-                transactionService.createTransaction(order, matchingOrder, matchedQuantity);
+                    double matchedQuantity = Math.min(order.getQuantity(), matchingOrder.getQuantity() / matchingOrder.getSoldStock().getPrice());
 
-                if (order.getQuantity() == 0) {
-                    orderRepository.remove(order);
+                    order.setQuantity(order.getQuantity() - matchedQuantity);
+                    matchingOrder.setQuantity(
+                            matchingOrder.getQuantity() - (currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity)));
+
+                    if (matchingOrder.getQuantity() == 0) {
+                        orderRepository.remove(matchingOrder);
+                    }
+
+                    transactionService.createTransaction(order, matchingOrder, matchedQuantity);
+
+                    if (order.getQuantity() == 0) {
+                        orderRepository.remove(order);
+                        break;
+                    }
+                } else {
                     break;
                 }
-            } else {
-                break;
             }
         }
 
@@ -84,7 +94,7 @@ public class OrderMatcher {
 
 
 
-    private TreeMap<Double, PriorityQueue<Order>> getOrdersForStock(Stock stock) {
+    private TreeMap<Double, PriorityQueue<Order>> getBuyOrdersForStock(Stock stock) {
         TreeMap<Double, PriorityQueue<Order>> orders = new TreeMap<>();
         orderRepository.findByBoughtStock(stock)
                 .forEach(order ->
@@ -95,5 +105,15 @@ public class OrderMatcher {
         return orders;
     }
 
+    private TreeMap<Double, PriorityQueue<Order>> getSellOrdersForStock(Stock stock) {
+        TreeMap<Double, PriorityQueue<Order>> orders = new TreeMap<>();
+        orderRepository.findBySoldStock(stock)
+                .forEach(order ->
+                        orders.computeIfAbsent(
+                                order.getPrice(),
+                                _ -> new PriorityQueue<>(Comparator.comparingLong(Order::getTimestamp))).add(order)
+                );
+        return orders;
+    }
 
 }

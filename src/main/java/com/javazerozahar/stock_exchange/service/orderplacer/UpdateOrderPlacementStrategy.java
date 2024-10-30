@@ -25,7 +25,7 @@ public class UpdateOrderPlacementStrategy implements OrderPlacementStrategy {
         Portfolio portfolio = portfolioService.getPortfolioByUserIdAndStock(order.getUserId(), order.getSoldStock());
 
         double orderValue = order.getQuantity() * order.getPrice();
-        double availableAmount = portfolio.getQuantity() * order.getBoughtStock().getPrice();
+        double availableAmount = portfolio.getQuantity() * order.getSoldStock().getPrice();
 
         orderRepository
                 .findById(order.getOrderId())

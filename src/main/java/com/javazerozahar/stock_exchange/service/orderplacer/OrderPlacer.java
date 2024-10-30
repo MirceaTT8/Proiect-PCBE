@@ -1,7 +1,6 @@
 package com.javazerozahar.stock_exchange.service.orderplacer;
 
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
-import com.javazerozahar.stock_exchange.model.dto.OrderDtoWithId;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.service.StockService;
@@ -56,15 +55,12 @@ public class OrderPlacer {
     private Order getOrder(OrderDTO orderDTO, Stock boughtStock, Stock soldStock) {
         Order order = new Order();
 
-        if (orderDTO instanceof OrderDtoWithId) {
-            order.setOrderType(orderDTO.getOrderType());
-        }
-
+        order.setOrderId(orderDTO.getOrderId());
         order.setUserId(orderDTO.getUserId());
-        order.setSoldStock(boughtStock);
+        order.setSoldStock(soldStock);
         order.setQuantity(orderDTO.getQuantity());
         order.setPrice(orderDTO.getPrice());
-        order.setBoughtStock(soldStock);
+        order.setBoughtStock(boughtStock);
         order.setOrderType(orderDTO.getOrderType());
         order.setTimestamp(System.currentTimeMillis());
         return order;

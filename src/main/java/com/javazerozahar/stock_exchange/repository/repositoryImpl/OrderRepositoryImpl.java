@@ -41,5 +41,17 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .filter(order -> order.getBoughtStock().equals(stock))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Order> findBySoldStock(Stock stock) {
+        return orderStore.values().stream()
+                .filter(order -> order.getSoldStock().equals(stock))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Order> findAll() {
+        return orderStore.values().stream().toList();
+    }
 }
 

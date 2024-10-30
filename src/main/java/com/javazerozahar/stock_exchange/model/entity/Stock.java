@@ -13,5 +13,4 @@ public class Stock {
     private Long id;
     private String symbol;
     private Double price;
-    private Double quantity;
 }

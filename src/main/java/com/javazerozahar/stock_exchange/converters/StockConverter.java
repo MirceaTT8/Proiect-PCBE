@@ -5,9 +5,9 @@ import com.javazerozahar.stock_exchange.model.entity.Stock;
 
 public class StockConverter {
     public Stock toStock(StockDTO stockDTO) {
-        return new Stock(stockDTO.getId(), stockDTO.getSymbol(), stockDTO.getPrice(), stockDTO.getQuantity());
+        return new Stock(stockDTO.getId(), stockDTO.getSymbol(), stockDTO.getPrice());
     }
     public StockDTO toStockDTO(Stock stock) {
-        return new StockDTO(stock.getId(), stock.getSymbol(), stock.getPrice(), stock.getQuantity());
+        return new StockDTO(stock.getId(), stock.getSymbol(), stock.getPrice());
     }
 }

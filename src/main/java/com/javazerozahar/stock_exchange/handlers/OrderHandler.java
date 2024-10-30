@@ -2,7 +2,6 @@ package com.javazerozahar.stock_exchange.handlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
-import com.javazerozahar.stock_exchange.model.dto.OrderDtoWithId;
 import com.javazerozahar.stock_exchange.service.OrderService;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 import com.sun.net.httpserver.HttpExchange;
@@ -50,18 +49,18 @@ public class OrderHandler implements HttpHandler {
     }
 
     private String handleDeleteRequest(HttpExchange exchange) throws IOException {
-        return handleRequest(exchange, OrderDtoWithId.class, "delete");
+        return handleRequest(exchange, "delete");
     }
 
     private String handlePutRequest(HttpExchange exchange) throws IOException {
-        return handleRequest(exchange, OrderDtoWithId.class, "update");
+        return handleRequest(exchange, "update");
     }
 
     private String handlePostRequest(HttpExchange exchange) throws IOException {
-        return handleRequest(exchange, OrderDTO.class, "create");
+        return handleRequest(exchange, "create");
     }
 
-    private <T extends OrderDTO> String handleRequest(HttpExchange exchange, Class<T> dtoClass, String orderStrategy) throws IOException {
+    private String handleRequest(HttpExchange exchange, String orderStrategy) throws IOException {
         InputStream inputStream = exchange.getRequestBody();
         byte[] requestBodyBytes = inputStream.readAllBytes();
         String requestBody = new String(requestBodyBytes, StandardCharsets.UTF_8);
@@ -69,7 +68,7 @@ public class OrderHandler implements HttpHandler {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            T order = objectMapper.readValue(requestBody, dtoClass);
+            OrderDTO order = objectMapper.readValue(requestBody, OrderDTO.class);
 
             orderService.placeOrder(order, orderStrategy);
 

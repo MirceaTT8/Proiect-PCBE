@@ -1,13 +1,14 @@
 package com.javazerozahar.stock_exchange.service;
 
-import com.javazerozahar.stock_exchange.exceptions.InsufficientFundsException;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
+import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
 import com.javazerozahar.stock_exchange.service.orderplacer.OrderPlacer;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -36,22 +37,12 @@ public class OrderService {
 
         lock.lock();
         try {
-            if (stockUnitsAvailable(orderDTO.getBoughtStockId(), orderDTO.getQuantity())) {
-                Order order = orderPlacer.placeOrder(orderDTO, orderStrategy);
-                orderMatcher.matchOrder(order);
-            } else {
-                throw new InsufficientFundsException("Insufficient stock funds");
-            }
+            Order order = orderPlacer.placeOrder(orderDTO, orderStrategy);
+            orderMatcher.matchOrder(order);
         } finally {
             lock.unlock();
         }
 
-    }
-
-    private boolean stockUnitsAvailable(Long stockId, Double requiredQuantity) {
-        return orderRepository.findByBoughtStock(stockService.getStock(stockId)).stream()
-                .mapToDouble(Order::getQuantity)
-                .sum() <= requiredQuantity;
     }
 
 }

@@ -38,11 +38,11 @@ public class TransactionService {
         double convertedMatchedQuantity = matchingOrder.getPrice() * currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity);
 
         if (order.getOrderType().equals(OrderType.BUY)) {
-            portfolioService.updatePorfolio(matchingOrder, convertedMatchedQuantity);
-            portfolioService.updatePorfolio(order, matchedQuantity);
+            portfolioService.updatePortfolio(matchingOrder, convertedMatchedQuantity);
+            portfolioService.updatePortfolio(order, matchedQuantity);
         } else {
-            portfolioService.updatePorfolio(matchingOrder, matchedQuantity);
-            portfolioService.updatePorfolio(order, convertedMatchedQuantity);
+            portfolioService.updatePortfolio(matchingOrder, matchedQuantity);
+            portfolioService.updatePortfolio(order, convertedMatchedQuantity);
         }
 
         double transactionedQuantity;

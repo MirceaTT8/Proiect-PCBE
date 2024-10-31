@@ -1,6 +1,7 @@
 package com.javazerozahar.stock_exchange.service;
 
 import com.javazerozahar.stock_exchange.exceptions.PortfolioNotFoundException;
+import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
@@ -21,9 +22,15 @@ public class PortfolioService {
                 .orElseThrow(() -> new PortfolioNotFoundException("Portfolio not found for " + userId + " : " + stock));
     }
 
-    public void updatePorfolio(Order order, double quantity) {
-        Portfolio portfolio = getPortfolioByUserIdAndStock(order.getUserId(), order.getBoughtStock());
-        portfolio.setQuantity(portfolio.getQuantity() + quantity);
+    public void updatePortfolio(Order order, double quantity) {
+        Portfolio portfolio;
+        if (order.getOrderType() == OrderType.SELL) {
+            portfolio = getPortfolioByUserIdAndStock(order.getUserId(), order.getSoldStock());
+            portfolio.setQuantity(portfolio.getQuantity() - quantity);
+        } else {
+            portfolio = getPortfolioByUserIdAndStock(order.getUserId(), order.getBoughtStock());
+            portfolio.setQuantity(portfolio.getQuantity() + quantity);
+        }
         portfolioRepository.save(portfolio);
     }
 

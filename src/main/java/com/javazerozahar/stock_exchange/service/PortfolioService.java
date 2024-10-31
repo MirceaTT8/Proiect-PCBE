@@ -21,7 +21,7 @@ public class PortfolioService {
                 .orElseThrow(() -> new PortfolioNotFoundException("Portfolio not found for " + userId + " : " + stock));
     }
 
-    public void updatePorfolio(Order order, double quantity) {
+    public void updatePortfolio(Order order, double quantity) {
         Portfolio portfolio = getPortfolioByUserIdAndStock(order.getUserId(), order.getBoughtStock());
         portfolio.setQuantity(portfolio.getQuantity() + quantity);
         portfolioRepository.save(portfolio);

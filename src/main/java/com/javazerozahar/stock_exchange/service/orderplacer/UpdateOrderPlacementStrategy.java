@@ -2,6 +2,7 @@ package com.javazerozahar.stock_exchange.service.orderplacer;
 
 import com.javazerozahar.stock_exchange.exceptions.InsufficientFundsException;
 import com.javazerozahar.stock_exchange.exceptions.OrderNotFoundException;
+import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
@@ -26,14 +27,14 @@ public class UpdateOrderPlacementStrategy implements OrderPlacementStrategy {
 
         Portfolio portfolio = portfolioService.getPortfolioByUserIdAndStock(order.getUserId(), order.getSoldStock());
 
-        double orderValue = order.getQuantity() * order.getPrice();
-        double availableAmount = portfolio.getQuantity() * order.getSoldStock().getPrice();
+        double orderValue = order.getQuantity() * (order.getOrderType().equals(OrderType.BUY) ? order.getPrice() : 1);
+        double availableAmount = portfolio.getQuantity();
 
         orderRepository
                 .findById(order.getOrderId())
                 .ifPresentOrElse(previousOrder -> {
 
-                            double previousOrderValue = previousOrder.getQuantity() * previousOrder.getPrice();
+                            double previousOrderValue = previousOrder.getQuantity() * (previousOrder.getOrderType().equals(OrderType.BUY) ? previousOrder.getPrice() : 1);
                             double priceDifference = orderValue - previousOrderValue;
 
                             if (availableAmount < priceDifference) {

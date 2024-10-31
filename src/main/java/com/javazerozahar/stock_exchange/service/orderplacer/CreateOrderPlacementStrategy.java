@@ -1,6 +1,7 @@
 package com.javazerozahar.stock_exchange.service.orderplacer;
 
 import com.javazerozahar.stock_exchange.exceptions.InsufficientFundsException;
+import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
@@ -25,8 +26,8 @@ public class CreateOrderPlacementStrategy implements OrderPlacementStrategy {
 
         Portfolio portfolio = portfolioService.getPortfolioByUserIdAndStock(order.getUserId(), order.getSoldStock());
 
-        double orderValue = order.getQuantity() * order.getPrice();
-        double availableAmount = portfolio.getQuantity() * order.getSoldStock().getPrice();
+        double orderValue = order.getQuantity() * (order.getOrderType().equals(OrderType.BUY) ? order.getPrice() : 1);
+        double availableAmount = portfolio.getQuantity();
 
         if (orderValue > availableAmount) {
             throw new InsufficientFundsException("Insufficient funds");

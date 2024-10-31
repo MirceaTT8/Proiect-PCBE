@@ -22,13 +22,14 @@ public class OrderService {
         this.orderMatcher = SingletonFactory.getInstance(OrderMatcher.class);
     }
 
-    public void placeOrder(OrderDTO orderDTO, String orderStrategy) {
+    public synchronized void placeOrder(OrderDTO orderDTO, String orderStrategy) {
 
         Lock lock = stockLocks.computeIfAbsent(orderDTO.getBoughtStockId(), _ -> new ReentrantLock(true));
 
+        Order order = orderPlacer.placeOrder(orderDTO, orderStrategy);
+
         lock.lock();
         try {
-            Order order = orderPlacer.placeOrder(orderDTO, orderStrategy);
             orderMatcher.matchOrder(order);
         } finally {
             lock.unlock();

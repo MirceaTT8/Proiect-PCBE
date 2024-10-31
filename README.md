@@ -13,18 +13,9 @@ A Java-based stock exchange simulation system that allows users to trade stocks 
 
 ## Technical Stack
 
-- Java 17
-- Spring Boot
+- Java 23
 - JUnit for testing
 - Maven for dependency management
-- H2 Database
-
-## Getting Started
-
-### Prerequisites
-
-- Java 17 or higher
-- Maven
 
 ### Installation
 

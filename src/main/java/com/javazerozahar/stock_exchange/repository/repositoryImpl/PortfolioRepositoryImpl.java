@@ -61,4 +61,9 @@ public class PortfolioRepositoryImpl implements PortfolioRepository {
                 .findFirst();
     }
 
+    @Override
+    public void reset() {
+        idCounter.set(1);
+        portfolioStore.clear();
+    }
 }

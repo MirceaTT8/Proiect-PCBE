@@ -28,54 +28,61 @@ public class Initialize {
             Stock stock1 = Stock.builder().symbol("AAPL").price(150.0).build();
             Stock stock2 = Stock.builder().symbol("GOOGL").price(2800.0).build();
             Stock stock3 = Stock.builder().symbol("$EUR").price(1.0).build();
-            Stock stock4 = Stock.builder().symbol("MSFT").price(300.0).build();
-            Stock stock5 = Stock.builder().symbol("AMZN").price(3500.0).build();
-            Stock stock6 = Stock.builder().symbol("TSLA").price(800.0).build();
-            Stock stock7 = Stock.builder().symbol("FB").price(320.0).build();
+            Stock stock4 = Stock.builder().symbol("TSLA").price(255.0).build();
+            Stock stock5 = Stock.builder().symbol("NVDA").price(137.0).build();
+            Stock stock6 = Stock.builder().symbol("META").price(570.0).build();
 
-            // Saving stocks
             stockRepo.save(stock1);
             stockRepo.save(stock2);
             stockRepo.save(stock3);
             stockRepo.save(stock4);
             stockRepo.save(stock5);
             stockRepo.save(stock6);
-            stockRepo.save(stock7);
 
             // Fetch and display all stocks
             List<Stock> allStocks = stockRepo.findAll();
             System.out.println("Stocks:");
             allStocks.forEach(System.out::println);
 
-            // Adding Stock history for AAPL and MSFT
+            // Adding Stock history for a stock
             StockHistory history1 = StockHistory.builder().stockId(stock1.getId()).price(149.0).timestamp(System.currentTimeMillis()).build();
             StockHistory history2 = StockHistory.builder().stockId(stock1.getId()).price(151.0).timestamp(System.currentTimeMillis()).build();
-            StockHistory history3 = StockHistory.builder().stockId(stock4.getId()).price(299.0).timestamp(System.currentTimeMillis()).build();
-            StockHistory history4 = StockHistory.builder().stockId(stock4.getId()).price(305.0).timestamp(System.currentTimeMillis()).build();
-
             stockHistoryRepo.save(history1);
             stockHistoryRepo.save(history2);
-            stockHistoryRepo.save(history3);
-            stockHistoryRepo.save(history4);
 
             // Fetch and display stock history for stock1
             List<StockHistory> stock1History = stockHistoryRepo.findByStockId(stock1.getId());
             System.out.println("Stock History for AAPL:");
             stock1History.forEach(System.out::println);
 
-            // Adding more user portfolios
-            List<Portfolio> portfolios = List.of(
-                    Portfolio.builder().userId(1L).quantity(10.0).stockId(stock1.getId()).build(),
-                    Portfolio.builder().userId(1L).quantity(50.0).stockId(stock4.getId()).build(),
-                    Portfolio.builder().userId(2L).quantity(100.0).stockId(stock1.getId()).build(),
-                    Portfolio.builder().userId(2L).quantity(25.0).stockId(stock5.getId()).build(),
-                    Portfolio.builder().userId(3L).quantity(1000.0).stockId(stock3.getId()).build(),
-                    Portfolio.builder().userId(3L).quantity(200.0).stockId(stock6.getId()).build(),
-                    Portfolio.builder().userId(4L).quantity(500.0).stockId(stock7.getId()).build()
-            );
+            List<Portfolio> portfolios = List.of(new Portfolio[]{
+                    Portfolio.builder()
+                            .userId(1L)
+                            .quantity(0.0)
+                            .stockId(1L)
+                            .build(),
+
+                    Portfolio.builder()
+                            .userId(2L)
+                            .quantity(100.0)
+                            .stockId(1L)
+                            .build(),
+
+                    Portfolio.builder()
+                            .userId(1L)
+                            .quantity(10000.0)
+                            .stockId(3L)
+                            .build(),
+
+                    Portfolio.builder()
+                            .userId(2L)
+                            .quantity(10000.0)
+                            .stockId(3L)
+                            .build()
+            });
 
             portfolios.forEach(portfolioRepository::save);
-
+//
 //            List<Account> allAccounts = accountRepo.findAll();
 //            System.out.println("Accounts:");
 //            allAccounts.forEach(System.out::println);

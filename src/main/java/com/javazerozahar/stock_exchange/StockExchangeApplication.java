@@ -12,8 +12,6 @@ import java.net.InetSocketAddress;
 @Log4j2
 public class StockExchangeApplication {
 
-
-
 	public static void main(String[] args) {
 
 		Initialize.start();

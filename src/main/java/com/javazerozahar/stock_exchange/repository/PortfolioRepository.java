@@ -6,7 +6,7 @@ import com.javazerozahar.stock_exchange.model.entity.Stock;
 import java.util.List;
 import java.util.Optional;
 
-public interface PortfolioRepository {
+public interface PortfolioRepository extends Resetable {
     void save(Portfolio portfolio);
     Optional<Portfolio> findById(Long id);
     List<Portfolio> findAllByUserId(Long accountId);

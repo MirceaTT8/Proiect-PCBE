@@ -50,4 +50,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     public void deleteById(Long id) {
         transactions.remove(id);
     }
+
+    @Override
+    public void reset() {
+        transactions.clear();
+        currentId.set(1);
+    }
 }

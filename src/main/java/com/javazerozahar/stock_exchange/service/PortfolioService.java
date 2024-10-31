@@ -1,7 +1,6 @@
 package com.javazerozahar.stock_exchange.service;
 
 import com.javazerozahar.stock_exchange.exceptions.PortfolioNotFoundException;
-import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
 import com.javazerozahar.stock_exchange.model.entity.Stock;

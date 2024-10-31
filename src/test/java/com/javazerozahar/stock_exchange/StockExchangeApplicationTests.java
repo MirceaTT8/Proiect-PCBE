@@ -376,7 +376,7 @@ class StockExchangeApplicationTests {
 	private void sendOrder(OrderDTO buyOrder) {
 	}
 
-	@RepeatedTest(50)
+	@RepeatedTest(1000)
 	void testBuyMatchesSellOrderConcurrent() throws ExecutionException, InterruptedException {
 		assertEquals(100.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 
@@ -401,7 +401,7 @@ class StockExchangeApplicationTests {
 				.build();
 
 		OrderDTO order2 = OrderDTO.builder()
-				.orderId(2L)
+				.orderId(null)
 				.userId(1L)
 				.soldStockId(3L)
 				.boughtStockId(1L)
@@ -413,7 +413,7 @@ class StockExchangeApplicationTests {
 
 		CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> orderService.placeOrder(order3, "create"));
 		CompletableFuture<Void> future2 = CompletableFuture.runAsync(() -> orderService.placeOrder(order1, "create"));
-		CompletableFuture<Void> future3 = CompletableFuture.runAsync(() -> orderService.placeOrder(order2, "update"));
+		CompletableFuture<Void> future3 = CompletableFuture.runAsync(() -> orderService.placeOrder(order2, "create"));
 
 		CompletableFuture.allOf(future1, future2, future3).get();
 

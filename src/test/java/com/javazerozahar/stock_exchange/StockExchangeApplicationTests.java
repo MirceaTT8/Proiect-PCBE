@@ -421,6 +421,53 @@ class StockExchangeApplicationTests {
 		assertEquals(10075.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(3L)).getQuantity());
 	}
 
+	@RepeatedTest(1000)
+	void testBuyMatchesSellOrderWithUpdateConcurrent() throws ExecutionException, InterruptedException {
+		assertEquals(100.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
+
+		OrderDTO order1 = OrderDTO.builder()
+				.orderId(null)
+				.userId(1L)
+				.soldStockId(3L)
+				.boughtStockId(1L)
+				.price(5.0)
+				.quantity(10.0)
+				.orderType(OrderType.BUY)
+				.build();
+
+		orderService.placeOrder(order1, "create");
+
+		Long order1Id = orderRepository.findAll().stream().filter(order -> order.getUserId() == 1L).toList().stream().findFirst().orElseThrow().getOrderId();
+
+		OrderDTO order3 = OrderDTO.builder()
+				.orderId(null)
+				.userId(2L)
+				.soldStockId(1L)
+				.boughtStockId(3L)
+				.price(5.0)
+				.quantity(15.0)
+				.orderType(OrderType.SELL)
+				.build();
+
+		OrderDTO order2 = OrderDTO.builder()
+				.orderId(order1Id)
+				.userId(1L)
+				.soldStockId(3L)
+				.boughtStockId(1L)
+				.price(5.0)
+				.quantity(20.0)
+				.orderType(OrderType.BUY)
+				.build();
+
+		CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> orderService.placeOrder(order3, "create"));
+		CompletableFuture<Void> future3 = CompletableFuture.runAsync(() -> orderService.placeOrder(order2, "update"));
+
+		CompletableFuture.allOf(future1, future3).get();
+
+		assertEquals(15.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(1L)).getQuantity());
+		assertEquals(10075.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(3L)).getQuantity());
+	}
+
 	@AfterEach
 	public void resetDatabase() {
 		orderRepository.reset();

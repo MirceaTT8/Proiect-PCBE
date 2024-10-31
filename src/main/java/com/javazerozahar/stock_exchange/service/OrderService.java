@@ -26,12 +26,13 @@ public class OrderService {
 
         Lock lock = stockLocks.computeIfAbsent(orderDTO.getBoughtStockId(), _ -> new ReentrantLock(true));
 
-        lock.lock();
+        Order order = orderPlacer.placeOrder(orderDTO, orderStrategy);
+
+//        lock.lock();
         try {
-            Order order = orderPlacer.placeOrder(orderDTO, orderStrategy);
             orderMatcher.matchOrder(order);
         } finally {
-            lock.unlock();
+//            lock.unlock();
         }
 
     }

@@ -35,4 +35,10 @@ public class StockRepositoryImpl implements StockRepository {
     public void deleteById(Long id) {
         stocks.remove(id);
     }
+
+    @Override
+    public void reset() {
+        stocks.clear();
+        currentId.set(1);
+    }
 }

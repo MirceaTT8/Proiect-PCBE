@@ -23,14 +23,8 @@ public class PortfolioService {
     }
 
     public void updatePortfolio(Order order, double quantity) {
-        Portfolio portfolio;
-        if (order.getOrderType() == OrderType.SELL) {
-            portfolio = getPortfolioByUserIdAndStock(order.getUserId(), order.getSoldStock());
-            portfolio.setQuantity(portfolio.getQuantity() - quantity);
-        } else {
-            portfolio = getPortfolioByUserIdAndStock(order.getUserId(), order.getBoughtStock());
-            portfolio.setQuantity(portfolio.getQuantity() + quantity);
-        }
+        Portfolio portfolio = getPortfolioByUserIdAndStock(order.getUserId(), order.getBoughtStock());
+        portfolio.setQuantity(portfolio.getQuantity() + quantity);
         portfolioRepository.save(portfolio);
     }
 

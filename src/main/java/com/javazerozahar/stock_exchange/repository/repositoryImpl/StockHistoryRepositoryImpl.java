@@ -18,4 +18,9 @@ public class StockHistoryRepositoryImpl implements StockHistoryRepository {
     public List<StockHistory> findByStockId(Long stockId) {
         return stockHistories.getOrDefault(stockId, new ArrayList<>());
     }
+
+    @Override
+    public void reset() {
+        stockHistories.clear();
+    }
 }

@@ -1,5 +1,6 @@
 package com.javazerozahar.stock_exchange.service;
 
+import com.javazerozahar.stock_exchange.exceptions.StockNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
@@ -72,25 +73,21 @@ public class TransactionService {
         transactionRepository.save(transaction);
 
         Optional<Stock> stock = stockRepository.findById(stockId);
-        Double stockPrice = 0.0;
-        String stockSymbol = "";
+
         if (stock.isPresent()) {
             Stock currentStock = stock.get();
-            stockPrice = currentStock.getPrice();
-            stockSymbol = currentStock.getSymbol();
+            currentStock.setPrice(order.getPrice());
+            stockRepository.update(currentStock);
+
+            StockHistory stockHistory = new StockHistory();
+            stockHistory.setPrice(order.getPrice());
+            stockHistory.setStockId(stockId);
+            stockHistory.setTimestamp(System.currentTimeMillis());
+            stockHistoryRepository.save(stockHistory);
+        } else {
+            throw new StockNotFoundException(stockId);
         }
 
-        StockHistory stockHistory = new StockHistory();
-        stockHistory.setPrice(stockPrice);
-        stockHistory.setStockId(stockId);
-        stockHistory.setTimestamp(order.getTimestamp());
-        stockHistoryRepository.save(stockHistory);
-
-        Stock newStock = new Stock();
-        newStock.setId(stockId);
-        newStock.setPrice(matchingOrder.getPrice());
-        newStock.setSymbol(stockSymbol);
-        stockRepository.update(newStock);
 
         log.info("Transaction {}", transaction);
     }

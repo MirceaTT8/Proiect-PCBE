@@ -38,56 +38,68 @@ public class OrderMatcher {
 
     public Order matchOrder(Order order) {
 
-        TreeMap<Double, PriorityQueue<Order>> orders = order.getOrderType().equals(OrderType.BUY) ?
-                getSellOrdersForStock(order.getBoughtStock()) :
-                getBuyOrdersForStock(order.getSoldStock());
+//        orderRepository.lockOrder(order.getOrderId());
+//        orderRepository.lockOrder(order.getBoughtStock().getId());
+        orderRepository.lockOrder(order.getSoldStock().getId());
 
-        Map.Entry<Double, PriorityQueue<Order>> matchingOrders;
+        try {
+
+            TreeMap<Double, PriorityQueue<Order>> orders = order.getOrderType().equals(OrderType.BUY) ?
+                    getSellOrdersForStock(order.getBoughtStock()) :
+                    getBuyOrdersForStock(order.getSoldStock());
+
+            Map.Entry<Double, PriorityQueue<Order>> matchingOrders;
 
 
-        if (order.getOrderType().equals(OrderType.BUY)) {
-            matchingOrders = orders.floorEntry(order.getPrice());
-        } else {
-            matchingOrders = orders.ceilingEntry(order.getPrice());
-        }
+            if (order.getOrderType().equals(OrderType.BUY)) {
+                matchingOrders = orders.floorEntry(order.getPrice());
+            } else {
+                matchingOrders = orders.ceilingEntry(order.getPrice());
+            }
 
-        if (matchingOrders != null) {
+            if (matchingOrders != null) {
 
-            log.info("MATCH {} matched \n{}", order, matchingOrders);
+                log.info("MATCH {} matched \n{}", order, matchingOrders);
 
-            PriorityQueue<Order> matchingQueue = matchingOrders.getValue();
+                PriorityQueue<Order> matchingQueue = matchingOrders.getValue();
 
-            while (!matchingQueue.isEmpty()) {
-                Order matchingOrder = matchingQueue.poll();
+                while (!matchingQueue.isEmpty()) {
+                    Order matchingOrder = matchingQueue.poll();
 
-                if (order.getOrderType().equals(OrderType.BUY) && matchingOrder.getPrice() <= order.getPrice() ||
-                        order.getOrderType().equals(OrderType.SELL) && matchingOrder.getPrice() >= order.getPrice()) {
+                    if (order.getOrderType().equals(OrderType.BUY) && matchingOrder.getPrice() <= order.getPrice() ||
+                            order.getOrderType().equals(OrderType.SELL) && matchingOrder.getPrice() >= order.getPrice()) {
 
-                    double matchedQuantity = Math.min(order.getQuantity(), order.getOrderType().equals(OrderType.SELL) ?
-                            matchingOrder.getQuantity() / matchingOrder.getSoldStock().getPrice() :
-                            matchingOrder.getQuantity() / matchingOrder.getBoughtStock().getPrice());
+                        double matchedQuantity = Math.min(order.getQuantity(), order.getOrderType().equals(OrderType.SELL) ?
+                                matchingOrder.getQuantity() / matchingOrder.getSoldStock().getPrice() :
+                                matchingOrder.getQuantity() / matchingOrder.getBoughtStock().getPrice());
 
-                    order.setQuantity(order.getQuantity() - matchedQuantity);
-                    matchingOrder.setQuantity(
-                            matchingOrder.getQuantity() - (currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity)));
+                        order.setQuantity(order.getQuantity() - matchedQuantity);
+                        matchingOrder.setQuantity(
+                                matchingOrder.getQuantity() - (currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity)));
 
-                    if (matchingOrder.getQuantity() == 0) {
-                        orderRepository.remove(matchingOrder);
-                    }
+                        if (matchingOrder.getQuantity() == 0) {
+                            orderRepository.remove(matchingOrder);
+                        }
 
-                    transactionService.createTransaction(order, matchingOrder, matchedQuantity);
+                        transactionService.createTransaction(order, matchingOrder, matchedQuantity);
 
-                    if (order.getQuantity() == 0) {
-                        orderRepository.remove(order);
+                        if (order.getQuantity() == 0) {
+                            orderRepository.remove(order);
+                            break;
+                        }
+                    } else {
                         break;
                     }
-                } else {
-                    break;
                 }
             }
-        }
 
-        return order;
+            return order;
+
+        } finally {
+//            orderRepository.unlockOrder(order.getOrderId());
+            orderRepository.unlockOrder(order.getSoldStock().getId());
+//            orderRepository.unlockOrder(order.getBoughtStock().getId());
+        }
     }
 
 

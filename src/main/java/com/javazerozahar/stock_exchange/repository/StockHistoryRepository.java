@@ -3,7 +3,7 @@ import com.javazerozahar.stock_exchange.model.entity.StockHistory;
 
 import java.util.List;
 
-public interface StockHistoryRepository {
+public interface StockHistoryRepository extends Resetable {
     void save(StockHistory stockHistory);
     List<StockHistory> findByStockId(Long stockId);
 }

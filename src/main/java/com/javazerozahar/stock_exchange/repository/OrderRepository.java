@@ -7,7 +7,7 @@ import com.javazerozahar.stock_exchange.utils.Lockable;
 import java.util.List;
 import java.util.Optional;
 
-public interface OrderRepository extends Lockable<Long>, Resetable {
+public interface OrderRepository extends Lockable<Long>, Resettable {
     Order save(Order order);
 
     Optional<Order> findById(Long orderId);

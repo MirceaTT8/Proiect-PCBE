@@ -9,10 +9,7 @@ import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.TreeMap;
+import java.util.*;
 
 @Log4j2
 public class OrderMatcher {
@@ -38,9 +35,10 @@ public class OrderMatcher {
 
     public Order matchOrder(Order order) {
 
-//        orderRepository.lockOrder(order.getOrderId());
-//        orderRepository.lockOrder(order.getBoughtStock().getId());
-        orderRepository.lockOrder(order.getSoldStock().getId());
+
+        orderRepository.lockOrder(order.getOrderId());
+
+        List<Long> matchedOrderIds = new ArrayList<>();
 
         try {
 
@@ -62,6 +60,9 @@ public class OrderMatcher {
                 log.info("MATCH {} matched \n{}", order, matchingOrders);
 
                 PriorityQueue<Order> matchingQueue = matchingOrders.getValue();
+
+                matchedOrderIds = matchingOrders.getValue().stream().map(Order::getOrderId).toList();
+                matchedOrderIds.forEach(orderRepository::lockOrder);
 
                 while (!matchingQueue.isEmpty()) {
                     Order matchingOrder = matchingQueue.poll();
@@ -96,9 +97,8 @@ public class OrderMatcher {
             return order;
 
         } finally {
-//            orderRepository.unlockOrder(order.getOrderId());
-            orderRepository.unlockOrder(order.getSoldStock().getId());
-//            orderRepository.unlockOrder(order.getBoughtStock().getId());
+            orderRepository.unlockOrder(order.getOrderId());
+            matchedOrderIds.forEach(orderRepository::unlockOrder);
         }
     }
 

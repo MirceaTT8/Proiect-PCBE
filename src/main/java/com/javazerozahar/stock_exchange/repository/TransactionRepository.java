@@ -5,7 +5,7 @@ import com.javazerozahar.stock_exchange.model.entity.Transaction;
 import java.util.List;
 import java.util.Optional;
 
-public interface TransactionRepository extends Resetable {
+public interface TransactionRepository extends Resettable {
     void save(Transaction transaction);
     Optional<Transaction> findById(Long id);
 

@@ -53,13 +53,13 @@ public class TransactionService {
         if (order.getOrderType().equals(OrderType.BUY)) {
             transactionedQuantity = matchedQuantity;
             stockId = order.getBoughtStock().getId();
-            sellerId = order.getUserId();
+            sellerId = matchingOrder.getUserId();
             buyerId = order.getUserId();
         } else {
             transactionedQuantity = convertedMatchedQuantity;
             stockId = matchingOrder.getBoughtStock().getId();
             sellerId = matchingOrder.getUserId();
-            buyerId = matchingOrder.getUserId();
+            buyerId = order.getUserId();
         }
 
         Transaction transaction = new Transaction();

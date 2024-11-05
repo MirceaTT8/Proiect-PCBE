@@ -53,7 +53,6 @@ public class Initialize {
             // Fetch and display stock history for stock1
             List<StockHistory> stock1History = stockHistoryRepo.findByStockId(stock1.getId());
             System.out.println("Stock History for AAPL:");
-            stock1History.forEach(System.out::println);
 
             List<Portfolio> portfolios = List.of(new Portfolio[]{
                     Portfolio.builder()

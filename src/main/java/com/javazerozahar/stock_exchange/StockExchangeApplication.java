@@ -15,20 +15,16 @@ import java.util.concurrent.Executors;
 public class StockExchangeApplication {
 
 	public static void main(String[] args) {
-		// Initialize any required application components
 		Initialize.start();
 
-		// Start the HTTP server in a separate thread
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
 		executorService.submit(StockExchangeApplication::startHttpServer);
 
-		// Start the RabbitMQ consumer in a separate thread
 		executorService.submit(() -> {
 			RabbitMQConsumer rabbitConsumer = new RabbitMQConsumer();
 			rabbitConsumer.receiveMessages();
 		});
 
-		// Keep the application running until it’s terminated
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			executorService.shutdown();
 			System.out.println("Application shutdown.");

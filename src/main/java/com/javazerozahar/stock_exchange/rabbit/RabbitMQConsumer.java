@@ -3,6 +3,7 @@ package com.javazerozahar.stock_exchange.rabbit;
 import com.rabbitmq.client.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
 public class RabbitMQConsumer {
@@ -19,20 +20,29 @@ public class RabbitMQConsumer {
     }
 
     public void receiveMessages() {
+
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
 
             System.out.println("Waiting for messages...");
 
-            DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-                String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                System.out.println("Received message from RabbitMQConsumerGeneral: " + message);
-            };
+            channel.basicConsume(QUEUE_NAME, true, new DefaultConsumer(channel) {
+                @Override
+                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                    String message = new String(body, StandardCharsets.UTF_8);
+                    System.out.println("Received: " + message);
+                }
+            });
 
-            channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> { });
+            while (channel.isOpen()) {
+                Thread.sleep(100);
+            }
+
 
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 

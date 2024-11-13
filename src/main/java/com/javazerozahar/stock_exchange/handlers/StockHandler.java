@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javazerozahar.stock_exchange.model.dto.StockDTO;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.repositoryImpl.StockRepositoryImpl;
+import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class StockHandler implements HttpHandler {
-    private final StockRepositoryImpl stockRepository = new StockRepositoryImpl();
+    private final StockRepositoryImpl stockRepository = SingletonFactory.getInstance(StockRepositoryImpl.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void handle(HttpExchange exchange) throws IOException {
@@ -28,13 +29,21 @@ public class StockHandler implements HttpHandler {
             case "GET" -> {
                 if ("/stocks".equals(requestURI)) {
                     List<Stock> stocks = stockRepository.findAll();
+                    if (stocks.isEmpty()) {
+                        System.out.println("No stocks found");
+                    }
                     response = objectMapper.writeValueAsString(stocks);
                     statusCode = 200;
                 } else if (requestURI.startsWith("/stocks/")) {
                     String id = requestURI.substring(requestURI.lastIndexOf('/') + 1);
                     Optional<Stock> stock = stockRepository.findById(Long.parseLong(id));
-                    response = objectMapper.writeValueAsString(stock);
-                    statusCode = 200;
+                    if (stock.isPresent()) {
+                        response = objectMapper.writeValueAsString(stock);
+                        statusCode = 200;
+                    } else {
+                        response = "Not Found";
+                        statusCode = 404;
+                    }
                 } else {
                     response = "Not Found";
                     statusCode = 404;

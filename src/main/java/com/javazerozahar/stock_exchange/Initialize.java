@@ -41,8 +41,8 @@ public class Initialize {
 
             // Fetch and display all stocks
             List<Stock> allStocks = stockRepo.findAll();
-            System.out.println("Stocks:");
-            allStocks.forEach(System.out::println);
+            //System.out.println("Stocks:");
+            //allStocks.forEach(System.out::println);
 
             // Adding Stock history for a stock
             StockHistory history1 = StockHistory.builder().stockId(stock1.getId()).price(149.0).timestamp(System.currentTimeMillis()).build();
@@ -52,7 +52,7 @@ public class Initialize {
 
             // Fetch and display stock history for stock1
             List<StockHistory> stock1History = stockHistoryRepo.findByStockId(stock1.getId());
-            System.out.println("Stock History for AAPL:");
+            //System.out.println("Stock History for AAPL:");
 
             List<Portfolio> portfolios = List.of(new Portfolio[]{
                     Portfolio.builder()

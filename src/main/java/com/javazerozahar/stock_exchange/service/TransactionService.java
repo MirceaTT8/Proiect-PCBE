@@ -1,5 +1,6 @@
 package com.javazerozahar.stock_exchange.service;
 
+import com.javazerozahar.stock_exchange.exceptions.OrderNotFoundException;
 import com.javazerozahar.stock_exchange.exceptions.StockNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
@@ -15,27 +16,40 @@ import com.javazerozahar.stock_exchange.repository.repositoryImpl.TransactionRep
 import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 import lombok.extern.log4j.Log4j2;
+import org.aspectj.weaver.ast.Or;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Log4j2
+@Service
 public class TransactionService {
 
-    private final PortfolioService portfolioService;
+    private OrderService orderService;
+    private PortfolioService portfolioService;
     private final TransactionRepository transactionRepository;
     private final StockHistoryRepository stockHistoryRepository;
     private final CurrencyConverter currencyConverter;
     private final StockRepository stockRepository;
 
     public TransactionService() {
-        this.portfolioService = SingletonFactory.getInstance(PortfolioService.class);
         this.transactionRepository = SingletonFactory.getInstance(TransactionRepositoryImpl.class);
         this.stockHistoryRepository = SingletonFactory.getInstance(StockHistoryRepositoryImpl.class);
         this.currencyConverter = SingletonFactory.getInstance(CurrencyConverter.class);
         this.stockRepository = SingletonFactory.getInstance(StockRepositoryImpl.class);
     }
 
-    public void createTransaction(Order order, Order matchingOrder, double matchedQuantity) {
+    public void createTransaction(Long orderId, Long matchingOrderId, double matchedQuantity) {
+        Optional<Order> optionalOrder = orderService.getOrder(orderId);
+        Optional<Order> optionalMatchingOrder = orderService.getOrder(matchingOrderId);
+
+        if (optionalOrder.isEmpty() || optionalMatchingOrder.isEmpty()) {
+            throw new OrderNotFoundException();
+        }
+        Order order = optionalOrder.get();
+        Order matchingOrder = optionalMatchingOrder.get();
+
         double convertedMatchedQuantity = matchingOrder.getPrice() * currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity);
 
         if (order.getOrderType().equals(OrderType.BUY)) {
@@ -92,5 +106,19 @@ public class TransactionService {
         log.info("Transaction {}", transaction);
     }
 
+    public Optional<Transaction> getTransaction(Long transactionId) {
+        return transactionRepository.findById(transactionId);
+    }
 
+    public List<Transaction> getAllTransactions() {
+        return transactionRepository.findAll();
+    }
+
+    public List<Transaction> getAllTransactionsWithStock(Long stockId) {
+        return transactionRepository.findAllByStockId(stockId);
+    }
+
+    public List<Transaction> getAllTransactionsByUser(Long userId) {
+        return transactionRepository.findAllByUserId(userId);
+    }
 }

@@ -278,7 +278,7 @@ class StockExchangeApplicationTests {
 				.orderType(OrderType.SELL)
 				.build();
 
-		transactionService.createTransaction(buyOrder, sellOrder, 10.0);
+		transactionService.createTransaction(buyOrder.getOrderId(), sellOrder.getOrderId(), 10.0);
 
 		Portfolio buyerPortfolio = portfolioService.getPortfolioByUserIdAndStock(1L, buyOrder.getBoughtStock());
 		Portfolio sellerPortfolio = portfolioService.getPortfolioByUserIdAndStock(2L, sellOrder.getBoughtStock());

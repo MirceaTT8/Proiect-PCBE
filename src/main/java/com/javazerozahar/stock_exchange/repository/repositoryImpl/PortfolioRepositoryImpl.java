@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class PortfolioRepositoryImpl implements PortfolioRepository {
 
     private final Map<Long, Portfolio> portfolioStore = new ConcurrentHashMap<>();
-    private final AtomicLong idCounter = new AtomicLong(1);
+    private final AtomicLong idCounter = new AtomicLong(0);
 
     @Override
     public void save(Portfolio portfolio) {
@@ -63,7 +63,7 @@ public class PortfolioRepositoryImpl implements PortfolioRepository {
 
     @Override
     public void reset() {
-        idCounter.set(1);
+        idCounter.set(0);
         portfolioStore.clear();
     }
 }

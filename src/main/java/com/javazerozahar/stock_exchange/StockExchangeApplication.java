@@ -1,7 +1,7 @@
 package com.javazerozahar.stock_exchange;
 
 import com.javazerozahar.stock_exchange.handlers.OrderHandler;
-import com.javazerozahar.stock_exchange.rabbit.RabbitMQConsumer;
+import com.javazerozahar.stock_exchange.rabbit.general.RabbitMQConsumer;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 import com.sun.net.httpserver.HttpServer;
 import lombok.extern.log4j.Log4j2;

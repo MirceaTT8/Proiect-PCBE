@@ -1,8 +1,10 @@
 package com.javazerozahar.stock_exchange.service.orderplacer;
 
+import com.javazerozahar.stock_exchange.converters.OrderConverter;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
+import com.javazerozahar.stock_exchange.rabbit.order.OrderPlacerProducer;
 import com.javazerozahar.stock_exchange.service.StockService;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 
@@ -10,17 +12,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class OrderPlacer {
 
     private final StockService stockService;
+    private final OrderPlacerProducer orderPlacerProducer;
 
     private final Map<String, OrderPlacementStrategy> orderPlacementStrategies;
 
     private final ConcurrentHashMap<Long, Lock> userLocks = new ConcurrentHashMap<>();
 
-    public OrderPlacer() {
+    public OrderPlacer(OrderPlacerProducer orderPlacerProducer) {
+        this.orderPlacerProducer = orderPlacerProducer;
         this.stockService = SingletonFactory.getInstance(StockService.class);
 
         this.orderPlacementStrategies = new HashMap<>();
@@ -42,14 +45,10 @@ public class OrderPlacer {
 
     public Order placeOrder(Order order, String orderPlacementStrategy) {
 
-        Lock lock = userLocks.computeIfAbsent(order.getUserId(), _ -> new ReentrantLock(true));
+        orderPlacerProducer.sendOrder(OrderConverter.toOrderDTO(order), orderPlacementStrategy);
+        System.out.println("Order placed and sent to queue for user: " + order.getUserId());
 
-        lock.lock();
-        try {
-            return orderPlacementStrategies.get(orderPlacementStrategy).placeOrder(order);
-        } finally {
-            lock.unlock();
-        }
+        return null;
     }
 
     private Order getOrder(OrderDTO orderDTO, Stock boughtStock, Stock soldStock) {

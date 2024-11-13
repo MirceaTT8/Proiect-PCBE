@@ -82,7 +82,7 @@ public class OrderMatcher {
                             orderRepository.remove(matchingOrder);
                         }
 
-                        transactionService.createTransaction(order.getOrderId(), matchingOrder.getOrderId(), matchedQuantity);
+                        transactionService.createTransaction(order, matchingOrder, matchedQuantity);
 
                         if (order.getQuantity() == 0) {
                             orderRepository.remove(order);

@@ -34,8 +34,11 @@ public class TransactionAPI {
     @GetMapping("/by-stock/{stockId}")
     public List<Transaction> getAllTransactionsWithStock(@PathVariable("stockId") Long stockId) { return transactionService.getAllTransactionsWithStock(stockId); }
 
+    //Ar trebui sa se faca automat la adaugarea/creearea unui order
+    /*
     @PostMapping("/create/{orderId}-{matchingOrderId}-{matchedQuantity}")
     public void createTransaction(@PathVariable("orderId") Long orderId, @PathVariable("matchingOrderId") Long matchingOrderId, @PathVariable("matchedQuantity") double matchedQuantity) {
         transactionService.createTransaction(orderId, matchingOrderId, matchedQuantity);
     }
+     */
 }

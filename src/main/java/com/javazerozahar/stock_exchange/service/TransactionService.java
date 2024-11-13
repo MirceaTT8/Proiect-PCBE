@@ -34,22 +34,14 @@ public class TransactionService {
     private final StockRepository stockRepository;
 
     public TransactionService() {
+
         this.transactionRepository = SingletonFactory.getInstance(TransactionRepositoryImpl.class);
         this.stockHistoryRepository = SingletonFactory.getInstance(StockHistoryRepositoryImpl.class);
         this.currencyConverter = SingletonFactory.getInstance(CurrencyConverter.class);
         this.stockRepository = SingletonFactory.getInstance(StockRepositoryImpl.class);
     }
 
-    public void createTransaction(Long orderId, Long matchingOrderId, double matchedQuantity) {
-        Optional<Order> optionalOrder = orderService.getOrder(orderId);
-        Optional<Order> optionalMatchingOrder = orderService.getOrder(matchingOrderId);
-
-        if (optionalOrder.isEmpty() || optionalMatchingOrder.isEmpty()) {
-            throw new OrderNotFoundException();
-        }
-        Order order = optionalOrder.get();
-        Order matchingOrder = optionalMatchingOrder.get();
-
+    public void createTransaction(Order order, Order matchingOrder, double matchedQuantity) {
         double convertedMatchedQuantity = matchingOrder.getPrice() * currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity);
 
         if (order.getOrderType().equals(OrderType.BUY)) {
@@ -60,17 +52,17 @@ public class TransactionService {
             portfolioService.updatePortfolio(order, convertedMatchedQuantity);
         }
 
-        double transactionedQuantity;
+        double transitionedQuantity;
         Long stockId;
         Long sellerId, buyerId;
 
         if (order.getOrderType().equals(OrderType.BUY)) {
-            transactionedQuantity = matchedQuantity;
+            transitionedQuantity = matchedQuantity;
             stockId = order.getBoughtStock().getId();
             sellerId = matchingOrder.getUserId();
             buyerId = order.getUserId();
         } else {
-            transactionedQuantity = convertedMatchedQuantity;
+            transitionedQuantity = convertedMatchedQuantity;
             stockId = matchingOrder.getBoughtStock().getId();
             sellerId = matchingOrder.getUserId();
             buyerId = order.getUserId();
@@ -78,7 +70,7 @@ public class TransactionService {
 
         Transaction transaction = new Transaction();
         transaction.setPrice(order.getPrice());
-        transaction.setQuantity(transactionedQuantity);
+        transaction.setQuantity(transitionedQuantity);
         transaction.setStockId(stockId);
         transaction.setTimestamp(System.currentTimeMillis());
         transaction.setSellerId(sellerId);

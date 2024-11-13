@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 public class OrderDTO {
     private Long orderId;
     private Long userId;
+    private Double price;
     private Long soldStockId;
     private Long boughtStockId;
-    private Double price;
     private Double quantity;
     private OrderType orderType;
     private Long timestamp;

@@ -1,9 +1,8 @@
-package com.javazerozahar.stock_exchange.rabbit;
+package com.javazerozahar.stock_exchange.rabbit.general;
 
 import com.rabbitmq.client.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
 public class RabbitMQConsumer {

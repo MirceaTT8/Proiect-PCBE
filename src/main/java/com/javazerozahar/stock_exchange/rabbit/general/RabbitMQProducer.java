@@ -1,4 +1,4 @@
-package com.javazerozahar.stock_exchange.rabbit;
+package com.javazerozahar.stock_exchange.rabbit.general;
 
 
 import com.rabbitmq.client.Channel;

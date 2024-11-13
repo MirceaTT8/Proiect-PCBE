@@ -1,5 +1,10 @@
 package com.javazerozahar.stock_exchange.model.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class StockHistoryDTO {
     private Long stockId;
     private Double price;
@@ -11,27 +16,4 @@ public class StockHistoryDTO {
         this.timestamp = timestamp;
     }
 
-    public Long getStockId() {
-        return stockId;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setStockId(Long stockId) {
-        this.stockId = stockId;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
 }

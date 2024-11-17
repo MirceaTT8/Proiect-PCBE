@@ -20,10 +20,8 @@ public class OrderPlacer {
 
     private final Map<String, OrderPlacementStrategy> orderPlacementStrategies;
 
-    private final ConcurrentHashMap<Long, Lock> userLocks = new ConcurrentHashMap<>();
-
-    public OrderPlacer(OrderPlacerProducer orderPlacerProducer) {
-        this.orderPlacerProducer = orderPlacerProducer;
+    public OrderPlacer() {
+        this.orderPlacerProducer = SingletonFactory.getInstance(OrderPlacerProducer.class);
         this.stockService = SingletonFactory.getInstance(StockService.class);
 
         this.orderPlacementStrategies = new HashMap<>();

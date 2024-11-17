@@ -6,9 +6,13 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class RabbitMQConfig {
+//
+//    private static final String QUEUE_NAME = "queue-names";
+//    private static final String EXCHANGE_NAME = "exchange-name";
+//    private static final String ROUTING_KEY = "routing-key";
 
-    private static final String QUEUE_NAME = "queue-names";
-    private static final String EXCHANGE_NAME = "exchange-name";
+    private static final String QUEUE_NAME = "order-queue";
+    private static final String EXCHANGE_NAME = "exchange-queue";
     private static final String ROUTING_KEY = "routing-key";
 
     private final ConnectionFactory factory;
@@ -25,7 +29,7 @@ public class RabbitMQConfig {
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
 
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+            channel.queueDeclare(QUEUE_NAME, true, false, false, null);
 
             channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT, true);
 

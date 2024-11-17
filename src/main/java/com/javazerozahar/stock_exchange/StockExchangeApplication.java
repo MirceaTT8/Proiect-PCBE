@@ -2,6 +2,7 @@ package com.javazerozahar.stock_exchange;
 
 import com.javazerozahar.stock_exchange.handlers.OrderHandler;
 import com.javazerozahar.stock_exchange.rabbit.general.RabbitMQConsumer;
+import com.javazerozahar.stock_exchange.rabbit.order.OrderPlacerConsumer;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 import com.sun.net.httpserver.HttpServer;
 import lombok.extern.log4j.Log4j2;
@@ -21,8 +22,8 @@ public class StockExchangeApplication {
 		executorService.submit(StockExchangeApplication::startHttpServer);
 
 		executorService.submit(() -> {
-			RabbitMQConsumer rabbitConsumer = new RabbitMQConsumer();
-			rabbitConsumer.receiveMessages();
+			OrderPlacerConsumer rabbitConsumer = new OrderPlacerConsumer();
+			rabbitConsumer.startListening();
 		});
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {

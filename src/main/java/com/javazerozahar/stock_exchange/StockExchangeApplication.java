@@ -6,6 +6,8 @@ import com.javazerozahar.stock_exchange.rabbit.order.OrderPlacerConsumer;
 import com.javazerozahar.stock_exchange.utils.SingletonFactory;
 import com.sun.net.httpserver.HttpServer;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

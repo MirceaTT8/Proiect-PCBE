@@ -5,8 +5,10 @@ import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.model.entity.Transaction;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
+@EnableJpaRepositories(basePackages = "com.javazerozahar.stock_exchange.repository")
 public class SpringApp {
     public static void main(String[] args) {
         Initialize.start();

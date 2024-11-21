@@ -17,14 +17,17 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "stock_id", nullable = false)
-    private Long stockId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stock", nullable = false)
+    private Stock stock;
 
-    @Column(name = "seller_id", nullable = false)
-    private Long sellerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller", nullable = false)
+    private User seller;
 
-    @Column(name = "buyer_id", nullable = false)
-    private Long buyerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer", nullable = false)
+    private User buyer;
 
     @Column(nullable = false)
     private Double quantity;

@@ -17,8 +17,9 @@ public class StockHistory {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "stock_id", nullable = false)
-    private Long stockId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stock", nullable = false)
+    private Stock stock;
 
     @Column(nullable = false)
     private Double price;

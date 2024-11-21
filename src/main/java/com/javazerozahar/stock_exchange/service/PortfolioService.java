@@ -5,20 +5,16 @@ import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.PortfolioRepositoryImpl;
-import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
-
-    public PortfolioService() {
-        this.portfolioRepository = SingletonFactory.getInstance(PortfolioRepositoryImpl.class);
-    }
 
     public List<Portfolio> getAllPortfolios() {
         return portfolioRepository.findAll();
@@ -34,7 +30,7 @@ public class PortfolioService {
     }
 
     public Portfolio updatePortfolio(Order order, double quantity) {
-        Portfolio portfolio = getPortfolioByUserIdAndStock(order.getUserId(), order.getBoughtStock());
+        Portfolio portfolio = getPortfolioByUserIdAndStock(order.getUser().getId(), order.getBoughtStock());
         portfolio.setQuantity(portfolio.getQuantity() + quantity);
         portfolioRepository.save(portfolio);
         return portfolio;

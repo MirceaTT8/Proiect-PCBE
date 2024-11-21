@@ -3,31 +3,35 @@ package com.javazerozahar.stock_exchange.converters;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
+import com.javazerozahar.stock_exchange.model.entity.User;
 import com.javazerozahar.stock_exchange.service.StockService;
-import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import com.javazerozahar.stock_exchange.service.UserService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@AllArgsConstructor
 public class OrderConverter {
 
-    private static StockService stockService = new StockService();
+    private final StockService stockService;
+    private final UserService userService;
 
-    public OrderConverter() {
-        stockService = SingletonFactory.getInstance(StockService.class);
-    }
     /**
      * Converts an OrderDTO to an Order entity.
      *
      * @param orderDTO The OrderDTO to convert.
      * @return The corresponding Order entity.
      */
-    public static Order toOrder(OrderDTO orderDTO) {
+    public Order toOrder(OrderDTO orderDTO) {
         // Retrieve the sold and bought stocks based on their IDs
         Stock soldStock = stockService.getStock(orderDTO.getSoldStockId());
         Stock boughtStock = stockService.getStock(orderDTO.getBoughtStockId());
+        User user = userService.getUser(orderDTO.getUserId());
 
         // Create and return the Order entity
         return new Order(
                 orderDTO.getOrderId(),
-                orderDTO.getUserId(),
+                user,
                 orderDTO.getPrice(),
                 soldStock,
                 boughtStock,
@@ -46,7 +50,7 @@ public class OrderConverter {
     public static OrderDTO toOrderDTO(Order order) {
         return new OrderDTO(
                 order.getOrderId(),
-                order.getUserId(),
+                order.getUser().getId(),
                 order.getPrice(),
                 order.getSoldStock().getId(),
                 order.getBoughtStock().getId(),

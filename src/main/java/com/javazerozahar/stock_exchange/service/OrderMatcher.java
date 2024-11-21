@@ -4,25 +4,21 @@ import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
 import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
-import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service
+@AllArgsConstructor
 @Log4j2
 public class OrderMatcher {
 
     private final OrderRepository orderRepository;
     private final TransactionService transactionService;
     private final CurrencyConverter currencyConverter;
-
-    public OrderMatcher() {
-        this.orderRepository = SingletonFactory.getInstance(OrderRepositoryImpl.class);
-        this.transactionService = SingletonFactory.getInstance(TransactionService.class);
-        this.currencyConverter = SingletonFactory.getInstance(CurrencyConverter.class);
-    }
 
     /**
      * Best price strategy <br>
@@ -36,7 +32,7 @@ public class OrderMatcher {
     public Order matchOrder(Order order) {
 
 
-        orderRepository.lockOrder(order.getOrderId());
+//        orderRepository.lockOrder(order.getOrderId());
 
         List<Long> matchedOrderIds = new ArrayList<>();
 
@@ -62,7 +58,7 @@ public class OrderMatcher {
                 PriorityQueue<Order> matchingQueue = matchingOrders.getValue();
 
                 matchedOrderIds = matchingOrders.getValue().stream().map(Order::getOrderId).toList();
-                matchedOrderIds.forEach(orderRepository::lockOrder);
+//                matchedOrderIds.forEach(orderRepository::lockOrder);
 
                 while (!matchingQueue.isEmpty()) {
                     Order matchingOrder = matchingQueue.poll();
@@ -79,13 +75,13 @@ public class OrderMatcher {
                                 matchingOrder.getQuantity() - (currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity)));
 
                         if (matchingOrder.getQuantity() == 0) {
-                            orderRepository.remove(matchingOrder);
+                            orderRepository.delete(matchingOrder);
                         }
 
                         transactionService.createTransaction(order, matchingOrder, matchedQuantity);
-
+ 
                         if (order.getQuantity() == 0) {
-                            orderRepository.remove(order);
+                            orderRepository.delete(order);
                             break;
                         }
                     } else {
@@ -97,8 +93,8 @@ public class OrderMatcher {
             return order;
 
         } finally {
-            orderRepository.unlockOrder(order.getOrderId());
-            matchedOrderIds.forEach(orderRepository::unlockOrder);
+//            orderRepository.unlockOrder(order.getOrderId());
+//            matchedOrderIds.forEach(orderRepository::unlockOrder);
         }
     }
 

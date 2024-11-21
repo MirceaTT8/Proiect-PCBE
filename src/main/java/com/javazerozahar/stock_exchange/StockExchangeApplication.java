@@ -1,31 +1,29 @@
 package com.javazerozahar.stock_exchange;
 
-import com.javazerozahar.stock_exchange.handlers.OrderHandler;
-import com.javazerozahar.stock_exchange.rabbit.general.RabbitMQConsumer;
 import com.javazerozahar.stock_exchange.rabbit.order.OrderPlacerConsumer;
-import com.javazerozahar.stock_exchange.utils.SingletonFactory;
-import com.sun.net.httpserver.HttpServer;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@SpringBootApplication
 @Log4j2
+@RequiredArgsConstructor
 public class StockExchangeApplication {
 
 	public static void main(String[] args) {
-		Initialize.start();
+		ApplicationContext context = SpringApplication.run(StockExchangeApplication.class, args);
+
+		context.getBean(Initializer.class).initialize();
 
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
-		executorService.submit(StockExchangeApplication::startHttpServer);
 
 		executorService.submit(() -> {
-			OrderPlacerConsumer rabbitConsumer = new OrderPlacerConsumer();
-			rabbitConsumer.startListening();
+			context.getBean(OrderPlacerConsumer.class).startListening();
 		});
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -34,15 +32,4 @@ public class StockExchangeApplication {
 		}));
 	}
 
-	private static void startHttpServer() {
-		try {
-			HttpServer server = HttpServer.create(new InetSocketAddress(3000), 0);
-			server.createContext("/orders", SingletonFactory.getInstance(OrderHandler.class));
-			server.setExecutor(Executors.newFixedThreadPool(10));  // Configure HTTP server thread pool
-			server.start();
-			System.out.println("HTTP server started on port 3000");
-		} catch (IOException e) {
-			System.err.println("Cannot start HTTP server: " + e.getMessage());
-		}
-	}
 }

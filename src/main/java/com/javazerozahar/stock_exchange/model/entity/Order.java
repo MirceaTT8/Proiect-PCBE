@@ -18,18 +18,19 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long orderId;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private Double price;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sold_stock_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "sold_stock_id", referencedColumnName = "id")
     private Stock soldStock;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bought_stock_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "bought_stock_id", referencedColumnName = "id")
     private Stock boughtStock;
 
     @Column(nullable = false)

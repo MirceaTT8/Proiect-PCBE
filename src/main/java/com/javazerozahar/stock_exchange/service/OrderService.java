@@ -1,33 +1,31 @@
 package com.javazerozahar.stock_exchange.service;
 
+import com.javazerozahar.stock_exchange.converters.OrderConverter;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
 import com.javazerozahar.stock_exchange.service.orderplacer.OrderPlacer;
-import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class OrderService {
 
     private final OrderPlacer orderPlacer;
     private final OrderMatcher orderMatcher;
     private final OrderRepository orderRepository;
+    private final OrderConverter orderConverter;
 
-    public OrderService() {
-        this.orderPlacer = SingletonFactory.getInstance(OrderPlacer.class);
-        this.orderMatcher = SingletonFactory.getInstance(OrderMatcher.class);
-        this.orderRepository = SingletonFactory.getInstance(OrderRepositoryImpl.class);
-    }
+    @Transactional
+    public void placeOrder(OrderDTO orderDTO, String orderStrategy) {
 
-    public synchronized void placeOrder(OrderDTO orderDTO, String orderStrategy) {
-
-        Order order = orderPlacer.placeOrder(orderDTO, orderStrategy);
+        Order order = orderPlacer.placeOrder(orderConverter.toOrder(orderDTO), orderStrategy);
         orderMatcher.matchOrder(order);
     }
 

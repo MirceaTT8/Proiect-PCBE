@@ -2,22 +2,16 @@ package com.javazerozahar.stock_exchange.repository;
 
 import com.javazerozahar.stock_exchange.model.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface TransactionRepository extends Resettable, JpaRepository<Transaction, Long> {
-    Transaction save(Transaction transaction);
-    Optional<Transaction> findById(Long id);
-
-    List<Transaction> findAll();
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     List<Transaction> findAllByStockId(Long stockId);
+
+    @Query("SELECT t FROM Transaction t WHERE t.buyer.id = :userId OR t.seller.id = :userId")
     List<Transaction> findAllByUserId(Long userId);
 
-    void update(Transaction transaction);
-
-    void deleteById(Long id);
 }
 

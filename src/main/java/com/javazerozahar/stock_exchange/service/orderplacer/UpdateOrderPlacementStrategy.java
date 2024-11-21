@@ -6,26 +6,23 @@ import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
 import com.javazerozahar.stock_exchange.service.PortfolioService;
-import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
 
+@Service
+@AllArgsConstructor
 @Log4j2
 public class UpdateOrderPlacementStrategy implements OrderPlacementStrategy {
 
     private final OrderRepository orderRepository;
     private final PortfolioService portfolioService;
 
-    public UpdateOrderPlacementStrategy() {
-        this.orderRepository = SingletonFactory.getInstance(OrderRepositoryImpl.class);
-        this.portfolioService = SingletonFactory.getInstance(PortfolioService.class);
-    }
-
     @Override
     public Order placeOrder(Order order) {
 
-        Portfolio portfolio = portfolioService.getPortfolioByUserIdAndStock(order.getUserId(), order.getSoldStock());
+        Portfolio portfolio = portfolioService.getPortfolioByUserIdAndStock(order.getUser().getId(), order.getSoldStock());
 
         double orderValue = order.getQuantity() * (order.getOrderType().equals(OrderType.BUY) ? order.getPrice() : 1);
         double availableAmount = portfolio.getQuantity();
@@ -54,7 +51,7 @@ public class UpdateOrderPlacementStrategy implements OrderPlacementStrategy {
         portfolioService.save(portfolio);
         orderRepository.save(order);
 
-        log.info("User {} updated order {}\n with value {}\nHas portfolio {}", order.getUserId(), order, orderValue, portfolio);
+        log.info("User {} updated order {}\n with value {}\nHas portfolio {}", order.getUser().getId(), order, orderValue, portfolio);
 
         return order;
     }

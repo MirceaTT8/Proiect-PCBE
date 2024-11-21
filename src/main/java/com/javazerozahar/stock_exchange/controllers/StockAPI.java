@@ -1,4 +1,4 @@
-package com.javazerozahar.stock_exchange.RestAPIs;
+package com.javazerozahar.stock_exchange.controllers;
 
 import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.service.StockService;

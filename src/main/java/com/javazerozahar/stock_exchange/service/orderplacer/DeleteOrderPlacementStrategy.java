@@ -5,26 +5,23 @@ import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
 import com.javazerozahar.stock_exchange.service.PortfolioService;
-import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
 
+@Service
+@AllArgsConstructor
 @Log4j2
 public class DeleteOrderPlacementStrategy implements OrderPlacementStrategy {
 
     private final OrderRepository orderRepository;
     private final PortfolioService portfolioService;
 
-    public DeleteOrderPlacementStrategy() {
-        this.orderRepository = SingletonFactory.getInstance(OrderRepositoryImpl.class);
-        this.portfolioService = SingletonFactory.getInstance(PortfolioService.class);
-    }
-
     @Override
     public Order placeOrder(Order order) {
 
-        Portfolio portfolio = portfolioService.getPortfolioByUserIdAndStock(order.getUserId(), order.getSoldStock());
+        Portfolio portfolio = portfolioService.getPortfolioByUserIdAndStock(order.getUser().getId(), order.getSoldStock());
 
         double availableAmount = portfolio.getQuantity();
 
@@ -36,13 +33,13 @@ public class DeleteOrderPlacementStrategy implements OrderPlacementStrategy {
                             portfolio.setQuantity(availableAmount + previousOrderValue);
 
                             log.info("User {} deleted order {} with value {}\nHas portfolio {}",
-                                    order.getUserId(), order, previousOrderValue, portfolio);
+                                    order.getUser().getId(), order, previousOrderValue, portfolio);
                         },
                         OrderNotFoundException::new
                 );
 
         portfolioService.save(portfolio);
-        orderRepository.remove(order);
+        orderRepository.delete(order);
 
 
         return order;

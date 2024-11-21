@@ -22,4 +22,5 @@ public class Stock {
 
     @Column(name = "price", nullable = false, precision = 10)
     private Double price;
+
 }

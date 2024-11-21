@@ -1,30 +1,28 @@
 package com.javazerozahar.stock_exchange.rabbit.order;
 
 import com.google.gson.Gson;
-import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
-import com.javazerozahar.stock_exchange.model.dto.OrderMessageDTO;
 import com.javazerozahar.stock_exchange.model.entity.Order;
-import com.javazerozahar.stock_exchange.rabbit.general.RabbitMQConfig;
-import com.javazerozahar.stock_exchange.rabbit.general.RabbitMQConsumer;
-import com.javazerozahar.stock_exchange.service.orderplacer.OrderPlacer;
-import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import com.javazerozahar.stock_exchange.service.OrderMatcher;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
+@Service
 public class OrderPlacerConsumer {
 
     private static final String QUEUE_NAME = "order-queue";
-    private final OrderPlacer orderPlacer;
     private final ConnectionFactory connectionFactory;
 
-    public OrderPlacerConsumer() {
-        this.orderPlacer = SingletonFactory.getInstance(OrderPlacer.class);;
+    private final OrderMatcher orderMatcher;
+
+    public OrderPlacerConsumer(OrderMatcher orderMatcher) {
+        this.orderMatcher = orderMatcher;
         this.connectionFactory = new ConnectionFactory();
         connectionFactory.setHost("localhost");
         connectionFactory.setPort(5672);
@@ -40,8 +38,7 @@ public class OrderPlacerConsumer {
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                OrderMessageDTO orderMessage = new Gson().fromJson(message, OrderMessageDTO.class);
-                processOrder(orderMessage);
+                processOrder(new Gson().fromJson(message, Order.class));
             };
 
             channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {});
@@ -57,25 +54,13 @@ public class OrderPlacerConsumer {
         }
     }
 
-    private void processOrder(OrderMessageDTO orderMessage) {
+    private void processOrder(Order order) {
         try {
-
-            Order processedOrder = orderPlacer.placeOrder(orderMessage.getOrder(), orderMessage.getOrderPlacementStrategy());
-            System.out.println("Processed order for user: " + processedOrder.getUserId());
+            orderMatcher.matchOrder(order);
+            System.out.println("Processed order for user: " + order.getUser().getId());
         } catch (Exception e) {
             System.err.println("Failed to process order: " + e.getMessage());
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            RabbitMQConfig config = new RabbitMQConfig();
-            config.setupQueueExchangeBinding();
-
-            OrderPlacerConsumer consumer = new OrderPlacerConsumer();
-            consumer.startListening();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

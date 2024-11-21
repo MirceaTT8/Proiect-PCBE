@@ -1,22 +1,13 @@
 package com.javazerozahar.stock_exchange.service;
 
-import com.javazerozahar.stock_exchange.exceptions.OrderNotFoundException;
-import com.javazerozahar.stock_exchange.exceptions.StockNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
-import com.javazerozahar.stock_exchange.model.entity.Order;
-import com.javazerozahar.stock_exchange.model.entity.Stock;
-import com.javazerozahar.stock_exchange.model.entity.StockHistory;
-import com.javazerozahar.stock_exchange.model.entity.Transaction;
+import com.javazerozahar.stock_exchange.model.entity.*;
 import com.javazerozahar.stock_exchange.repository.StockHistoryRepository;
 import com.javazerozahar.stock_exchange.repository.StockRepository;
 import com.javazerozahar.stock_exchange.repository.TransactionRepository;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.StockHistoryRepositoryImpl;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.StockRepositoryImpl;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.TransactionRepositoryImpl;
 import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
-import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,22 +15,14 @@ import java.util.Optional;
 
 @Log4j2
 @Service
+@AllArgsConstructor
 public class TransactionService {
 
-    private OrderService orderService;
-    private PortfolioService portfolioService;
+    private final PortfolioService portfolioService;
     private final TransactionRepository transactionRepository;
     private final StockHistoryRepository stockHistoryRepository;
     private final CurrencyConverter currencyConverter;
     private final StockRepository stockRepository;
-
-    public TransactionService() {
-
-        this.transactionRepository = SingletonFactory.getInstance(TransactionRepositoryImpl.class);
-        this.stockHistoryRepository = SingletonFactory.getInstance(StockHistoryRepositoryImpl.class);
-        this.currencyConverter = SingletonFactory.getInstance(CurrencyConverter.class);
-        this.stockRepository = SingletonFactory.getInstance(StockRepositoryImpl.class);
-    }
 
     public void createTransaction(Order order, Order matchingOrder, double matchedQuantity) {
         double convertedMatchedQuantity = matchingOrder.getPrice() * currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity);
@@ -53,47 +36,39 @@ public class TransactionService {
         }
 
         double transitionedQuantity;
-        Long stockId;
-        Long sellerId, buyerId;
+        Stock stock;
+        User seller, buyer;
 
         if (order.getOrderType().equals(OrderType.BUY)) {
             transitionedQuantity = matchedQuantity;
-            stockId = order.getBoughtStock().getId();
-            sellerId = matchingOrder.getUserId();
-            buyerId = order.getUserId();
+            stock = order.getBoughtStock();
+            seller = matchingOrder.getUser();
+            buyer = order.getUser();
         } else {
             transitionedQuantity = convertedMatchedQuantity;
-            stockId = matchingOrder.getBoughtStock().getId();
-            sellerId = matchingOrder.getUserId();
-            buyerId = order.getUserId();
+            stock = matchingOrder.getBoughtStock();
+            seller = matchingOrder.getUser();
+            buyer = order.getUser();
         }
 
         Transaction transaction = new Transaction();
         transaction.setPrice(order.getPrice());
         transaction.setQuantity(transitionedQuantity);
-        transaction.setStockId(stockId);
+        transaction.setStock(stock);
         transaction.setTimestamp(System.currentTimeMillis());
-        transaction.setSellerId(sellerId);
-        transaction.setBuyerId(buyerId);
+        transaction.setSeller(seller);
+        transaction.setBuyer(buyer);
 
         transactionRepository.save(transaction);
 
-        Optional<Stock> stock = stockRepository.findById(stockId);
+        stock.setPrice(order.getPrice());
+        stock = stockRepository.save(stock);
 
-        if (stock.isPresent()) {
-            Stock currentStock = stock.get();
-            currentStock.setPrice(order.getPrice());
-            stockRepository.update(currentStock);
-
-            StockHistory stockHistory = new StockHistory();
-            stockHistory.setPrice(order.getPrice());
-            stockHistory.setStockId(stockId);
-            stockHistory.setTimestamp(System.currentTimeMillis());
-            stockHistoryRepository.save(stockHistory);
-        } else {
-            throw new StockNotFoundException(stockId);
-        }
-
+        StockHistory stockHistory = new StockHistory();
+        stockHistory.setPrice(order.getPrice());
+        stockHistory.setStock(stock);
+        stockHistory.setTimestamp(System.currentTimeMillis());
+        stockHistoryRepository.save(stockHistory);
 
         log.info("Transaction {}", transaction);
     }

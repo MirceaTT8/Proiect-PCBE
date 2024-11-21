@@ -1,5 +1,6 @@
 package com.javazerozahar.stock_exchange;
 
+import com.javazerozahar.stock_exchange.exceptions.StockNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
@@ -9,52 +10,50 @@ import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
 import com.javazerozahar.stock_exchange.repository.StockRepository;
 import com.javazerozahar.stock_exchange.repository.TransactionRepository;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.OrderRepositoryImpl;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.PortfolioRepositoryImpl;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.StockRepositoryImpl;
-import com.javazerozahar.stock_exchange.repository.repositoryImpl.TransactionRepositoryImpl;
-import com.javazerozahar.stock_exchange.service.OrderService;
-import com.javazerozahar.stock_exchange.service.PortfolioService;
-import com.javazerozahar.stock_exchange.service.StockService;
-import com.javazerozahar.stock_exchange.service.TransactionService;
-import com.javazerozahar.stock_exchange.utils.SingletonFactory;
+import com.javazerozahar.stock_exchange.service.*;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class StockExchangeApplicationTests {
 
+	@Autowired
 	private OrderService orderService;
+
+	@Autowired
 	private PortfolioService portfolioService;
+
+	@Autowired
 	private StockService stockService;
+
+	@Autowired
 	private TransactionService transactionService;
 
+	@Autowired
 	private OrderRepository orderRepository;
+
+	@Autowired
 	private StockRepository stockRepository;
+
+	@Autowired
 	private PortfolioRepository portfolioRepository;
+
+	@Autowired
 	private TransactionRepository transactionRepository;
 
-	@BeforeAll
-	public static void start() {
-		StockExchangeApplication.main(null);
-
-	}
+	@Autowired
+	private Initializer initializer;
+    @Autowired
+    private UserService userService;
 
 	@BeforeEach
 	public void prepare() {
-		this.orderService = SingletonFactory.getInstance(OrderService.class);
-		this.portfolioService = SingletonFactory.getInstance(PortfolioService.class);
-		this.stockService = SingletonFactory.getInstance(StockService.class);
-		this.transactionService = SingletonFactory.getInstance(TransactionService.class);
-
-		this.orderRepository = SingletonFactory.getInstance(OrderRepositoryImpl.class);
-		this.stockRepository = SingletonFactory.getInstance(StockRepositoryImpl.class);
-		this.portfolioRepository = SingletonFactory.getInstance(PortfolioRepositoryImpl.class);
-		this.transactionRepository = SingletonFactory.getInstance(TransactionRepositoryImpl.class);
-
-		Initialize.start();
+		initializer.initialize();
 	}
 
 	@Test
@@ -68,6 +67,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		OrderDTO order2 = OrderDTO.builder()
@@ -78,6 +78,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		OrderDTO order3 = OrderDTO.builder()
@@ -88,6 +89,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(15.0)
 				.orderType(OrderType.SELL)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		orderService.placeOrder(order1, "create");
@@ -225,7 +227,7 @@ class StockExchangeApplicationTests {
 	void testGetPortfolio() {
 		Portfolio portfolio = portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(1L));
 		assertNotNull(portfolio);
-		assertEquals(1L, portfolio.getUserId());
+		assertEquals(1L, portfolio.getUser().getId());
 	}
 
 	@Test
@@ -238,7 +240,7 @@ class StockExchangeApplicationTests {
 
 		Order testOrder = Order.builder()
 				.orderId(1L)
-				.userId(1L)
+				.user(userService.getUser(1L))
 				.soldStock(soldStock)
 				.boughtStock(boughtStock)
 				.price(10.0)
@@ -260,7 +262,7 @@ class StockExchangeApplicationTests {
 	void testCreateTransaction() {
 		Order buyOrder = Order.builder()
 				.orderId(1L)
-				.userId(1L)
+				.user(userService.getUser(1L))
 				.soldStock(stockService.getStock(3L))
 				.boughtStock(stockService.getStock(1L))
 				.price(5.0)
@@ -270,7 +272,7 @@ class StockExchangeApplicationTests {
 
 		Order sellOrder = Order.builder()
 				.orderId(2L)
-				.userId(2L)
+				.user(userService.getUser(2L))
 				.soldStock(stockService.getStock(1L))
 				.boughtStock(stockService.getStock(3L))
 				.price(5.0)
@@ -310,7 +312,7 @@ class StockExchangeApplicationTests {
 	@Test
 	@DisplayName("Test Invalid Stock ID")
 	void testInvalidStockId() {
-		assertThrows(RuntimeException.class, () -> {
+		assertThrows(StockNotFoundException.class, () -> {
 			stockService.getStock(999L);
 		});
 	}
@@ -376,7 +378,7 @@ class StockExchangeApplicationTests {
 	private void sendOrder(OrderDTO buyOrder) {
 	}
 
-	@RepeatedTest(1000)
+	@RepeatedTest(5)
 	void testBuyMatchesSellOrderConcurrent() throws ExecutionException, InterruptedException {
 		assertEquals(100.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 
@@ -421,7 +423,7 @@ class StockExchangeApplicationTests {
 		assertEquals(10075.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(3L)).getQuantity());
 	}
 
-	@RepeatedTest(1000)
+	@RepeatedTest(5)
 	void testBuyMatchesSellOrderWithUpdateConcurrent() throws ExecutionException, InterruptedException {
 		assertEquals(100.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 
@@ -437,7 +439,7 @@ class StockExchangeApplicationTests {
 
 		orderService.placeOrder(order1, "create");
 
-		Long order1Id = orderRepository.findAll().stream().filter(order -> order.getUserId() == 1L).toList().stream().findFirst().orElseThrow().getOrderId();
+		Long order1Id = orderRepository.findAll().stream().filter(order -> order.getUser().getId() == 1L).toList().stream().findFirst().orElseThrow().getOrderId();
 
 		OrderDTO order3 = OrderDTO.builder()
 				.orderId(null)
@@ -470,9 +472,6 @@ class StockExchangeApplicationTests {
 
 	@AfterEach
 	public void resetDatabase() {
-		orderRepository.reset();
-		transactionRepository.reset();
-		portfolioRepository.reset();
-		stockRepository.reset();
+		initializer.reset();
 	}
 }

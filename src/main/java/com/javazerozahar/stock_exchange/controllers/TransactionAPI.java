@@ -1,10 +1,6 @@
-package com.javazerozahar.stock_exchange.RestAPIs;
+package com.javazerozahar.stock_exchange.controllers;
 
-import com.javazerozahar.stock_exchange.model.entity.Order;
-import com.javazerozahar.stock_exchange.model.entity.Portfolio;
-import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.model.entity.Transaction;
-import com.javazerozahar.stock_exchange.service.PortfolioService;
 import com.javazerozahar.stock_exchange.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -19,10 +19,10 @@ public class Initializer {
     private final TransactionRepository transactionRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
 
     public void initialize() {
 
-        // Create repository instances
         List<User> users = List.of(new User[]{
                 User.builder().id(1L).build(),
                 User.builder().id(2L).build(),
@@ -158,6 +158,7 @@ public class Initializer {
     public void reset() {
         portfolioRepository.deleteAll();
         transactionRepository.deleteAll();
+        orderRepository.deleteAll();
         userRepository.deleteAll();
         stockHistoryRepository.deleteAll();
         stockRepository.deleteAll();

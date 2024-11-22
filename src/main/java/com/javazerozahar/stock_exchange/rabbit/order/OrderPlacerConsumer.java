@@ -1,6 +1,8 @@
 package com.javazerozahar.stock_exchange.rabbit.order;
 
 import com.google.gson.Gson;
+import com.javazerozahar.stock_exchange.converters.OrderConverter;
+import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.service.OrderMatcher;
 import com.rabbitmq.client.Channel;
@@ -20,14 +22,16 @@ public class OrderPlacerConsumer {
     private final ConnectionFactory connectionFactory;
 
     private final OrderMatcher orderMatcher;
+    private final OrderConverter orderConverter;
 
-    public OrderPlacerConsumer(OrderMatcher orderMatcher) {
+    public OrderPlacerConsumer(OrderMatcher orderMatcher, OrderConverter orderConverter) {
         this.orderMatcher = orderMatcher;
         this.connectionFactory = new ConnectionFactory();
         connectionFactory.setHost("localhost");
         connectionFactory.setPort(5672);
         connectionFactory.setUsername("guest");
         connectionFactory.setPassword("guest");
+        this.orderConverter = orderConverter;
     }
 
     public void startListening() {
@@ -38,7 +42,7 @@ public class OrderPlacerConsumer {
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                processOrder(new Gson().fromJson(message, Order.class));
+                processOrder(orderConverter.toOrder(new Gson().fromJson(message, OrderDTO.class)));
             };
 
             channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {});

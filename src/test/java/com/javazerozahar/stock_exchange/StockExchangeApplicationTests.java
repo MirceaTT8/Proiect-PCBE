@@ -53,6 +53,7 @@ class StockExchangeApplicationTests {
 
 	@BeforeEach
 	public void prepare() {
+		initializer.reset();
 		initializer.initialize();
 	}
 
@@ -60,7 +61,6 @@ class StockExchangeApplicationTests {
 	void testSellMatchesBuyOrderSequential() {
 
 		OrderDTO order1 = OrderDTO.builder()
-				.orderId(null)
 				.userId(1L)
 				.soldStockId(3L)
 				.boughtStockId(1L)
@@ -71,7 +71,6 @@ class StockExchangeApplicationTests {
 				.build();
 
 		OrderDTO order2 = OrderDTO.builder()
-				.orderId(null)
 				.userId(1L)
 				.soldStockId(3L)
 				.boughtStockId(1L)
@@ -82,7 +81,6 @@ class StockExchangeApplicationTests {
 				.build();
 
 		OrderDTO order3 = OrderDTO.builder()
-				.orderId(null)
 				.userId(2L)
 				.soldStockId(1L)
 				.boughtStockId(3L)
@@ -118,6 +116,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		OrderDTO order2 = OrderDTO.builder()
@@ -128,6 +127,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		OrderDTO order3 = OrderDTO.builder()
@@ -138,6 +138,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(15.0)
 				.orderType(OrderType.SELL)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		orderService.placeOrder(order3, "create");
@@ -165,6 +166,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		orderService.placeOrder(order1, "create");
@@ -193,6 +195,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(15.0)
 				.orderType(OrderType.SELL)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		orderService.placeOrder(order, "create");
@@ -246,6 +249,7 @@ class StockExchangeApplicationTests {
 				.price(10.0)
 				.quantity(5.0)
 				.orderType(OrderType.SELL)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		// Execute
@@ -268,6 +272,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		Order sellOrder = Order.builder()
@@ -278,6 +283,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.SELL)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		transactionService.createTransaction(buyOrder, sellOrder, 10.0);
@@ -300,6 +306,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		orderService.placeOrder(testOrder, "create");
@@ -390,6 +397,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		OrderDTO order3 = OrderDTO.builder()
@@ -400,6 +408,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(15.0)
 				.orderType(OrderType.SELL)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		OrderDTO order2 = OrderDTO.builder()
@@ -410,6 +419,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 
@@ -435,6 +445,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(10.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		orderService.placeOrder(order1, "create");
@@ -449,6 +460,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(15.0)
 				.orderType(OrderType.SELL)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		OrderDTO order2 = OrderDTO.builder()
@@ -459,6 +471,7 @@ class StockExchangeApplicationTests {
 				.price(5.0)
 				.quantity(20.0)
 				.orderType(OrderType.BUY)
+				.timestamp(System.currentTimeMillis())
 				.build();
 
 		CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> orderService.placeOrder(order3, "create"));

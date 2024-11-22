@@ -47,7 +47,7 @@ public class OrderConverter {
      * @param order The Order entity to convert.
      * @return The corresponding OrderDTO.
      */
-    public static OrderDTO toOrderDTO(Order order) {
+    public OrderDTO toOrderDTO(Order order) {
         return new OrderDTO(
                 order.getOrderId(),
                 order.getUser().getId(),

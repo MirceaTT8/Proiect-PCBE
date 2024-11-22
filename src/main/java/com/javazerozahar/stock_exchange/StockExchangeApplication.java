@@ -3,6 +3,7 @@ package com.javazerozahar.stock_exchange;
 import com.javazerozahar.stock_exchange.rabbit.order.OrderPlacerConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -15,10 +16,15 @@ import java.util.concurrent.Executors;
 @RequiredArgsConstructor
 public class StockExchangeApplication {
 
+	@Value("${stockexchange.initialize-db}")
+	private static boolean initializeDb;
+
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(StockExchangeApplication.class, args);
 
-		context.getBean(Initializer.class).initialize();
+		if (initializeDb) {
+			context.getBean(Initializer.class).initialize();
+		}
 
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
 

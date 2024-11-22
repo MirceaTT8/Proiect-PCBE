@@ -16,12 +16,8 @@ public class OrderPlacerProducer {
     private final ConnectionFactory connectionFactory;
     private final OrderConverter orderConverter;
 
-    public OrderPlacerProducer(OrderConverter orderConverter) {
-        this.connectionFactory = new ConnectionFactory();
-        connectionFactory.setPort(5672);
-        connectionFactory.setHost("localhost");
-        connectionFactory.setUsername("guest");
-        connectionFactory.setPassword("guest");
+    public OrderPlacerProducer(ConnectionFactory connectionFactory, OrderConverter orderConverter) {
+        this.connectionFactory = connectionFactory;
         this.orderConverter = orderConverter;
     }
 

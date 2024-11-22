@@ -159,7 +159,6 @@ class StockExchangeApplicationTests {
 	@Test
 	public void testUpdateBuyOrderChangePriceAndQuantitySequential() {
 		OrderDTO order1 = OrderDTO.builder()
-				.orderId(null)
 				.userId(1L)
 				.soldStockId(3L)
 				.boughtStockId(1L)
@@ -188,7 +187,6 @@ class StockExchangeApplicationTests {
 		double initialQuantity = portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity();
 
 		OrderDTO order = OrderDTO.builder()
-				.orderId(null)
 				.userId(2L)
 				.soldStockId(1L)
 				.boughtStockId(3L)

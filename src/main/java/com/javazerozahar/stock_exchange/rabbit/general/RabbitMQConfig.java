@@ -1,41 +1,32 @@
 package com.javazerozahar.stock_exchange.rabbit.general;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
+@Configuration
 public class RabbitMQConfig {
-//
-//    private static final String QUEUE_NAME = "queue-names";
-//    private static final String EXCHANGE_NAME = "exchange-name";
-//    private static final String ROUTING_KEY = "routing-key";
 
-    private static final String QUEUE_NAME = "order-queue";
-    private static final String EXCHANGE_NAME = "exchange-queue";
-    private static final String ROUTING_KEY = "routing-key";
+    @Value("${spring.rabbitmq.host}")
+    private String host;
 
-    private final ConnectionFactory factory;
+    @Value("${spring.rabbitmq.port}")
+    private int port;
 
-    public RabbitMQConfig() {
-        factory = new ConnectionFactory();
-        factory.setHost("localhost");    // RabbitMQ host
-        factory.setPort(5672);           // RabbitMQ port
-        factory.setUsername("guest");    // RabbitMQ username
-        factory.setPassword("guest");    // RabbitMQ password
-    }
+    @Value("${spring.rabbitmq.username}")
+    private String username;
 
-    public void setupQueueExchangeBinding() throws IOException, TimeoutException {
-        try (Connection connection = factory.newConnection();
-             Channel channel = connection.createChannel()) {
+    @Value("${spring.rabbitmq.password}")
+    private String password;
 
-            channel.queueDeclare(QUEUE_NAME, true, false, false, null);
-
-            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT, true);
-
-            channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
-
-            System.out.println("Queue, exchange, and binding setup completed.");
-        }
+    @Bean
+    public ConnectionFactory connectionFactory() {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(host);
+        factory.setPort(port);
+        factory.setUsername(username);
+        factory.setPassword(password);
+        return factory;
     }
 }

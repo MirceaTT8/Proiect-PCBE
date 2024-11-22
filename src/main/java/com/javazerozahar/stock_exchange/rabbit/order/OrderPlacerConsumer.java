@@ -27,10 +27,6 @@ public class OrderPlacerConsumer {
     public OrderPlacerConsumer(OrderMatcher orderMatcher, OrderConverter orderConverter) {
         this.orderMatcher = orderMatcher;
         this.connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("localhost");
-        connectionFactory.setPort(5672);
-        connectionFactory.setUsername("guest");
-        connectionFactory.setPassword("guest");
         this.orderConverter = orderConverter;
     }
 

@@ -34,7 +34,7 @@ public class OrderController {
     @GetMapping("/user/{userId}")
     public List<OrderDTO> getOrdersForUser(
             @PathVariable("userId") Long userId,
-            @RequestParam(required = false) String stockId
+            @RequestParam(required = false) Long stockId
     ) {
         return orderService.getOrdersByUser(userId, stockId);
     }

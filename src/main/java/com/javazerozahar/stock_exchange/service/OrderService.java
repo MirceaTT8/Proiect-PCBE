@@ -56,8 +56,8 @@ public class OrderService {
         return orderRepository.findById(orderId);
     }
 
-    public List<OrderDTO> getOrdersByUser(Long userId, String stockId) {
-        if (stockId == null) {
+    public List<OrderDTO> getOrdersByUser(Long userId, Long stockId) {
+        if (stockId != null) {
             return orderRepository.findByUserIdStockId(userId, stockId).stream().map(orderConverter::toOrderDTO).toList();
         }
 

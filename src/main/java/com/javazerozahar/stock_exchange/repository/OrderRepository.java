@@ -12,18 +12,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findBySoldStock(Stock stock);
 
-    @Query("SELECT o FROM Order o WHERE o.boughtStock.id == :stockId OR o.soldStock.id == :stockId")
+    @Query("SELECT o FROM Order o WHERE o.boughtStock.id = :stockId OR o.soldStock.id = :stockId")
     List<Order> findAllByStockId(Long stockId);
 
     List<Order> findByUserId(Long userId);
 
-    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND (o.boughtStock.id == :stockId OR o.soldStock.id == :stockId)")
-    List<Order> findByUserIdStockId(Long userId, String stockId);
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND (o.boughtStock.id = :stockId OR o.soldStock.id = :stockId)")
+    List<Order> findByUserIdStockId(Long userId, Long stockId);
 
 
-    @Query("SELECT o FROM Order o WHERE o.boughtStock.id == :stockId")
+    @Query("SELECT o FROM Order o WHERE o.boughtStock.id = :stockId")
     List<Order> findBuyByStockId(Long stockId);
 
-    @Query("SELECT o FROM Order o WHERE o.soldStock.id == :stockId")
+    @Query("SELECT o FROM Order o WHERE o.soldStock.id = :stockId")
     List<Order> findSellByStockId(Long stockId);
 }

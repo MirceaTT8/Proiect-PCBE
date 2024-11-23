@@ -13,7 +13,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT t FROM Transaction t WHERE t.buyer.id = :userId OR t.seller.id = :userId")
     List<Transaction> findAllByUserId(Long userId);
 
-    @Query("SELECT t FROM Transaction t WHERE t.stock.id == :stockID AND (t.buyer.id = :userId OR t.seller.id = :userId)")
+    @Query("SELECT t FROM Transaction t WHERE t.stock.id = :stockId AND (t.buyer.id = :userId OR t.seller.id = :userId)")
     List<Transaction> findAllByUserIdAndStockId(Long userId, Long stockId);
 }
 

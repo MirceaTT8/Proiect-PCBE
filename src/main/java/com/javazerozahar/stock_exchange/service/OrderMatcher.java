@@ -3,6 +3,7 @@ package com.javazerozahar.stock_exchange.service;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
+import com.javazerozahar.stock_exchange.rabbit.transaction.TransactionPlacerProducer;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
 import lombok.AllArgsConstructor;
@@ -17,8 +18,8 @@ import java.util.*;
 public class OrderMatcher {
 
     private final OrderRepository orderRepository;
-    private final TransactionService transactionService;
     private final CurrencyConverter currencyConverter;
+    private final TransactionPlacerProducer transactionPlacerProducer;
 
     /**
      * Best price strategy <br>
@@ -78,8 +79,8 @@ public class OrderMatcher {
                             orderRepository.delete(matchingOrder);
                         }
 
-                        transactionService.createTransaction(order, matchingOrder, matchedQuantity);
- 
+                        transactionPlacerProducer.sendTransaction(order, matchingOrder, matchedQuantity);
+
                         if (order.getQuantity() == 0) {
                             orderRepository.delete(order);
                             break;

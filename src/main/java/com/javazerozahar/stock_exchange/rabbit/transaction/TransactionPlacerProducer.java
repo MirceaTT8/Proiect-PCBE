@@ -1,4 +1,4 @@
-package com.javazerozahar.stock_exchange.rabbit.order;
+package com.javazerozahar.stock_exchange.rabbit.transaction;
 
 import com.google.gson.Gson;
 import com.javazerozahar.stock_exchange.converters.OrderConverter;
@@ -15,24 +15,29 @@ import java.nio.charset.StandardCharsets;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class OrderPlacerProducer {
-    private static final String QUEUE_NAME = "order-queue";
+public class TransactionPlacerProducer {
+
+    private static final String QUEUE_NAME = "transaction-queue";
 
     private final ConnectionFactory connectionFactory;
     private final OrderConverter orderConverter;
 
-    public void sendOrder(Order order) {
+    public void sendTransaction(Order order, Order matchingOrder, double matchedQuantity) {
         try (Connection connection = connectionFactory.newConnection();
-             Channel channel = connection.createChannel()) {
+        Channel channel = connection.createChannel()) {
 
             channel.queueDeclare(QUEUE_NAME, true, false, false, null);
 
-            String message = new Gson().toJson(orderConverter.toOrderDTO(order));
+            String message = new Gson().toJson(new TransactionRabbitMqDTO(
+                    orderConverter.toOrderDTO(order),
+                    orderConverter.toOrderDTO(matchingOrder),
+                    matchedQuantity
+            ));
 
             channel.basicPublish("", QUEUE_NAME, null, message.getBytes(StandardCharsets.UTF_8));
 
             if (log.isInfoEnabled()) {
-                log.info("Order sent to queue: " + message);
+                log.info("Transaction sent to queue: {}", message);
             }
 
         } catch (Exception e) {

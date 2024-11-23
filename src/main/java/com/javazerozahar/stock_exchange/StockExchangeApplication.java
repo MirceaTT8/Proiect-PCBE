@@ -1,6 +1,7 @@
 package com.javazerozahar.stock_exchange;
 
 import com.javazerozahar.stock_exchange.rabbit.order.OrderPlacerConsumer;
+import com.javazerozahar.stock_exchange.rabbit.transaction.TransactionPlacerConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,7 @@ public class StockExchangeApplication {
 
 		executorService.submit(() -> {
 			context.getBean(OrderPlacerConsumer.class).startListening();
+			context.getBean(TransactionPlacerConsumer.class).startListening();
 		});
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {

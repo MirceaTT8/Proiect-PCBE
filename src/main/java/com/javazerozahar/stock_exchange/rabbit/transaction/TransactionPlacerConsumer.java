@@ -1,10 +1,8 @@
-package com.javazerozahar.stock_exchange.rabbit.order;
+package com.javazerozahar.stock_exchange.rabbit.transaction;
 
 import com.google.gson.Gson;
 import com.javazerozahar.stock_exchange.converters.OrderConverter;
-import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
-import com.javazerozahar.stock_exchange.model.entity.Order;
-import com.javazerozahar.stock_exchange.service.OrderMatcher;
+import com.javazerozahar.stock_exchange.service.TransactionService;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -20,26 +18,26 @@ import java.util.concurrent.TimeoutException;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class OrderPlacerConsumer {
+public class TransactionPlacerConsumer {
 
-    private static final String QUEUE_NAME = "order-queue";
+    private static final String QUEUE_NAME = "transaction_queue";
     private final ConnectionFactory connectionFactory;
-
-    private final OrderMatcher orderMatcher;
+    private final TransactionService transactionService;
     private final OrderConverter orderConverter;
 
     public void startListening() {
-        try(Connection connection = connectionFactory.newConnection();
-            Channel channel = connection.createChannel()) {
+        try (Connection connection = connectionFactory.newConnection();
+        Channel channel = connection.createChannel()) {
 
             channel.queueDeclare(QUEUE_NAME, true, false, false, null);
 
             DeliverCallback deliverCallback = (_, delivery) -> {
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                processOrder(orderConverter.toOrder(new Gson().fromJson(message, OrderDTO.class)));
+                processTransaction(new Gson().fromJson(message, TransactionRabbitMqDTO.class));
             };
 
-            channel.basicConsume(QUEUE_NAME, true, deliverCallback, _ -> {});
+            channel.basicConsume(QUEUE_NAME, true, deliverCallback, _ -> {
+            });
 
             while (channel.isOpen()) {
                 Thread.sleep(100);
@@ -52,16 +50,23 @@ public class OrderPlacerConsumer {
         }
     }
 
-    private void processOrder(Order order) {
+    private void processTransaction(TransactionRabbitMqDTO transaction) {
+
         try {
-            orderMatcher.matchOrder(order);
+            transactionService.createTransaction(
+                    orderConverter.toOrder(transaction.getOrder()),
+                    orderConverter.toOrder(transaction.getMatchedOrder()),
+                    transaction.getMatchedQuantity()
+            );
 
             if (log.isInfoEnabled()) {
-                log.info("Processed order for user: {}", order.getUser().getId());
+                log.info("Processed transaction for orders: {} {}",
+                        transaction.getOrder(), transaction.getMatchedOrder());
             }
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
-                log.error("Error processing order for user: {}", order.getUser().getId(), e);
+                log.error("Unable to process transaction for orders {} {} ",
+                        transaction.getOrder(), transaction.getMatchedOrder(), e);
             }
         }
     }

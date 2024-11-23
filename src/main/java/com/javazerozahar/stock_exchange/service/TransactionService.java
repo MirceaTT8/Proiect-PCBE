@@ -1,6 +1,8 @@
 package com.javazerozahar.stock_exchange.service;
 
+import com.javazerozahar.stock_exchange.converters.TransactionConverter;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
+import com.javazerozahar.stock_exchange.model.dto.TransactionDTO;
 import com.javazerozahar.stock_exchange.model.entity.*;
 import com.javazerozahar.stock_exchange.repository.StockHistoryRepository;
 import com.javazerozahar.stock_exchange.repository.StockRepository;
@@ -23,6 +25,7 @@ public class TransactionService {
     private final StockHistoryRepository stockHistoryRepository;
     private final CurrencyConverter currencyConverter;
     private final StockRepository stockRepository;
+    private final TransactionConverter transactionConverter;
 
     public void createTransaction(Order order, Order matchingOrder, double matchedQuantity) {
         double convertedMatchedQuantity = matchingOrder.getPrice() * currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity);
@@ -77,8 +80,20 @@ public class TransactionService {
         return transactionRepository.findById(transactionId);
     }
 
-    public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
+    public List<TransactionDTO> getAllTransactions(Long userId, Long stockId) {
+        if (userId == null && stockId == null) {
+            return transactionRepository.findAll().stream().map(transactionConverter::toTransactionDTO).toList();
+        }
+
+        if (userId != null && stockId == null) {
+            return transactionRepository.findAllByUserId(userId).stream().map(transactionConverter::toTransactionDTO).toList();
+        }
+
+        if (userId == null) {
+            return transactionRepository.findAllByStockId(stockId).stream().map(transactionConverter::toTransactionDTO).toList();
+        }
+
+        return transactionRepository.findAllByUserIdAndStockId(userId, stockId).stream().map(transactionConverter::toTransactionDTO).toList();
     }
 
     public List<Transaction> getAllTransactionsWithStock(Long stockId) {

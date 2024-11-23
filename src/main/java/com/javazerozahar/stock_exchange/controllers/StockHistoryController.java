@@ -1,23 +1,23 @@
 package com.javazerozahar.stock_exchange.controllers;
 
-import com.javazerozahar.stock_exchange.model.entity.StockHistory;
+import com.javazerozahar.stock_exchange.model.dto.StockHistoryDTO;
 import com.javazerozahar.stock_exchange.service.StockHistoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/stockHistory")
+@RequestMapping("/stock-history")
 @CrossOrigin(origins = "http://localhost:8080")
-public class StockHistoryAPI {
-    @Autowired
+@AllArgsConstructor
+public class StockHistoryController {
     private StockHistoryService stockHistoryService;
 
     @GetMapping("/{stockId}")
     @ResponseBody
-    public List<StockHistory> getStockHistoryOfStock(@PathVariable("stockId") Long stockId) {
+    public List<StockHistoryDTO> getStockHistoryOfStock(@PathVariable("stockId") Long stockId) {
         return stockHistoryService.getStockHistoryOfStock(stockId);
     }
 }

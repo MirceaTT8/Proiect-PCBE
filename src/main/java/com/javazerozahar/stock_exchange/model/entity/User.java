@@ -23,4 +23,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Portfolio> portfolios;
+
+    @Override
+    public String toString() {
+        return "User [id=" + id + " ";
+    }
 }

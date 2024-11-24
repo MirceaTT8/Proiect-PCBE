@@ -9,6 +9,7 @@ import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -20,6 +21,7 @@ public class OrderMatcher {
     private final OrderRepository orderRepository;
     private final CurrencyConverter currencyConverter;
     private final TransactionPlacerProducer transactionPlacerProducer;
+    private final TransactionService transactionService;
 
     /**
      * Best price strategy <br>
@@ -29,7 +31,7 @@ public class OrderMatcher {
      *
      * @param order
      */
-
+    @Transactional
     public Order matchOrder(Order order) {
 
 
@@ -79,7 +81,9 @@ public class OrderMatcher {
                             orderRepository.delete(matchingOrder);
                         }
 
-                        transactionPlacerProducer.sendTransaction(order, matchingOrder, matchedQuantity);
+//                        transactionPlacerProducer.sendTransaction(order, matchingOrder, matchedQuantity);
+
+                        transactionService.createTransaction(order, matchingOrder, matchedQuantity);
 
                         if (order.getQuantity() == 0) {
                             orderRepository.delete(order);

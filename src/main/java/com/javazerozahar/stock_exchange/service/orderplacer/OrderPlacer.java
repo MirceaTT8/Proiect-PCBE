@@ -6,6 +6,7 @@ import com.javazerozahar.stock_exchange.service.StockService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -19,6 +20,7 @@ public class OrderPlacer {
     /**
      * @throws com.javazerozahar.stock_exchange.exceptions.InsufficientFundsException if the criteria aren't met
      */
+    @Transactional
     public Order placeOrder(Order order, String orderPlacementStrategy) {
         order = orderPlacementStrategyFactory.getOrderPlacementStrategy(orderPlacementStrategy).placeOrder(order);
 

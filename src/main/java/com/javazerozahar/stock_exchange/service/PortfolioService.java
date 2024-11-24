@@ -9,6 +9,7 @@ import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class PortfolioService {
                 .orElseThrow(() -> new PortfolioNotFoundException("Portfolio not found for " + userId + " : " + stock));
     }
 
+    @Transactional
     public Portfolio updatePortfolio(Order order, double quantity) {
         Portfolio portfolio = getPortfolioByUserIdAndStock(order.getUser().getId(), order.getBoughtStock());
         portfolio.setQuantity(portfolio.getQuantity() + quantity);
@@ -47,6 +49,7 @@ public class PortfolioService {
         return portfolio;
     }
 
+    @Transactional
     public void save(Portfolio portfolio) {
         portfolioRepository.save(portfolio);
     }

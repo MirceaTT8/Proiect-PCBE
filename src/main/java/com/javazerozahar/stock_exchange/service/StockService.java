@@ -7,6 +7,7 @@ import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.repository.StockRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,27 +18,32 @@ public class StockService {
     private final StockRepository stockRepository;
     private final StockConverter stockConverter;
 
+    @Transactional(readOnly = true)
     public Stock getStock(Long stockId) {
         return stockRepository.findById(stockId)
                 .orElseThrow(() -> new StockNotFoundException(stockId));
     }
 
+    @Transactional(readOnly = true)
     public StockDTO getStockDTO(Long stockId) {
         return stockConverter.toStockDTO(getStock(stockId));
     }
 
+    @Transactional(readOnly = true)
     public List<StockDTO> getAllStocks() {
-        return stockRepository.findAll().stream().map(stockConverter::toStockDTO).toList();
+        return stockRepository.findAll().stream()
+                .map(stockConverter::toStockDTO)
+                .toList();
     }
 
+    @Transactional
     public void addStock(StockDTO stockDTO) {
         stockRepository.save(stockConverter.toStock(stockDTO));
     }
 
+    @Transactional
     public void updateStock(StockDTO stockDTO) {
-
         // TODO Patch mapping
-
         stockRepository.save(stockConverter.toStock(stockDTO));
     }
 }

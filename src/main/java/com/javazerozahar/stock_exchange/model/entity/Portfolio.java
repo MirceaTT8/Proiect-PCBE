@@ -36,7 +36,7 @@ public class Portfolio {
     public String toString() {
         return "Portfolio{" +
                 "id=" + id +
-                ", user=" + user.getId() +
+//                ", userId=" + (user != null ? user.getId() : "null") +
                 ", stock=" + stock +
                 ", quantity=" + quantity +
                 '}';

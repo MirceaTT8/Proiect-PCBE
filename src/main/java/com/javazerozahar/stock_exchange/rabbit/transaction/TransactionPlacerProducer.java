@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class TransactionPlacerProducer {
     private final RabbitTemplate rabbitTemplate;
     private final OrderConverter orderConverter;
 
+    @Transactional
     public void sendTransaction(Order order, Order matchingOrder, double matchedQuantity) {
 
         try {

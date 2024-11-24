@@ -98,11 +98,4 @@ public class TransactionService {
         return transactionRepository.findAllByUserIdAndStockId(userId, stockId).stream().map(transactionConverter::toTransactionDTO).toList();
     }
 
-    public List<Transaction> getAllTransactionsWithStock(Long stockId) {
-        return transactionRepository.findAllByStockId(stockId);
-    }
-
-    public List<Transaction> getAllTransactionsByUser(Long userId) {
-        return transactionRepository.findAllByUserId(userId);
-    }
 }

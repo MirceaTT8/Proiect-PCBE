@@ -2,10 +2,12 @@ package com.javazerozahar.stock_exchange.rabbit.transaction;
 
 import com.google.gson.Gson;
 import com.javazerozahar.stock_exchange.converters.OrderConverter;
+import com.javazerozahar.stock_exchange.rabbit.general.MessageTracker;
 import com.javazerozahar.stock_exchange.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,8 +15,12 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class TransactionPlacerConsumer {
 
+    @Value("${rabbitmq.queue.transaction}")
+    private String queueName;
+
     private final TransactionService transactionService;
     private final OrderConverter orderConverter;
+    private final MessageTracker messageTracker;
 
     @RabbitListener(queues = "${rabbitmq.queue.transaction}")
     public void receiveTransaction(String message) {
@@ -39,6 +45,8 @@ public class TransactionPlacerConsumer {
                 log.error("Unable to process transaction for orders {} {} ",
                         transaction.getOrder(), transaction.getMatchedOrder(), e);
             }
+        } finally {
+            messageTracker.decrement(queueName);
         }
     }
 

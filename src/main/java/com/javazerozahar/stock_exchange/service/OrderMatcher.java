@@ -81,9 +81,9 @@ public class OrderMatcher {
                             orderRepository.delete(matchingOrder);
                         }
 
-//                        transactionPlacerProducer.sendTransaction(order, matchingOrder, matchedQuantity);
+                        transactionPlacerProducer.sendTransaction(order, matchingOrder, matchedQuantity);
 
-                        transactionService.createTransaction(order, matchingOrder, matchedQuantity);
+//                        transactionService.createTransaction(order, matchingOrder, matchedQuantity);
 
                         if (order.getQuantity() == 0) {
                             orderRepository.delete(order);

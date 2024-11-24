@@ -6,6 +6,7 @@ import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
+import com.javazerozahar.stock_exchange.rabbit.general.MessageTracker;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.repository.PortfolioRepository;
 import com.javazerozahar.stock_exchange.repository.StockRepository;
@@ -13,6 +14,7 @@ import com.javazerozahar.stock_exchange.repository.TransactionRepository;
 import com.javazerozahar.stock_exchange.service.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.concurrent.*;
@@ -48,8 +50,18 @@ class StockExchangeApplicationTests {
 
 	@Autowired
 	private Initializer initializer;
+
     @Autowired
     private UserService userService;
+
+	@Autowired
+	private MessageTracker messageTracker;
+
+	@Value("${rabbitmq.queue.order}")
+	private String orderQueueName;
+
+	@Value("${rabbitmq.queue.transaction}")
+	private String transactionQueueName;
 
 	@BeforeEach
 	public void prepare() {
@@ -91,9 +103,15 @@ class StockExchangeApplicationTests {
 		orderService.placeOrder(order1, "create");
 		orderService.placeOrder(order2, "create");
 
+		messageTracker.waitUntilQueueEmpty(orderQueueName);
+		messageTracker.waitUntilQueueEmpty(transactionQueueName);
+
 		assertEquals(9900.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(3L)).getQuantity());
 
 		orderService.placeOrder(order3, "create");
+
+		messageTracker.waitUntilQueueEmpty(orderQueueName);
+		messageTracker.waitUntilQueueEmpty(transactionQueueName);
 
 		assertEquals(85.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 
@@ -107,7 +125,6 @@ class StockExchangeApplicationTests {
 		assertEquals(100.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 
 		OrderDTO order1 = OrderDTO.builder()
-				.orderId(null)
 				.userId(1L)
 				.soldStockId(3L)
 				.boughtStockId(1L)
@@ -118,7 +135,6 @@ class StockExchangeApplicationTests {
 				.build();
 
 		OrderDTO order2 = OrderDTO.builder()
-				.orderId(null)
 				.userId(1L)
 				.soldStockId(3L)
 				.boughtStockId(1L)
@@ -129,7 +145,6 @@ class StockExchangeApplicationTests {
 				.build();
 
 		OrderDTO order3 = OrderDTO.builder()
-				.orderId(null)
 				.userId(2L)
 				.soldStockId(1L)
 				.boughtStockId(3L)
@@ -144,12 +159,18 @@ class StockExchangeApplicationTests {
 
 		orderService.placeOrder(order1, "create");
 
-		assertEquals(9950.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(3L)).getQuantity());
+		messageTracker.waitUntilQueueEmpty(orderQueueName);
+		messageTracker.waitUntilQueueEmpty(transactionQueueName);
+
+        assertEquals(9950.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(3L)).getQuantity());
 		assertEquals(10.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(1L)).getQuantity());
 
 		orderService.placeOrder(order2, "create");
-		assertEquals(9900.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(3L)).getQuantity());
 
+		messageTracker.waitUntilQueueEmpty(orderQueueName);
+		messageTracker.waitUntilQueueEmpty(transactionQueueName);
+
+		assertEquals(9900.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(3L)).getQuantity());
 		assertEquals(15.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(1L)).getQuantity());
 		assertEquals(10075.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(3L)).getQuantity());
 	}
@@ -168,6 +189,9 @@ class StockExchangeApplicationTests {
 
 		orderService.placeOrder(order1, "create");
 
+		messageTracker.waitUntilQueueEmpty(orderQueueName);
+		messageTracker.waitUntilQueueEmpty(transactionQueueName);
+
 		assertEquals(9950.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(3L)).getQuantity());
 
 		order1.setOrderId(1L);
@@ -176,6 +200,8 @@ class StockExchangeApplicationTests {
 
 		orderService.placeOrder(order1, "update");
 
+		messageTracker.waitUntilQueueEmpty(orderQueueName);
+		messageTracker.waitUntilQueueEmpty(transactionQueueName);
 		assertEquals(9800.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(3L)).getQuantity());
 	}
 
@@ -196,6 +222,9 @@ class StockExchangeApplicationTests {
 
 		orderService.placeOrder(order, "create");
 
+		messageTracker.waitUntilQueueEmpty(orderQueueName);
+		messageTracker.waitUntilQueueEmpty(transactionQueueName);
+
 		assertEquals(initialQuantity - 15.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 
 		order.setOrderId(1L);
@@ -203,6 +232,9 @@ class StockExchangeApplicationTests {
 		order.setPrice(10.0);
 
 		orderService.placeOrder(order, "update");
+
+		messageTracker.waitUntilQueueEmpty(orderQueueName);
+		messageTracker.waitUntilQueueEmpty(transactionQueueName);
 
 		assertEquals(initialQuantity - 20.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 	}
@@ -419,6 +451,9 @@ class StockExchangeApplicationTests {
 
 		CompletableFuture.allOf(future1, future2, future3).get();
 
+		messageTracker.waitUntilQueueEmpty(orderQueueName);
+		messageTracker.waitUntilQueueEmpty(transactionQueueName);
+
 		assertEquals(15.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(1L)).getQuantity());
 		assertEquals(10075.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(3L)).getQuantity());
 	}
@@ -475,6 +510,6 @@ class StockExchangeApplicationTests {
 
 	@AfterEach
 	public void resetDatabase() {
-		initializer.reset();
+//		initializer.reset();
 	}
 }

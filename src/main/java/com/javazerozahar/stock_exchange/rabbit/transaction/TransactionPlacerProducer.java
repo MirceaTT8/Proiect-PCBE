@@ -3,6 +3,7 @@ package com.javazerozahar.stock_exchange.rabbit.transaction;
 import com.google.gson.Gson;
 import com.javazerozahar.stock_exchange.converters.OrderConverter;
 import com.javazerozahar.stock_exchange.model.entity.Order;
+import com.javazerozahar.stock_exchange.rabbit.general.MessageTracker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -20,6 +21,7 @@ public class TransactionPlacerProducer {
 
     private final RabbitTemplate rabbitTemplate;
     private final OrderConverter orderConverter;
+    private final MessageTracker messageTracker;
 
     @Transactional
     public void sendTransaction(Order order, Order matchingOrder, double matchedQuantity) {
@@ -30,6 +32,8 @@ public class TransactionPlacerProducer {
                     orderConverter.toOrderDTO(matchingOrder),
                     matchedQuantity
             ));
+
+            messageTracker.increment(queueName);
 
             rabbitTemplate.convertAndSend(queueName, message);
 

@@ -4,7 +4,6 @@ import com.javazerozahar.stock_exchange.converters.OrderConverter;
 import com.javazerozahar.stock_exchange.exceptions.OrderNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
-import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.repository.OrderRepository;
 import com.javazerozahar.stock_exchange.service.orderplacer.OrderPlacer;
 import jakarta.transaction.Transactional;
@@ -18,13 +17,11 @@ import java.util.List;
 public class OrderService {
 
     private final OrderPlacer orderPlacer;
-    private final OrderMatcher orderMatcher;
     private final OrderRepository orderRepository;
     private final OrderConverter orderConverter;
 
     @Transactional
     public void placeOrder(OrderDTO orderDTO, String orderStrategy) {
-
         orderPlacer.placeOrder(orderConverter.toOrder(orderDTO), orderStrategy);
     }
 

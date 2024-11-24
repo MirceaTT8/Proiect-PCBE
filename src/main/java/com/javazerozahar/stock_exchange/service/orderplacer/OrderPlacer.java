@@ -25,7 +25,6 @@ public class OrderPlacer {
         order = orderPlacementStrategyFactory.getOrderPlacementStrategy(orderPlacementStrategy).placeOrder(order);
 
         orderPlacerProducer.sendOrder(order);
-        log.info("Order placed and sent to queue for user: " + order.getUser().getId());
 
         return order;
     }

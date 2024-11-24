@@ -32,93 +32,80 @@ public class OrderMatcher {
      * @param order
      */
     @Transactional
-    public Order matchOrder(Order order) {
+    public synchronized Order matchOrder(Order order) {
+
+        // Lock the current order
+        orderRepository.findByIdWithLock(order.getOrderId());
+
+        TreeMap<Double, PriorityQueue<Order>> orders = order.getOrderType().equals(OrderType.BUY) ?
+                getSellOrdersForStock(order.getBoughtStock()) :
+                getBuyOrdersForStock(order.getSoldStock());
+
+        Map.Entry<Double, PriorityQueue<Order>> matchingOrders;
 
 
-//        orderRepository.lockOrder(order.getOrderId());
+        if (order.getOrderType().equals(OrderType.BUY)) {
+            matchingOrders = orders.floorEntry(order.getPrice());
+        } else {
+            matchingOrders = orders.ceilingEntry(order.getPrice());
+        }
 
-        List<Long> matchedOrderIds = new ArrayList<>();
+        if (matchingOrders != null) {
 
-        try {
+            log.info("MATCH {} matched \n{}", order, matchingOrders);
 
-            TreeMap<Double, PriorityQueue<Order>> orders = order.getOrderType().equals(OrderType.BUY) ?
-                    getSellOrdersForStock(order.getBoughtStock()) :
-                    getBuyOrdersForStock(order.getSoldStock());
+            PriorityQueue<Order> matchingQueue = matchingOrders.getValue();
 
-            Map.Entry<Double, PriorityQueue<Order>> matchingOrders;
+            while (!matchingQueue.isEmpty()) {
+                Order matchingOrder = matchingQueue.poll();
 
+                if (order.getOrderType().equals(OrderType.BUY) && matchingOrder.getPrice() <= order.getPrice() ||
+                        order.getOrderType().equals(OrderType.SELL) && matchingOrder.getPrice() >= order.getPrice()) {
 
-            if (order.getOrderType().equals(OrderType.BUY)) {
-                matchingOrders = orders.floorEntry(order.getPrice());
-            } else {
-                matchingOrders = orders.ceilingEntry(order.getPrice());
-            }
+                    double matchedQuantity = Math.min(order.getQuantity(), order.getOrderType().equals(OrderType.SELL) ?
+                            matchingOrder.getQuantity() / matchingOrder.getSoldStock().getPrice() :
+                            matchingOrder.getQuantity() / matchingOrder.getBoughtStock().getPrice());
 
-            if (matchingOrders != null) {
+                    order.setQuantity(order.getQuantity() - matchedQuantity);
+                    matchingOrder.setQuantity(
+                            matchingOrder.getQuantity() - (currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity)));
 
-                log.info("MATCH {} matched \n{}", order, matchingOrders);
+                    if (matchingOrder.getQuantity() == 0) {
+                        orderRepository.delete(matchingOrder);
+                    }
 
-                PriorityQueue<Order> matchingQueue = matchingOrders.getValue();
+                    transactionPlacerProducer.sendTransaction(order, matchingOrder, matchedQuantity);
 
-                matchedOrderIds = matchingOrders.getValue().stream().map(Order::getOrderId).toList();
-//                matchedOrderIds.forEach(orderRepository::lockOrder);
-
-                while (!matchingQueue.isEmpty()) {
-                    Order matchingOrder = matchingQueue.poll();
-
-                    if (order.getOrderType().equals(OrderType.BUY) && matchingOrder.getPrice() <= order.getPrice() ||
-                            order.getOrderType().equals(OrderType.SELL) && matchingOrder.getPrice() >= order.getPrice()) {
-
-                        double matchedQuantity = Math.min(order.getQuantity(), order.getOrderType().equals(OrderType.SELL) ?
-                                matchingOrder.getQuantity() / matchingOrder.getSoldStock().getPrice() :
-                                matchingOrder.getQuantity() / matchingOrder.getBoughtStock().getPrice());
-
-                        order.setQuantity(order.getQuantity() - matchedQuantity);
-                        matchingOrder.setQuantity(
-                                matchingOrder.getQuantity() - (currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity)));
-
-                        if (matchingOrder.getQuantity() == 0) {
-                            orderRepository.delete(matchingOrder);
-                        }
-
-                        transactionPlacerProducer.sendTransaction(order, matchingOrder, matchedQuantity);
-
-//                        transactionService.createTransaction(order, matchingOrder, matchedQuantity);
-
-                        if (order.getQuantity() == 0) {
-                            orderRepository.delete(order);
-                            break;
-                        }
-                    } else {
+                    if (order.getQuantity() == 0) {
+                        orderRepository.delete(order);
                         break;
                     }
+                } else {
+                    break;
                 }
             }
-
-            return order;
-
-        } finally {
-//            orderRepository.unlockOrder(order.getOrderId());
-//            matchedOrderIds.forEach(orderRepository::unlockOrder);
         }
-    }
 
+        return order;
+
+
+    }
 
 
     private TreeMap<Double, PriorityQueue<Order>> getBuyOrdersForStock(Stock stock) {
         TreeMap<Double, PriorityQueue<Order>> orders = new TreeMap<>();
-        orderRepository.findByBoughtStock(stock)
+        orderRepository.findByBoughtStockIdWithLock(stock.getId())
                 .forEach(order ->
-                    orders.computeIfAbsent(
-                            order.getPrice(),
-                            _ -> new PriorityQueue<>(Comparator.comparingLong(Order::getTimestamp))).add(order)
+                        orders.computeIfAbsent(
+                                order.getPrice(),
+                                _ -> new PriorityQueue<>(Comparator.comparingLong(Order::getTimestamp))).add(order)
                 );
         return orders;
     }
 
     private TreeMap<Double, PriorityQueue<Order>> getSellOrdersForStock(Stock stock) {
         TreeMap<Double, PriorityQueue<Order>> orders = new TreeMap<>();
-        orderRepository.findBySoldStock(stock)
+        orderRepository.findBySoldStockIdWithLock(stock.getId())
                 .forEach(order ->
                         orders.computeIfAbsent(
                                 order.getPrice(),

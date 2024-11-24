@@ -1,6 +1,7 @@
 package com.javazerozahar.stock_exchange.service;
 
 import com.javazerozahar.stock_exchange.converters.TransactionConverter;
+import com.javazerozahar.stock_exchange.exceptions.TransactionNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.dto.TransactionDTO;
 import com.javazerozahar.stock_exchange.model.entity.*;
@@ -13,7 +14,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Log4j2
 @Service
@@ -76,8 +76,10 @@ public class TransactionService {
         log.info("Transaction {}", transaction);
     }
 
-    public Optional<Transaction> getTransaction(Long transactionId) {
-        return transactionRepository.findById(transactionId);
+    public TransactionDTO getTransaction(Long transactionId) {
+        return transactionConverter.toTransactionDTO(
+                transactionRepository.findById(transactionId)
+                        .orElseThrow(() -> new TransactionNotFoundException(transactionId)));
     }
 
     public List<TransactionDTO> getAllTransactions(Long userId, Long stockId) {

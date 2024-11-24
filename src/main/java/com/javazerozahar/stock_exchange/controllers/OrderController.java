@@ -1,13 +1,11 @@
 package com.javazerozahar.stock_exchange.controllers;
 
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
-import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -27,7 +25,7 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    public Optional<Order> getOrder(@PathVariable("orderId") Long orderId) {
+    public OrderDTO getOrder(@PathVariable("orderId") Long orderId) {
         return orderService.getOrder(orderId);
     }
 

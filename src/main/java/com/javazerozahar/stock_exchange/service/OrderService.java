@@ -1,6 +1,7 @@
 package com.javazerozahar.stock_exchange.service;
 
 import com.javazerozahar.stock_exchange.converters.OrderConverter;
+import com.javazerozahar.stock_exchange.exceptions.OrderNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
@@ -11,7 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -52,8 +52,8 @@ public class OrderService {
 
     }
 
-    public Optional<Order> getOrder(Long orderId) {
-        return orderRepository.findById(orderId);
+    public OrderDTO getOrder(Long orderId) {
+        return orderConverter.toOrderDTO(orderRepository.findById(orderId).orElseThrow(OrderNotFoundException::new));
     }
 
     public List<OrderDTO> getOrdersByUser(Long userId, Long stockId) {

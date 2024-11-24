@@ -1,13 +1,11 @@
 package com.javazerozahar.stock_exchange.controllers;
 
 import com.javazerozahar.stock_exchange.model.dto.TransactionDTO;
-import com.javazerozahar.stock_exchange.model.entity.Transaction;
 import com.javazerozahar.stock_exchange.service.TransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/transactions")
@@ -26,7 +24,7 @@ public class TransactionController {
     }
 
     @GetMapping("/{transactionId}")
-    public Optional<Transaction> getTransaction(@PathVariable("transactionId") Long transactionId) {
+    public TransactionDTO getTransaction(@PathVariable("transactionId") Long transactionId) {
         return transactionService.getTransaction(transactionId);
     }
 

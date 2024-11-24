@@ -2,6 +2,7 @@ package com.javazerozahar.stock_exchange.utils;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+@Deprecated
 public class SingletonFactory {
     private static final ConcurrentHashMap<Class<?>, Object> instances = new ConcurrentHashMap<>();
 

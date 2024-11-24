@@ -1,6 +1,7 @@
 package com.javazerozahar.stock_exchange.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class Portfolio {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,4 +31,14 @@ public class Portfolio {
 
     @Column(nullable = false)
     private Double quantity;
+
+    @Override
+    public String toString() {
+        return "Portfolio{" +
+                "id=" + id +
+                ", user=" + user.getId() +
+                ", stock=" + stock +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

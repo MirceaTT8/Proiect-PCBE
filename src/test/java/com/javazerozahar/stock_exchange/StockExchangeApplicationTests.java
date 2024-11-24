@@ -53,8 +53,6 @@ class StockExchangeApplicationTests {
 
 	@BeforeEach
 	public void prepare() {
-		initializer.reset();
-		initializer.initialize();
 	}
 
 	@Test
@@ -172,7 +170,7 @@ class StockExchangeApplicationTests {
 
 		assertEquals(9950.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(3L)).getQuantity());
 
-		order1.setOrderId(2L);
+		order1.setOrderId(1L);
 		order1.setQuantity(20.0);
 		order1.setPrice(10.0);
 
@@ -200,7 +198,7 @@ class StockExchangeApplicationTests {
 
 		assertEquals(initialQuantity - 15.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 
-		order.setOrderId(2L);
+		order.setOrderId(1L);
 		order.setQuantity(20.0);
 		order.setPrice(10.0);
 
@@ -208,12 +206,6 @@ class StockExchangeApplicationTests {
 
 		assertEquals(initialQuantity - 20.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 	}
-
-//	@Test
-//	@DisplayName("Test Buy Matches Sell Order Sequential")
-//	void testBuyMatchesSellOrderSequential() {
-//		// Existing test implementation
-//	}
 
 	@Test
 	@DisplayName("Test Stock Service - Get Stock")

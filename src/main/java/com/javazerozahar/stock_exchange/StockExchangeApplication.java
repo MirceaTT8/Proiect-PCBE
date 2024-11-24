@@ -1,13 +1,14 @@
 package com.javazerozahar.stock_exchange;
 
-import com.javazerozahar.stock_exchange.rabbit.order.OrderPlacerConsumer;
-import com.javazerozahar.stock_exchange.rabbit.transaction.TransactionPlacerConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,21 +19,12 @@ import java.util.concurrent.Executors;
 public class StockExchangeApplication {
 
 	@Value("${stockexchange.initialize-db}")
-	private static boolean initializeDb;
+	private boolean initializeDb;
 
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(StockExchangeApplication.class, args);
 
-		if (initializeDb) {
-			context.getBean(Initializer.class).initialize();
-		}
-
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
-
-		executorService.submit(() -> {
-			context.getBean(OrderPlacerConsumer.class).startListening();
-			context.getBean(TransactionPlacerConsumer.class).startListening();
-		});
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			executorService.shutdown();
@@ -40,4 +32,12 @@ public class StockExchangeApplication {
 		}));
 	}
 
+	@Bean
+	public ApplicationListener<ApplicationReadyEvent> initializeDatabase(Initializer initializer) {
+		return _ -> {
+			if (initializeDb) {
+				initializer.initialize();
+			}
+		};
+	}
 }

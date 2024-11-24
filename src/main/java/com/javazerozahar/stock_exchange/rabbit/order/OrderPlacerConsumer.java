@@ -5,51 +5,26 @@ import com.javazerozahar.stock_exchange.converters.OrderConverter;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.service.OrderMatcher;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.DeliverCallback;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeoutException;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class OrderPlacerConsumer {
 
-    private static final String QUEUE_NAME = "order-queue";
-    private final ConnectionFactory connectionFactory;
-
     private final OrderMatcher orderMatcher;
     private final OrderConverter orderConverter;
 
-    public void startListening() {
-        try(Connection connection = connectionFactory.newConnection();
-            Channel channel = connection.createChannel()) {
+    @RabbitListener(queues = "${rabbitmq.queue.order}")
+    public void receiveOrder(String message) {
+        Order order = orderConverter.toOrder(new Gson().fromJson(message, OrderDTO.class));
 
-            channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+        log.info("Received order from queue: {}", order);
 
-            DeliverCallback deliverCallback = (_, delivery) -> {
-                String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                processOrder(orderConverter.toOrder(new Gson().fromJson(message, OrderDTO.class)));
-            };
-
-            channel.basicConsume(QUEUE_NAME, true, deliverCallback, _ -> {});
-
-            while (channel.isOpen()) {
-                Thread.sleep(100);
-            }
-
-        } catch (IOException | TimeoutException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        processOrder(order);
     }
 
     private void processOrder(Order order) {

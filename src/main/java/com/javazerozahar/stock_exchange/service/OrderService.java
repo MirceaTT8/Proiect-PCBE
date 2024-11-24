@@ -25,8 +25,7 @@ public class OrderService {
     @Transactional
     public void placeOrder(OrderDTO orderDTO, String orderStrategy) {
 
-        Order order = orderPlacer.placeOrder(orderConverter.toOrder(orderDTO), orderStrategy);
-        orderMatcher.matchOrder(order);
+        orderPlacer.placeOrder(orderConverter.toOrder(orderDTO), orderStrategy);
     }
 
     public List<OrderDTO> getAllOrders(Long stockId, String orderType) {

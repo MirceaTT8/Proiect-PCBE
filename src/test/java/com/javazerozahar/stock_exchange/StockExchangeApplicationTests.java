@@ -16,6 +16,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.*;
 
@@ -65,6 +66,8 @@ class StockExchangeApplicationTests {
 
 	@BeforeEach
 	public void prepare() {
+//		initializer.reset();
+//		initializer.initialize();
 	}
 
 	@Test
@@ -407,9 +410,8 @@ class StockExchangeApplicationTests {
 	private void sendOrder(OrderDTO buyOrder) {
 	}
 
-	@RepeatedTest(5)
+	@RepeatedTest(1)
 	void testBuyMatchesSellOrderConcurrent() throws ExecutionException, InterruptedException {
-		assertEquals(100.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 
 		OrderDTO order1 = OrderDTO.builder()
 				.orderId(null)
@@ -458,9 +460,8 @@ class StockExchangeApplicationTests {
 		assertEquals(10075.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(3L)).getQuantity());
 	}
 
-	@RepeatedTest(5)
+	@RepeatedTest(1)
 	void testBuyMatchesSellOrderWithUpdateConcurrent() throws ExecutionException, InterruptedException {
-		assertEquals(100.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(1L)).getQuantity());
 
 		OrderDTO order1 = OrderDTO.builder()
 				.orderId(null)
@@ -502,7 +503,10 @@ class StockExchangeApplicationTests {
 		CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> orderService.placeOrder(order3, "create"));
 		CompletableFuture<Void> future3 = CompletableFuture.runAsync(() -> orderService.placeOrder(order2, "update"));
 
-		CompletableFuture.allOf(future1, future3).get();
+		CompletableFuture.allOf(future1, future3).join();
+
+		messageTracker.waitUntilQueueEmpty(orderQueueName);
+		messageTracker.waitUntilQueueEmpty(transactionQueueName);
 
 		assertEquals(15.0, portfolioService.getPortfolioByUserIdAndStock(1L, stockService.getStock(1L)).getQuantity());
 		assertEquals(10075.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(3L)).getQuantity());

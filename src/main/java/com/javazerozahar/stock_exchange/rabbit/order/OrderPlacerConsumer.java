@@ -2,6 +2,7 @@ package com.javazerozahar.stock_exchange.rabbit.order;
 
 import com.google.gson.Gson;
 import com.javazerozahar.stock_exchange.converters.OrderConverter;
+import com.javazerozahar.stock_exchange.exceptions.OrderNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderDTO;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.rabbit.general.MessageTracker;
@@ -40,6 +41,8 @@ public class OrderPlacerConsumer {
             if (log.isInfoEnabled()) {
                 log.info("Processed order for user: {}", order.getUser().getId());
             }
+        } catch (OrderNotFoundException e) {
+            log.info("Order {} not found or was already matched", order.getOrderId());
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
                 log.error("Error processing order for user: {}", order.getUser().getId(), e);

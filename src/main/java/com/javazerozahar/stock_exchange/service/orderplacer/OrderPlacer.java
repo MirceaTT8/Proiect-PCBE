@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AllArgsConstructor
 @Log4j2
+@Transactional
 public class OrderPlacer {
 
     private final StockService stockService;
@@ -20,7 +21,6 @@ public class OrderPlacer {
     /**
      * @throws com.javazerozahar.stock_exchange.exceptions.InsufficientFundsException if the criteria aren't met
      */
-    @Transactional
     public Order placeOrder(Order order, String orderPlacementStrategy) {
         order = orderPlacementStrategyFactory.getOrderPlacementStrategy(orderPlacementStrategy).placeOrder(order);
 

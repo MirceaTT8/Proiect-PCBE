@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
+@Transactional
 public class TransactionPlacerProducer {
 
     @Value("${rabbitmq.queue.transaction}")

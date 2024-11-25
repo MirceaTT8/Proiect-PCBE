@@ -1,5 +1,6 @@
 package com.javazerozahar.stock_exchange.service;
 
+import com.javazerozahar.stock_exchange.exceptions.OrderNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.model.entity.Stock;
@@ -9,6 +10,7 @@ import com.javazerozahar.stock_exchange.utils.CurrencyConverter;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -16,12 +18,14 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 @Log4j2
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 public class OrderMatcher {
 
     private final OrderRepository orderRepository;
     private final CurrencyConverter currencyConverter;
     private final TransactionPlacerProducer transactionPlacerProducer;
     private final TransactionService transactionService;
+    private final PortfolioService portfolioService;
 
     /**
      * Best price strategy <br>
@@ -32,10 +36,12 @@ public class OrderMatcher {
      * @param order
      */
     @Transactional
-    public synchronized Order matchOrder(Order order) {
+    public Order matchOrder(Order order) {
 
-        // Lock the current order
-        orderRepository.findByIdWithLock(order.getOrderId());
+        // Lock the current order and portfolio
+        order = orderRepository.findByIdWithLock(order.getOrderId()).orElseThrow(OrderNotFoundException::new);
+        portfolioService.getPortfolioByUserIdAndStockWithLock(order.getUser().getId(), order.getBoughtStock());
+
 
         TreeMap<Double, PriorityQueue<Order>> orders = order.getOrderType().equals(OrderType.BUY) ?
                 getSellOrdersForStock(order.getBoughtStock()) :
@@ -90,7 +96,6 @@ public class OrderMatcher {
 
 
     }
-
 
     private TreeMap<Double, PriorityQueue<Order>> getBuyOrdersForStock(Stock stock) {
         TreeMap<Double, PriorityQueue<Order>> orders = new TreeMap<>();

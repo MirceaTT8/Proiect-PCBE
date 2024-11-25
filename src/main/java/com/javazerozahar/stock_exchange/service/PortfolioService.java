@@ -36,14 +36,21 @@ public class PortfolioService {
         return portfolioRepository.findByUserIdAndStockId(userId, stockId).stream().map(portfolioConverter::toPortfolioDTO).toList();
     }
 
+    @Transactional
     public Portfolio getPortfolioByUserIdAndStock(Long userId, Stock stock) {
-        return portfolioRepository.findByUserIdAndStock(userId, stock)
+        return portfolioRepository.findByUserIdAndStockWithLock(userId, stock)
                 .orElseThrow(() -> new PortfolioNotFoundException("Portfolio not found for " + userId + " : " + stock));
     }
 
     @Transactional
+    public Portfolio getPortfolioByUserIdAndStockWithLock(Long userId, Stock stock) {
+        return portfolioRepository.findByUserIdAndStockWithLock(userId, stock)
+                .orElseThrow(() -> new PortfolioNotFoundException("Portfolio not found\""));
+    }
+
+    @Transactional
     public Portfolio updatePortfolio(Order order, double quantity) {
-        Portfolio portfolio = getPortfolioByUserIdAndStock(order.getUser().getId(), order.getBoughtStock());
+        Portfolio portfolio = portfolioRepository.findByUserIdAndStockWithLock(order.getUser().getId(), order.getBoughtStock()).orElseThrow();
         portfolio.setQuantity(portfolio.getQuantity() + quantity);
         portfolioRepository.save(portfolio);
         return portfolio;

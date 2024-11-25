@@ -23,12 +23,10 @@ public class Initializer {
 
     public void initialize() {
 
-        List<User> users = List.of(new User[]{
-                User.builder().id(1L).build(),
-                User.builder().id(2L).build(),
-                User.builder().id(3L).build()
-        });
-
+        User user1 = User.builder().id(1L).build();
+        User user2 = User.builder().id(2L).build();
+        User user3 = User.builder().id(3L).build();
+        List<User> users = List.of(user1, user2, user3);
         userRepository.saveAll(users);
 
         // Adding some Stock entries
@@ -52,40 +50,47 @@ public class Initializer {
         //allStocks.forEach(System.out::println);
 
         // Adding Stock history for a stock
-        StockHistory history1 = StockHistory.builder().stock(stock1).price(149.0).timestamp(System.currentTimeMillis()).build();
-        StockHistory history2 = StockHistory.builder().stock(stock1).price(151.0).timestamp(System.currentTimeMillis()).build();
-        stockHistoryRepository.save(history1);
-        stockHistoryRepository.save(history2);
+        StockHistory history1 = StockHistory.builder()
+                .stock(stock1)
+                .price(149.0)
+                .timestamp(System.currentTimeMillis())
+                .build();
+        StockHistory history2 = StockHistory.builder()
+                .stock(stock1)
+                .price(151.0)
+                .timestamp(System.currentTimeMillis())
+                .build();
+
+        stockHistoryRepository.saveAll(List.of(history1, history2));
 
         // Fetch and display stock history for stock1
         List<StockHistory> stock1History = stockHistoryRepository.findByStockId(stock1.getId());
         //System.out.println("Stock History for AAPL:");
 
-        List<Portfolio> portfolios = List.of(new Portfolio[]{
+        List<Portfolio> portfolios = List.of(
                 Portfolio.builder()
-                        .user(userRepository.findById(1L).get())
+                        .user(user1)
                         .quantity(0.0)
-                        .stock(stockRepository.findById(1L).get())
+                        .stock(stock1)
                         .build(),
-
                 Portfolio.builder()
-                        .user(userRepository.findById(2L).get())
+                        .user(user2)
                         .quantity(100.0)
-                        .stock(stockRepository.findById(1L).get())
+                        .stock(stock1)
                         .build(),
-
                 Portfolio.builder()
-                        .user(userRepository.findById(1L).get())
+                        .user(user1)
                         .quantity(10000.0)
-                        .stock(stockRepository.findById(3L).get())
+                        .stock(stock3)
                         .build(),
-
                 Portfolio.builder()
-                        .user(userRepository.findById(2L).get())
+                        .user(user2)
                         .quantity(10000.0)
-                        .stock(stockRepository.findById(3L).get())
+                        .stock(stock3)
                         .build()
-        });
+        );
+
+        portfolioRepository.saveAll(portfolios);
 
         portfolioRepository.saveAll(portfolios);
 //

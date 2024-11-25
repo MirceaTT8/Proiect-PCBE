@@ -9,6 +9,9 @@ import com.javazerozahar.stock_exchange.rabbit.general.MessageTracker;
 import com.javazerozahar.stock_exchange.service.OrderMatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,7 +28,11 @@ public class OrderPlacerConsumer {
     private final OrderConverter orderConverter;
     private final MessageTracker messageTracker;
 
-    @RabbitListener(queues = "${rabbitmq.queue.order}")
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "${rabbitmq.queue.order}", durable = "true"),
+            exchange = @Exchange(name = "order-exchange"),
+            key = "order-routing-key"
+    ))
     public void receiveOrder(String message) {
         Order order = orderConverter.toOrder(new Gson().fromJson(message, OrderDTO.class));
 

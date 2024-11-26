@@ -30,12 +30,12 @@ public class Initializer {
         userRepository.saveAll(users);
 
         // Adding some Stock entries
-        Stock stock1 = Stock.builder().symbol("AAPL").price(150.0).build();
-        Stock stock2 = Stock.builder().symbol("GOOGL").price(2800.0).build();
-        Stock stock3 = Stock.builder().symbol("$EUR").price(1.0).build();
-        Stock stock4 = Stock.builder().symbol("TSLA").price(255.0).build();
-        Stock stock5 = Stock.builder().symbol("NVDA").price(137.0).build();
-        Stock stock6 = Stock.builder().symbol("META").price(570.0).build();
+        Stock stock1 = Stock.builder().id(1L).symbol("AAPL").price(150.0).build();
+        Stock stock2 = Stock.builder().id(2L).symbol("GOOGL").price(2800.0).build();
+        Stock stock3 = Stock.builder().id(3L).symbol("$EUR").price(1.0).build();
+        Stock stock4 = Stock.builder().id(4L).symbol("TSLA").price(255.0).build();
+        Stock stock5 = Stock.builder().id(5L).symbol("NVDA").price(137.0).build();
+        Stock stock6 = Stock.builder().id(6L).symbol("META").price(570.0).build();
 
         stockRepository.save(stock1);
         stockRepository.save(stock2);

@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class OrderPlacer {
 
-    private final StockService stockService;
     private final OrderPlacerProducer orderPlacerProducer;
     private final OrderPlacementStrategyFactory orderPlacementStrategyFactory;
 

@@ -1,23 +1,26 @@
 package com.javazerozahar.stock_exchange.converters;
 
+import com.javazerozahar.stock_exchange.exceptions.UserNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.PortfolioDTO;
 import com.javazerozahar.stock_exchange.model.entity.Portfolio;
+import com.javazerozahar.stock_exchange.model.entity.User;
+import com.javazerozahar.stock_exchange.repository.UserRepository;
 import com.javazerozahar.stock_exchange.service.StockService;
-import com.javazerozahar.stock_exchange.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class PortfolioConverter {
-
-    private final UserService userService;
+    
+    private final UserRepository userRepository;
     private final StockService stockService;
 
     public Portfolio toPortfolio(PortfolioDTO portfolioDTO) {
+        User searchedUser = userRepository.findById(portfolioDTO.getUserId()).orElseThrow(() -> new UserNotFoundException(portfolioDTO.getUserId()));
         return new Portfolio(
                 portfolioDTO.getId(),
-                userService.getUser(portfolioDTO.getUserId()),
+                searchedUser,
                 stockService.getStock(portfolioDTO.getStockId()),
                 portfolioDTO.getQuantity()
         );

@@ -1,7 +1,6 @@
 package com.javazerozahar.stock_exchange.controllers;
 
 import com.javazerozahar.stock_exchange.model.dto.StockDTO;
-import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.service.StockService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,7 @@ public class StockController {
 
     @GetMapping("/{stockId}")
     public ResponseEntity<StockDTO> getStock(@PathVariable("stockId") Long stockId) {
-        return new ResponseEntity<>(stockService.getStockDTO(stockId) ,HttpStatus.OK);
+        return new ResponseEntity<>(stockService.getStockDTO(stockId), HttpStatus.OK);
     }
 
     @PostMapping
@@ -34,7 +33,7 @@ public class StockController {
     }
 
     @PatchMapping
-    public ResponseEntity<Stock> updateStock(@RequestBody StockDTO stockDTO) {
+    public ResponseEntity<StockDTO> updateStock(@RequestBody StockDTO stockDTO) {
         return new ResponseEntity<>(stockService.updateStock(stockDTO), HttpStatus.CREATED);
     }
 }

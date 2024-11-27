@@ -6,14 +6,23 @@
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
         </Console>
     </Appenders>
+    <Properties>
+        <Property name="logging.level.DebugLogger">${bundle:application:logging.level.DebugLogger}</Property>
+        <Property name="logging.level.ErrorLogger">${bundle:application:logging.level.ErrorLogger}</Property>
+        <Property name="logging.level.root">${bundle:application:logging.level.root}</Property>
+    </Properties>
     <!-- Define the loggers -->
     <Loggers>
-        <!-- Logger for error level -->
-        <Logger name="ErrorLogger" level="error" additivity="false">
-            <AppenderRef ref="ConsoleAppender" />
-        </Logger>
-        <Root level="info">
-            <AppenderRef ref="ConsoleAppender" />
-        </Root>
+        <Loggers>
+            <Logger name="DebugLogger" level="${logging.level.DebugLogger}" additivity="false">
+                <AppenderRef ref="ConsoleAppender" />
+            </Logger>
+            <Logger name="ErrorLogger" level="${logging.level.ErrorLogger}" additivity="false">
+                <AppenderRef ref="ConsoleAppender" />
+            </Logger>
+            <Root level="${logging.level.root}">
+                <AppenderRef ref="ConsoleAppender" />
+            </Root>
+        </Loggers>
     </Loggers>
 </Configuration>

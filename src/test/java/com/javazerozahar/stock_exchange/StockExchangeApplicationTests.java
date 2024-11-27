@@ -76,6 +76,9 @@ class StockExchangeApplicationTests {
 
     @BeforeAll
     static void beforeAll() {
+
+        System.setProperty("stockexchange.initialize-db", "false");
+
         postgresqlContainer = new PostgreSQLContainer<>("postgres:latest")
                 .withDatabaseName("test")
                 .withUsername("test")

@@ -1,8 +1,11 @@
 package com.javazerozahar.stock_exchange.controllers;
 
 import com.javazerozahar.stock_exchange.model.dto.StockDTO;
+import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.service.StockService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,22 +19,22 @@ public class StockController {
     private StockService stockService;
 
     @GetMapping
-    public List<StockDTO> getAllStocks() {
-        return stockService.getAllStocks();
+    public ResponseEntity<List<StockDTO>> getAllStocks() {
+        return new ResponseEntity<>(stockService.getAllStocks(), HttpStatus.OK);
     }
 
     @GetMapping("/{stockId}")
-    public StockDTO getStock(@PathVariable("stockId") Long stockId) {
-        return stockService.getStockDTO(stockId);
+    public ResponseEntity<StockDTO> getStock(@PathVariable("stockId") Long stockId) {
+        return new ResponseEntity<>(stockService.getStockDTO(stockId) ,HttpStatus.OK);
     }
 
     @PostMapping
-    public void addStock(@RequestBody StockDTO stockDTO) {
-        stockService.addStock(stockDTO);
+    public ResponseEntity<StockDTO> addStock(@RequestBody StockDTO stockDTO) {
+        return new ResponseEntity<>(stockService.addStock(stockDTO), HttpStatus.CREATED);
     }
 
     @PatchMapping
-    public void updateStock(@RequestBody StockDTO stockDTO) {
-        stockService.updateStock(stockDTO);
+    public ResponseEntity<Stock> updateStock(@RequestBody StockDTO stockDTO) {
+        return new ResponseEntity<>(stockService.updateStock(stockDTO), HttpStatus.CREATED);
     }
 }

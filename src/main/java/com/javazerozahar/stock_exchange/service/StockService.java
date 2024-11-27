@@ -37,13 +37,13 @@ public class StockService {
     }
 
     @Transactional
-    public void addStock(StockDTO stockDTO) {
-        stockRepository.save(stockConverter.toStock(stockDTO));
+    public StockDTO addStock(StockDTO stockDTO) {
+        return stockConverter.toStockDTO(stockRepository.save(stockConverter.toStock(stockDTO)));
     }
 
     @Transactional
-    public void updateStock(StockDTO stockDTO) {
+    public Stock updateStock(StockDTO stockDTO) {
         // TODO Patch mapping
-        stockRepository.save(stockConverter.toStock(stockDTO));
+        return stockRepository.save(stockConverter.toStock(stockDTO));
     }
 }

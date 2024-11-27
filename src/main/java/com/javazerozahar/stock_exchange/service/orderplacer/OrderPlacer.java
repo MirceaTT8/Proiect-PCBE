@@ -2,7 +2,6 @@ package com.javazerozahar.stock_exchange.service.orderplacer;
 
 import com.javazerozahar.stock_exchange.model.entity.Order;
 import com.javazerozahar.stock_exchange.rabbit.order.OrderPlacerProducer;
-import com.javazerozahar.stock_exchange.service.StockService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;

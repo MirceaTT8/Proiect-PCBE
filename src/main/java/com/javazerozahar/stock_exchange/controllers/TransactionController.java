@@ -3,6 +3,8 @@ package com.javazerozahar.stock_exchange.controllers;
 import com.javazerozahar.stock_exchange.model.dto.TransactionDTO;
 import com.javazerozahar.stock_exchange.service.TransactionService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,16 +18,16 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @GetMapping
-    public List<TransactionDTO> getAllTransactions(
+    public ResponseEntity<List<TransactionDTO>> getAllTransactions(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long stockId
     ) {
-        return transactionService.getAllTransactions(userId, stockId);
+        return new ResponseEntity<>(transactionService.getAllTransactions(userId, stockId), HttpStatus.OK);
     }
 
     @GetMapping("/{transactionId}")
-    public TransactionDTO getTransaction(@PathVariable("transactionId") Long transactionId) {
-        return transactionService.getTransaction(transactionId);
+    public ResponseEntity<TransactionDTO> getTransaction(@PathVariable("transactionId") Long transactionId) {
+        return new ResponseEntity<>(transactionService.getTransaction(transactionId), HttpStatus.OK);
     }
 
 }

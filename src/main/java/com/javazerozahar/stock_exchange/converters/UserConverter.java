@@ -12,9 +12,9 @@ public class UserConverter {
     private final PortfolioConverter portfolioConverter;
 
     public User toUser(UserDTO userDTO) {
-        return new User(userDTO.getId(), userDTO.getPortfolioDTOs().stream().map(portfolioConverter::toPortfolio).toList());
+        return new User(userDTO.getId(), userDTO.getName(), userDTO.getPortfolioDTOs().stream().map(portfolioConverter::toPortfolio).toList());
     }
     public UserDTO toUserDTO(User user) {
-        return new UserDTO(user.getId(), user.getPortfolios().stream().map(portfolioConverter::toPortfolioDTO).toList());
+        return new UserDTO(user.getId(), user.getName(), user.getPortfolios().stream().map(portfolioConverter::toPortfolioDTO).toList());
     }
 }

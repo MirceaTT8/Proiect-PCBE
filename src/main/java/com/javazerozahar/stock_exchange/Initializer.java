@@ -23,9 +23,9 @@ public class Initializer {
 
     public void initialize() {
 
-        User user1 = User.builder().id(1L).build();
-        User user2 = User.builder().id(2L).build();
-        User user3 = User.builder().id(3L).build();
+        User user1 = User.builder().id(1L).name("UserName1").build();
+        User user2 = User.builder().id(2L).name("UserName2").build();
+        User user3 = User.builder().id(3L).name("UserName3").build();
         List<User> users = List.of(user1, user2, user3);
         userRepository.saveAll(users);
 

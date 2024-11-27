@@ -5,6 +5,7 @@ import com.javazerozahar.stock_exchange.exceptions.UserNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.UserDTO;
 import com.javazerozahar.stock_exchange.model.entity.User;
 import com.javazerozahar.stock_exchange.repository.UserRepository;
+import com.javazerozahar.stock_exchange.utils.Patcher;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserConverter userConverter;
+    private final Patcher patcher;
 
     @Transactional(readOnly = true)
     public User getUser(Long userId) {
@@ -41,8 +43,10 @@ public class UserService {
     }
 
     @Transactional
-    public User updateUser(UserDTO userDTO) {
-        // TODO Patch mapping
-        return userRepository.save(userConverter.toUser(userDTO));
+    public UserDTO updateUser(UserDTO userDTO) {
+        UserDTO userToBeUpdated = getUserDTO(userDTO.getId());
+        User user = userConverter.toUser(patcher.patch(userToBeUpdated, userDTO));
+        userRepository.save(user);
+        return userConverter.toUserDTO(user);
     }
 }

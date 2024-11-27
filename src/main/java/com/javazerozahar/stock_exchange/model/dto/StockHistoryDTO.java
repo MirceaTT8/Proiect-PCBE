@@ -1,10 +1,12 @@
 package com.javazerozahar.stock_exchange.model.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class StockHistoryDTO {
     private Long id;
     private Long stockId;

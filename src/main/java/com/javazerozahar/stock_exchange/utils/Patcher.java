@@ -7,6 +7,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.List;
 
 @Component
 @Log4j2
@@ -29,11 +31,12 @@ public class Patcher {
 
                 Object value = field.get(source);
 
-                if (value != null) {
+                if ((value != null)) {
                     if (field.isAnnotationPresent(Updatable.class)) {
                         field.set(target, value);
                     } else {
-                        throw new CannotPatchException("Field " + field.getName() + " is not updatable");
+                        if (!(value instanceof List && ((List<?>)value).isEmpty() ))
+                            throw new CannotPatchException("Field " + field.getName() + " is not updatable");
                     }
                 }
 

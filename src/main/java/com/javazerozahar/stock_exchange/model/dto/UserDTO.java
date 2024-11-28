@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -19,5 +20,5 @@ public class UserDTO {
     @Updatable
     private String name;
 
-    private List<PortfolioDTO> portfolioDTOs;
+    private List<PortfolioDTO> portfolioDTOs = new ArrayList<>();
 }

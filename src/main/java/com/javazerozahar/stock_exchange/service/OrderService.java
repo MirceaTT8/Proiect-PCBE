@@ -23,6 +23,9 @@ public class OrderService {
 
     @Transactional
     public OrderDTO placeOrder(OrderDTO orderDTO, String orderStrategy) {
+
+        orderDTO.setTimestamp(System.currentTimeMillis());
+
         Order order = orderPlacer.placeOrder(orderConverter.toOrder(orderDTO), orderStrategy);
         return orderConverter.toOrderDTO(order);
     }

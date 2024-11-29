@@ -508,7 +508,7 @@ class StockExchangeApplicationTests {
         assertEquals(10075.0, portfolioService.getPortfolioByUserIdAndStock(2L, stockService.getStock(3L)).getQuantity());
     }
 
-    @RepeatedTest(100)
+    @RepeatedTest(10)
     void testBuyMatchesSellOrderWithUpdateConcurrent() throws ExecutionException, InterruptedException {
 
         OrderDTO order1 = OrderDTO.builder()

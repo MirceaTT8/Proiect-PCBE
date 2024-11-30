@@ -1,6 +1,6 @@
 <script setup>
 
-import TextField from './components/TextField.vue';
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
@@ -10,8 +10,7 @@ import TextField from './components/TextField.vue';
   </header>
 
   <main>
-    <h1>Ciorna</h1>
-    <TextField labelTitle="custom label"/>
+    <RouterView/>
   </main>
 </template>
 

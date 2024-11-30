@@ -7,8 +7,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { defineProps } from 'vue';
+import { ref, defineProps } from 'vue';
 
 defineProps({
     labelTitle: {

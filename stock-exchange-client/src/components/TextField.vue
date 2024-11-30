@@ -63,7 +63,7 @@ const handleInput = (event) => {
         grid-template-columns: 1fr 0.6fr;
         grid-gap: 10px;
         max-width: 500px;
-        font-family: monospace;
+        font-family: 'Roboto', sans-serif;
     }
     #default-value {
         max-width: 230px;

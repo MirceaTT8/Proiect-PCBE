@@ -1,13 +1,29 @@
 <template>
-  <h1>This is ProfileView</h1>
+  <div class="profile-view">
+    <h1>User Profile</h1>
+    <Profile />
+  </div>
 </template>
 
 <script>
-export default {
+import Profile from '@/components/Profile.vue';
 
-}
+export default {
+  name: 'ProfileView',
+  components: {
+    Profile,
+  },
+};
 </script>
 
-<style>
+<style scoped>
+.profile-view {
+  text-align: center;
+  padding: 2rem;
+}
 
+h1 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
 </style>

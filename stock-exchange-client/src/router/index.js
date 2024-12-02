@@ -4,24 +4,25 @@ import ProfileView from '@/views/ProfileView.vue';
 import PortfolioView from '@/views/PortfolioView.vue';
 import OrderView from '@/views/OrderView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
+import TransactionView from "@/views/TransactionView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
             path: '/:stockId?',
-            name: 'dashboard',
+            name: 'Dashboard',
             component: DashboardView,
         },
         {
-            path: '/my',
-            name: 'profile',
-            component: ProfileView,
+            path: '/portfolio',
+            name: 'Portfolio',
+            component: PortfolioView,
         },
         {
-            path: '/portfolios',
-            name: 'portfolios',
-            component: PortfolioView,
+            path: '/transactions',
+            name: 'Transactions',
+            component: TransactionView,
         },
         {
             path: '/orders',
@@ -32,6 +33,11 @@ const router = createRouter({
             path: '/:catchAll(.*)',
             name: 'not-found',
             component: NotFoundView,
+        },
+        {
+            path: "/profile",
+            name: "ProfileView",
+            component: ProfileView,
         },
     ]
 });

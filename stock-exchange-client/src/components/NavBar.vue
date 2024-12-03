@@ -5,34 +5,52 @@ export default {
   name: "NavBar",
   setup() {
     const router = useRouter();
-    const links = router.options.routes.filter(route => route.name !== "not-found");
+    const links = router.options.routes.filter((route) => route.name !== "not-found");
     const username = "JohnDoe"; // Default username displayed
 
+    const navigateToDashboard = () => {
+      router.push({ name: "DashboardView" }); // Navigate to the DashboardView route
+    };
+
     const navigateToProfile = () => {
-      router.push({ name: "ProfileView" }); // Navigates to the ProfileView route
+      router.push({ name: "ProfileView" }); // Navigate to the ProfileView route
     };
 
     return {
       links,
       username,
+      navigateToDashboard,
       navigateToProfile,
     };
   },
 };
 </script>
 
+
+
 <template>
   <nav class="navbar">
     <ul class="navbar-menu">
-      <li class="navbar-item" v-for="link in links" :key="link.name">
-        <router-link :to="link.path" class="navbar-link">{{ link.name }}</router-link>
+      <li class="navbar-item">
+        <router-link to="/:stockId?" class="navbar-link">Dashboard</router-link>
+      </li>
+      <li class="navbar-item">
+        <router-link to="/portfolio" class="navbar-link">Portfolio</router-link>
+      </li>
+      <li class="navbar-item">
+        <router-link to="/transactions" class="navbar-link">Transactions</router-link>
+      </li>
+      <li class="navbar-item">
+        <router-link to="/orders" class="navbar-link">Orders</router-link>
       </li>
     </ul>
     <div class="navbar-user">
       <div class="dropdown">
-        <button class="dropdown-button">
+        <!-- Clicking on this navigates to the Dashboard -->
+        <button class="dropdown-button" @click="navigateToDashboard">
           {{ username }}
         </button>
+        <!-- Dropdown content -->
         <div class="dropdown-content">
           <p @click="navigateToProfile">Manage Account</p>
         </div>
@@ -40,6 +58,8 @@ export default {
     </div>
   </nav>
 </template>
+
+
 
 <style scoped>
 .navbar {
@@ -90,6 +110,7 @@ export default {
 
 .dropdown-button:hover {
   background-color: #555;
+  cursor: pointer;
 }
 
 .dropdown-content {

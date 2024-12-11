@@ -3,6 +3,21 @@
 
 import { RouterView } from 'vue-router';
 import  NavBar from '@/components/NavBar.vue'
+
+import {onMounted} from "vue";
+import {setCurrentUser} from "@/services/userService.js";
+
+onMounted(() => {
+
+  // For testing purposes
+
+  const user = {
+    id: 1,
+  };
+
+  setCurrentUser(user);
+});
+
 </script>
 
 <template>

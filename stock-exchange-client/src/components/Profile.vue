@@ -1,23 +1,43 @@
+<script setup>
+import {onMounted, reactive, ref} from 'vue';
+import {fetchUserById, getCurrentUser, updateUserProfile} from "@/services/userService.js";
 
-<script>
-export default {
-  name: "Profile",
-  data() {
-    return {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
-    };
-  },
-  methods: {
-    updateProfile() {
-      // Logic to handle profile update (e.g., send data to API)
-      console.log("Profile Updated:", this.firstName, this.lastName, this.email, this.phoneNumber);
-      alert("Profile successfully updated!");
-    },
-  },
-};
+import Notification from "@/components/Notification.vue";
+
+// Define a reactive object for user data
+const user = reactive({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phoneNumber: ''
+});
+
+const isSubmitting = ref(false);
+const message = ref('');
+const messageType = ref('');
+
+onMounted(async () => {
+  const currentUser = getCurrentUser();
+  if (currentUser && currentUser.id) {
+    const userData = await fetchUserById(currentUser.id);
+    Object.assign(user, userData);
+  }
+});
+
+const updateProfile = async () => {
+  try {
+    isSubmitting.value = true;
+    message.value = '';
+    await updateUserProfile({...user, id: getCurrentUser().id});
+    message.value = 'Profile updated successfully!';
+    messageType.value = 'success';
+  } catch (error) {
+    message.value = `Error updating profile: ${error.message}`;
+    messageType.value = 'error';
+  } finally {
+    isSubmitting.value = false;
+  }
+}
 </script>
 
 <template>
@@ -27,24 +47,29 @@ export default {
       <form @submit.prevent="updateProfile">
         <div class="form-group">
           <label for="firstName">First Name</label>
-          <input id="firstName" v-model="firstName" type="text" required />
+          <input id="firstName" v-model="user.firstName" type="text" required/>
         </div>
         <div class="form-group">
           <label for="lastName">Last Name</label>
-          <input id="lastName" v-model="lastName" type="text" required />
+          <input id="lastName" v-model="user.lastName" type="text" required/>
         </div>
         <div class="form-group">
           <label for="email">Email</label>
-          <input id="email" v-model="email" type="email" required />
+          <input id="email" v-model="user.email" type="email" required/>
         </div>
         <div class="form-group">
           <label for="phone">Phone Number</label>
-          <input id="phone" v-model="phoneNumber" type="tel" required />
+          <input id="phone" v-model="user.phoneNumber" type="tel" required/>
         </div>
-        <button type="submit" class="update-button">Update</button>
+        <button type="submit" class="update-button" :disabled="isSubmitting.value">Update</button>
       </form>
     </div>
+    <Notification v-if="message"
+      :message="message"
+      :type="messageType"
+    />
   </div>
+
 </template>
 
 
@@ -55,6 +80,7 @@ export default {
   align-items: center;
   background-color: #f9f9f9;
   padding: 120px;
+  position: relative;
   border-radius: 20px;
 }
 

@@ -40,9 +40,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
+        log.error("Unhandled exception occurred: {}", ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse("User not found", "The no user with requested id exists");
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
         log.error("Unhandled exception occurred: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", "An unexpected error occurred");
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 }

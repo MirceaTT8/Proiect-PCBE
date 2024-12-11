@@ -21,10 +21,10 @@ public class UserDTO {
     private String lastName;
 
     @Updatable
-    private String email;
+    private String firstName;
 
     @Updatable
-    private String firstName;
+    private String email;
 
     @Updatable
     private String phoneNumber;

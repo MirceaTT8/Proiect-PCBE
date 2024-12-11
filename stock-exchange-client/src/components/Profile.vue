@@ -53,8 +53,9 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   background-color: #f9f9f9;
+  padding: 120px;
+  border-radius: 20px;
 }
 
 .profile-form {
@@ -65,6 +66,10 @@ export default {
   width: 100%;
   max-width: 400px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .profile-form h1 {
@@ -86,7 +91,7 @@ export default {
 }
 
 .form-group input {
-  width: 100%;
+  width: 300px;
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -98,11 +103,12 @@ export default {
   padding: 0.75rem;
   background-color: #007bff;
   border: none;
-  border-radius: 4px;
+  border-radius: 15px;
   color: white;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 2rem;
 }
 
 .update-button:hover {

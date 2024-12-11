@@ -18,12 +18,16 @@ export default {
 
 <style scoped>
 .profile-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: center;
-  padding: 2rem;
+  padding: 1rem;
 }
 
 h1 {
   margin-bottom: 1.5rem;
   color: #333;
+  padding: 25px;
 }
 </style>

@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
         log.error("Unhandled exception occurred: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse("User not found", "The no user with requested id exists");

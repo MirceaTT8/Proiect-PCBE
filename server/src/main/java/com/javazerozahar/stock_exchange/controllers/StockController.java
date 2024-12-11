@@ -36,4 +36,10 @@ public class StockController {
     public ResponseEntity<StockDTO> updateStock(@RequestBody StockDTO stockDTO) {
         return new ResponseEntity<>(stockService.updateStock(stockDTO), HttpStatus.CREATED);
     }
+
+    @DeleteMapping("/{stockId}")
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    public void deleteStock(@PathVariable("stockId") Long stockId) {
+//        stockService.deleteStock(stockId);
+    }
 }

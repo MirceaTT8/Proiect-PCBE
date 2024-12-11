@@ -26,4 +26,21 @@ public class PortfolioController {
         return new ResponseEntity<>(portfolioService.getPortfolios(userId, stockId), HttpStatus.OK);
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    public void createPortfolio(@RequestBody PortfolioDTO portfolioDTO) {
+
+    }
+
+    @PatchMapping
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    public void updatePortfolio(@RequestBody PortfolioDTO portfolioDTO) {
+//        return new ResponseEntity<>(portfolioService.updatePortfolioDTO(portfolioDTO), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{portfolioId}")
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    public void deletePortfolio(@PathVariable("portfolioId") Long portfolioId) {
+//        portfolioService.deletePortfolio(portfolioId);
+    }
 }

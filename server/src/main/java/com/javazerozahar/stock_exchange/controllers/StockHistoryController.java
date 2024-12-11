@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/stock-history")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
 @AllArgsConstructor
 public class StockHistoryController {
     private StockHistoryService stockHistoryService;

@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/portfolios")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
 @AllArgsConstructor
 public class PortfolioController {
 

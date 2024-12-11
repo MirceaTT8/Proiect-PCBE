@@ -2,7 +2,6 @@ package com.javazerozahar.stock_exchange.controllers;
 
 
 import com.javazerozahar.stock_exchange.model.dto.UserDTO;
-import com.javazerozahar.stock_exchange.model.entity.User;
 import com.javazerozahar.stock_exchange.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin(origins = "*")
 @AllArgsConstructor
 public class UserController {
 

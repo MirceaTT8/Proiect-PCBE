@@ -20,8 +20,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
+    @Column(name = "lastName")
+    private String lastName;
+
+    @Column(name = "firstName")
+    private String fistName;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phoneNumber")
+    private String phoneNumber;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
@@ -29,6 +38,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", " + "name=" + name + "]";
+        return "User [id=" + id + ", " + "name=" + lastName + "]";
     }
 }

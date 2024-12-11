@@ -23,9 +23,27 @@ public class Initializer {
 
     public void initialize() {
 
-        User user1 = User.builder().id(1L).name("UserName1").build();
-        User user2 = User.builder().id(2L).name("UserName2").build();
-        User user3 = User.builder().id(3L).name("UserName3").build();
+        User user1 = User.builder()
+                .lastName("John Doe")
+                .fistName("John")
+                .email("johndoe@example.com")
+                .phoneNumber("+40712345678")
+                .build();
+
+        User user2 = User.builder()
+                .lastName("Jane Smith")
+                .fistName("Jane")
+                .email("janesmith@example.com")
+                .phoneNumber("+40720456789")
+                .build();
+
+        User user3 = User.builder()
+                .lastName("Alice Johnson")
+                .fistName("Alice")
+                .email("alicejohnson@example.com")
+                .phoneNumber("+40730123456")
+                .build();
+
         List<User> users = List.of(user1, user2, user3);
         userRepository.saveAll(users);
 

@@ -18,7 +18,16 @@ public class UserDTO {
     private Long id;
 
     @Updatable
-    private String name;
+    private String lastName;
+
+    @Updatable
+    private String email;
+
+    @Updatable
+    private String firstName;
+
+    @Updatable
+    private String phoneNumber;
 
     private List<PortfolioDTO> portfolioDTOs = new ArrayList<>();
 }

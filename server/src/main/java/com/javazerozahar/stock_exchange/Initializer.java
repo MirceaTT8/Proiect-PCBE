@@ -7,7 +7,9 @@ import com.javazerozahar.stock_exchange.model.entity.User;
 import com.javazerozahar.stock_exchange.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -20,6 +22,7 @@ public class Initializer {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final LocalContainerEntityManagerFactoryBean entityManagerFactory;
 
     public void initialize() {
 
@@ -68,18 +71,12 @@ public class Initializer {
         //allStocks.forEach(System.out::println);
 
         // Adding Stock history for a stock
-        StockHistory history1 = StockHistory.builder()
-                .stock(stock1)
-                .price(149.0)
-                .timestamp(System.currentTimeMillis())
-                .build();
-        StockHistory history2 = StockHistory.builder()
-                .stock(stock1)
-                .price(151.0)
-                .timestamp(System.currentTimeMillis())
-                .build();
 
-        stockHistoryRepository.saveAll(List.of(history1, history2));
+        for (Stock stock : allStocks) {
+            int startPrice = (int) (Math.random() * 296) + 5;
+            stockHistoryRepository.saveAll(generateStockHistory(stock, startPrice, 2,1000, 1000));
+            stockHistoryRepository.saveAll(generateStockHistory(stock, startPrice, 0.3,40, 5));
+        }
 
         // Fetch and display stock history for stock1
         List<StockHistory> stock1History = stockHistoryRepository.findByStockId(stock1.getId());
@@ -185,5 +182,28 @@ public class Initializer {
         userRepository.deleteAll();
         stockHistoryRepository.deleteAll();
         stockRepository.deleteAll();
+    }
+
+    private List<StockHistory> generateStockHistory(Stock stock, int basePrice, double fluctuation, int entries, int days) {
+        List<StockHistory> stockHistories = new ArrayList<>();
+
+        long currentTime = System.currentTimeMillis();
+        long oneDayMillis = 24 * 60 * 60 * 1000;
+        long totalSpanMillis = days * oneDayMillis;
+
+        double fluctuationLimit = basePrice * fluctuation;
+        long timeIncrement = totalSpanMillis / entries;
+
+        for (int i = 0; i < entries; i++) {
+            double priceFluctuation = (Math.random() * 2 * fluctuationLimit) - fluctuationLimit;
+            StockHistory history = StockHistory.builder()
+                    .stock(stock)
+                    .price(basePrice + priceFluctuation)
+                    .timestamp(currentTime - (i * timeIncrement))
+                    .build();
+            stockHistories.add(history);
+        }
+
+        return stockHistories;
     }
 }

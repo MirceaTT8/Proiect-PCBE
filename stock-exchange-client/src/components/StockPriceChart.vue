@@ -76,9 +76,11 @@ const updateChartOption = async () => {
   });
   const prices = data.map((item) => item.price);
 
+  const lineColor = prices[0] >= prices[prices.length - 1] ? '#00C853' : '#D50000';
+
   chartOption.value = {
     title: {
-      text: `Stock Price Evolution for ${props.stock.name}: ${props.stock.symbol}`,
+      text: `${props.stock.name}: ${props.stock.symbol}`,
       left: 'center',
     },
     tooltip: {
@@ -97,6 +99,7 @@ const updateChartOption = async () => {
         rotate: 45,
         formatter: (value) => value,
       },
+      inverse: true,
     },
     yAxis: {
       type: 'value',
@@ -114,6 +117,7 @@ const updateChartOption = async () => {
         smooth: true,
         lineStyle: {
           width: 2,
+          color: lineColor,
         },
         showSymbol: false,
       },

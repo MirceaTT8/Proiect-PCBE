@@ -1,26 +1,19 @@
 <template>
   <div class="stock-order-card">
     <h2>Place Stock Order</h2>
-    <form @submit.prevent="submitOrder">
-      <div class="form-row">
-        <div class="form-group toggle-group">
-          <label class="switch">
-            <input type="checkbox" v-model="isSellOrder" />
-            <span class="slider"></span>
-          </label>
-          <span class="order-type-label">{{ orderTypeLabel }}</span>
-        </div>
-        <div class="form-group">
-          <label for="stock-id">Stock ID:</label>
-          <input
-              type="text"
-              id="stock-id"
-              :value="stockId"
-              disabled
-              class="disabled-input"
-          />
-        </div>
+    <div class="header">
+      <div class="toggle-group">
+        <label class="switch">
+          <input type="checkbox" v-model="isSellOrder"/>
+          <span class="slider"></span>
+        </label>
+        <span class="order-type-label">{{ orderTypeLabel }}</span>
       </div>
+      <h3>{{ stock.name }}</h3>
+      <p>{{ stock.symbol }}</p>
+      <h3>$ {{ stock.price }}</h3>
+    </div>
+    <form @submit.prevent="submitOrder">
       <div class="form-row">
         <div class="form-group">
           <label for="quantity">Quantity:</label>
@@ -53,21 +46,23 @@
     </form>
   </div>
   <Notification v-if="notificationMessage"
-    :message="notificationMessage"
-    :type="notificationType"
+                :message="notificationMessage"
+                :type="notificationType"
   />
 
 
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import {ref, computed} from 'vue';
 import Notification from "@/components/Notification.vue";
+import {placeOrder} from "@/services/orderService.js";
 
-defineProps({
-  stockId: {
-    type: Number,
+const props = defineProps({
+  stock: {
+    type: Object,
     required: true,
+    default: () => ({})
   },
 });
 
@@ -91,19 +86,15 @@ const submitOrder = async () => {
 
   const orderData = {
     orderType: orderTypeLabel.value,
-    stockId: stockId.value,
+    stockId: props.stock.id,
     quantity: quantity.value,
     price: price.value,
   };
 
   try {
-    // Replace with your API call
-    console.log('Submitting order:', orderData);
+    await placeOrder(orderData);
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    notificationMessage.value = 'Order placed successfully!';
+    notificationMessage.value = 'Order placed successfully.';
     notificationType.value = 'success';
   } catch (error) {
     console.error('Error submitting order:', error);
@@ -181,9 +172,13 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
-.disabled-input {
-  background-color: #f5f5f5;
-  color: #999;
+.header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
 }
 
 .toggle-group {

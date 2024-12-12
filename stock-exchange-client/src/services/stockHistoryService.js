@@ -13,7 +13,6 @@ const fetchStockHistory = async (stockId, range) => {
             throw new Error('Failed to fetch stock history data');
         }
         const data = await response.json();
-        console.log('Update successful:', data);
         return data;
     } catch (error) {
         console.error('Error fetching stock history data:', error);

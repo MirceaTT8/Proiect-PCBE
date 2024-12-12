@@ -6,13 +6,17 @@ import  NavBar from '@/components/NavBar.vue'
 
 import {onMounted} from "vue";
 import {setCurrentUser} from "@/services/userService.js";
+import {getDefaultTradingStock} from "@/services/stockService.js";
 
-onMounted(() => {
+onMounted(async () => {
 
   // For testing purposes
 
+  const defaultTradingStock = await getDefaultTradingStock();
+
   const user = {
     id: 1,
+    defaultTradingStock: defaultTradingStock,
   };
 
   setCurrentUser(user);

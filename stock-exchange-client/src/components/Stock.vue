@@ -4,11 +4,15 @@
       <div class="stock-name">{{ stock.name }}</div>
       <div class="stock-symbol">{{ stock.symbol }}</div>
     </div>
-    <div class="stock-value">{{ stock.price }}</div>
+    <div :class="priceClass" class="stock-value">
+      {{ stock.price.toFixed(2) }}
+      <span v-if="priceChange !== null">({{ priceChange.toFixed(2) }}%)</span>
+    </div>
   </div>
 </template>
-
 <script setup>
+import {computed} from "vue";
+
 const props = defineProps({
   stock: Object,
 });
@@ -18,6 +22,30 @@ const emit = defineEmits(['select']);
 function handleClick() {
   emit('select', props.stock);
 }
+
+const priceChange = computed(() => {
+  if (
+      props.stock.priceADayBefore === undefined ||
+      props.stock.priceADayBefore === null ||
+      props.stock.priceADayBefore === 0
+  ) {
+    return null;
+  }
+  return ((props.stock.price - props.stock.priceADayBefore) / props.stock.priceADayBefore) * 100;
+});
+
+const priceClass = computed(() => {
+  if (priceChange.value === null) {
+    return 'stock-value-neutral';
+  }
+  if (priceChange.value > 0.05) {
+    return 'stock-value-up';
+  } else if (priceChange.value < -0.05) {
+    return 'stock-value-down';
+  } else {
+    return 'stock-value-neutral';
+  }
+});
 </script>
 
 <style scoped>
@@ -70,5 +98,22 @@ body {
   font-size: 24px;
   color: #4CAF50;
   font-weight: bold;
+}
+
+.stock-value span {
+  font-size: 18px;
+  font-weight: lighter;
+}
+
+.stock-value-up {
+  color: #4CAF50;
+}
+
+.stock-value-down {
+  color: #F44336;
+}
+
+.stock-value-neutral {
+  color: #000000;
 }
 </style>

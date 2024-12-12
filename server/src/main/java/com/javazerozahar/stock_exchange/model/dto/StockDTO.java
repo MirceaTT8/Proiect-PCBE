@@ -2,6 +2,7 @@ package com.javazerozahar.stock_exchange.model.dto;
 
 import com.javazerozahar.stock_exchange.model.annotations.DtoId;
 import com.javazerozahar.stock_exchange.model.annotations.Updatable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class StockDTO {
 
     @DtoId
@@ -18,12 +20,9 @@ public class StockDTO {
     private String symbol;
 
     @Updatable
-    private Double price;
+    private String name;
 
-    public StockDTO(Long id, String symbol, Double price) {
-        this.id = id;
-        this.symbol = symbol;
-        this.price = price;
-    }
+    @Updatable
+    private Double price;
 
 }

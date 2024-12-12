@@ -10,11 +10,16 @@ public class StockConverter {
         return new Stock(
                 stockDTO.getId(),
                 stockDTO.getSymbol(),
+                stockDTO.getName(),
                 stockDTO.getPrice(),
                 true
         );
     }
     public StockDTO toStockDTO(Stock stock) {
-        return new StockDTO(stock.getId(), stock.getSymbol(), stock.getPrice());
+        return new StockDTO(
+                stock.getId(),
+                stock.getSymbol(),
+                stock.getName(),
+                stock.getPrice());
     }
 }

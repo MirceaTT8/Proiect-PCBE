@@ -20,6 +20,9 @@ public class Stock {
     @Column(name = "symbol", nullable = false, unique = true)
     private String symbol;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
     @Column(name = "price", nullable = false, precision = 10)
     private Double price;
 

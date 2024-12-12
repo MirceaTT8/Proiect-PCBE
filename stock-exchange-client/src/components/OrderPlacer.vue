@@ -11,7 +11,7 @@
       </div>
       <h3>{{ stock.name }}</h3>
       <p>{{ stock.symbol }}</p>
-      <h3>$ {{ stock.price }}</h3>
+      <h3>€ {{ stock.price }}</h3>
     </div>
     <form @submit.prevent="submitOrder">
       <div class="form-row">
@@ -38,7 +38,7 @@
         </div>
       </div>
       <div class="total-amount">
-        Total Order Amount: ${{ totalAmount.toFixed(2) }}
+        Total Order Amount: € {{ totalAmount.toFixed(2) }}
       </div>
       <button type="submit" :disabled="isSubmitting">
         {{ isSubmitting ? 'Submitting...' : 'Place Order' }}

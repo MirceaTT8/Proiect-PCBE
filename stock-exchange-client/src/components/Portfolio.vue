@@ -1,8 +1,8 @@
 <template>
-  <div class="portfolio-card" @click="handleClick">
+  <div class="portfolio-card" :id="isCurrency ? 'currency' : null" @click="handleClick">
     <div class="portfolio-info">
       <div class="portfolio-name">{{ portfolio.stock.name }}</div>
-      <div class="portfolio-symbol">{{ portfolio.stock.symbol }}</div>
+      <div v-if="!isCurrency" class="portfolio-symbol">{{ portfolio.stock.symbol }}</div>
     </div>
     <div class="portfolio-quantity">{{ portfolio.quantity }}</div>
     <div class="evaluation">EUR {{ evaluatedPrice }}</div>
@@ -18,6 +18,10 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['select']);
+
+const isCurrency = computed(() => {
+  return props.portfolio.stock.symbol.startsWith("$");
+});
 
 const evaluatedPrice = computed(() => {
   return props.portfolio.quantity * props.portfolio.stock.price;
@@ -46,10 +50,19 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 20px;
-  width: 100%;
-  max-width: 500px;
+  width: 500px;
+  max-width: 700px;
   margin: 0;
   box-sizing: border-box;
+}
+
+#currency {
+  background: #f1f1f1;
+}
+
+#currency:hover {
+  background: #f1f1f1;
+  cursor: default;
 }
 
 .portfolio-card:hover {

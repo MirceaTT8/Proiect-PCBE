@@ -1,9 +1,18 @@
 <template>
   <h1>This is PortfolioView</h1>
-  <PortfolioList v-if="loadedPortfolios"
-                 :portfolios="portfolios"
-                 @portfolio-selected="handlePortfolioSelected"
-  />
+  <div class="container">
+    <div class="portfolios">
+      <PortfolioList v-if="loadedPortfolios"
+                     :portfolios="portfolios"
+                     @portfolio-selected="handlePortfolioSelected"
+      />
+    </div>
+    <div class="orders">
+      <OrderPlacer v-if="selectedPortfolio"
+                   :stock="selectedPortfolio.stock"
+      />
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -13,6 +22,7 @@ import PortfolioList from "@/components/PortfolioList.vue";
 import {fetchPortfolios} from "@/services/portfolioService.js";
 import {getCurrentUser} from "@/services/userService.js";
 import {fetchStocks, getDefaultTradingStock} from "@/services/stockService.js";
+import OrderPlacer from "@/components/OrderPlacer.vue";
 
 const portfolios = ref([]);
 const selectedPortfolio = ref();
@@ -53,6 +63,12 @@ const handlePortfolioSelected = (portfolio) => {
 
 </script>
 
-<style>
-
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-around;
+}
 </style>

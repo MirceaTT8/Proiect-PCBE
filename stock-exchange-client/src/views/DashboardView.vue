@@ -80,6 +80,7 @@ export default {
 .stock-list-column {
   flex: 0 0 33%;
   overflow-y: auto;
+  margin-left: 70px;
 }
 
 .order-placer-column {

@@ -32,6 +32,8 @@ emit('portfolioSelected', portfolio);
 .portfolio-list {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 20px;
   width: 100%;

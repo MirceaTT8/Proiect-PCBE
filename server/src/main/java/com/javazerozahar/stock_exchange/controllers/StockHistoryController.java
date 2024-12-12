@@ -19,7 +19,10 @@ public class StockHistoryController {
 
     @GetMapping("/{stockId}")
     @ResponseBody
-    public ResponseEntity<List<StockHistoryDTO>> getStockHistoryOfStock(@PathVariable("stockId") Long stockId) {
-        return new ResponseEntity<>(stockHistoryService.getStockHistoryOfStock(stockId), HttpStatus.OK);
+    public ResponseEntity<List<StockHistoryDTO>> getStockHistoryOfStock(
+            @PathVariable("stockId") Long stockId,
+            @RequestParam(required = false) Integer days
+    ) {
+        return new ResponseEntity<>(stockHistoryService.getStockHistoryOfStock(stockId, days), HttpStatus.OK);
     }
 }

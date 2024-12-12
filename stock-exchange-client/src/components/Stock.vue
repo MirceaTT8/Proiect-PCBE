@@ -1,5 +1,5 @@
 <template>
-  <div class="stock-card">
+  <div class="stock-card" @click="handleClick">
     <div class="stock-info">
       <div class="stock-name">{{ stock.name }}</div>
       <div class="stock-symbol">{{ stock.symbol }}</div>
@@ -12,6 +12,12 @@
 const props = defineProps({
   stock: Object,
 });
+
+const emit = defineEmits(['select']);
+
+function handleClick() {
+  emit('select', props.stock);
+}
 </script>
 
 <style scoped>
@@ -36,6 +42,11 @@ body {
   max-width: 500px;
   margin: 0;
   box-sizing: border-box;
+}
+
+.stock-card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  cursor: pointer;
 }
 
 .stock-info {

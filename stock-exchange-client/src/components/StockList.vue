@@ -5,21 +5,24 @@
         v-for="stock in stocks"
         :key="stock.symbol"
         :stock="stock"
+        @select="handleSelect"
     />
   </div>
 </template>
 
 <script setup>
 import Stock from "@/components/Stock.vue";
-import {onMounted} from "vue";
 
 const props = defineProps({
   stocks: Array
 });
 
-onMounted(() => {
-  console.log(props.stocks);
-})
+const emit = defineEmits(['stockSelected']);
+
+const handleSelect = (stock) => {
+  emit('stockSelected', stock);
+}
+
 </script>
 
 <style scoped>

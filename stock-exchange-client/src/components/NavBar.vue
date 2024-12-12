@@ -32,7 +32,7 @@ export default {
   <nav class="navbar">
     <ul class="navbar-menu">
       <li class="navbar-item">
-        <router-link to="/:stockId?" class="navbar-link">Dashboard</router-link>
+        <router-link to="/" class="navbar-link">Dashboard</router-link>
       </li>
       <li class="navbar-item">
         <router-link to="/portfolio" class="navbar-link">Portfolio</router-link>

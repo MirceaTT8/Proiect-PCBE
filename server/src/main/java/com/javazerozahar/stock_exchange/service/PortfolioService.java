@@ -82,4 +82,9 @@ public class PortfolioService {
     public PortfolioDTO addPortfolio(PortfolioDTO portfolioDTO) {
         return portfolioConverter.toPortfolioDTO(portfolioRepository.save(portfolioConverter.toPortfolio(portfolioDTO)));
     }
+
+    public PortfolioDTO getPortfolio(Long portfolioId) {
+        return portfolioConverter.toPortfolioDTO(portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new PortfolioNotFoundException("Portfolio not found")));
+    }
 }

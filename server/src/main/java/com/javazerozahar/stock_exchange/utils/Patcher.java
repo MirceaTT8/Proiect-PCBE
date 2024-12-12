@@ -33,7 +33,7 @@ public class Patcher {
                     if (field.isAnnotationPresent(Updatable.class)) {
                         field.set(target, value);
                     } else {
-                        if (!(value instanceof Iterable<?>)) {
+                        if (!(value instanceof Iterable<?>) && !value.equals(field.get(target))) {
                             log.info(value.getClass().getName() + ": " + value);
                             throw new CannotPatchException("Field " + field.getName() + " is not updatable");
                         }

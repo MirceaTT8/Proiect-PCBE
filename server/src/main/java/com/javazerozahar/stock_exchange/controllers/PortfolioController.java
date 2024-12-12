@@ -26,6 +26,11 @@ public class PortfolioController {
         return new ResponseEntity<>(portfolioService.getPortfolios(userId, stockId), HttpStatus.OK);
     }
 
+    @GetMapping("/{portfolioId}")
+    public ResponseEntity<PortfolioDTO> getStock(@PathVariable("portfolioId") Long portfolioId) {
+        return new ResponseEntity<>(portfolioService.getPortfolio(portfolioId), HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<PortfolioDTO> createPortfolio(@RequestBody PortfolioDTO portfolioDTO) {
         return new ResponseEntity<>(portfolioService.addPortfolio(portfolioDTO), HttpStatus.CREATED);

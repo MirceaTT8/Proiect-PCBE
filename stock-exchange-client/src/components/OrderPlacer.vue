@@ -11,7 +11,7 @@
       </div>
       <h3>{{ stock.name }}</h3>
       <p>{{ stock.symbol }}</p>
-      <h3>€ {{ stock.price }}</h3>
+      <h3 v-if="stock.price">€ {{ stock.price.toFixed(2) }}</h3>
     </div>
     <form @submit.prevent="submitOrder">
       <div class="form-row">

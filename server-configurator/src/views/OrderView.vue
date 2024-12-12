@@ -1,14 +1,299 @@
 <template>
-
+  <div class="order-management-container">
+    <div class="order-management-form">
+      <h1>Order Management</h1>
+      <form @submit.prevent="">
+        <div class="form-group">
+          <label for="id">Order ID</label>
+          <input
+              id="id"
+              v-model="order.id"
+              type="text"
+              placeholder="Enter order ID to load data or leave empty to create new order"
+          />
+        </div>
+        <div class="form-group">
+          <label for="userId">User ID</label>
+          <input id="userId" v-model="order.userId" type="text" required />
+        </div>
+        <div class="form-group">
+          <label for="stockId">Stock ID</label>
+          <input id="stockId" v-model="order.stockId" type="text" required />
+        </div>
+        <div class="form-group">
+          <label for="quantity">Quantity</label>
+          <input
+              id="quantity"
+              v-model.number="order.quantity"
+              type="number"
+              min="1"
+              required
+          />
+        </div>
+        <div class="form-group">
+          <label for="price">Price</label>
+          <input
+              id="price"
+              v-model.number="order.price"
+              type="number"
+              step="0.01"
+              min="0"
+              required
+          />
+        </div>
+        <div class="form-group">
+          <label for="orderType">Order Type</label>
+          <select id="orderType" v-model="order.orderType" required>
+            <option disabled value="">Select Order Type</option>
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+          </select>
+        </div>
+        <div class="button-group">
+          <button
+              v-if="!order.id"
+              type="button"
+              class="create-button"
+              @click="handleCreate"
+              :disabled="isSubmitting"
+          >
+            Create
+          </button>
+          <div v-else>
+            <button
+                type="button"
+                class="update-button"
+                @click="handleUpdate"
+                :disabled="isSubmitting"
+            >
+              Update
+            </button>
+            <button
+                type="button"
+                class="delete-button"
+                @click="handleDelete"
+                :disabled="isSubmitting"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <Notification v-if="message" :message="message" :type="messageType" />
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { reactive, ref, watch } from 'vue';
+import {
+  fetchOrderById,
+  createOrder,
+  updateOrder,
+  deleteOrder,
+} from '@/services/orderService.js';
+import Notification from '@/components/Notification.vue';
 
-const orders = ref([])
+const order = reactive({
+  id: '',
+  userId: '',
+  stockId: '',
+  quantity: 1,
+  price: 0.0,
+  orderType: '',
+});
 
-// Логика для операций CRUD
+const isSubmitting = ref(false);
+const message = ref('');
+const messageType = ref('');
 
-onMounted(() => {
-})
+const resetForm = () => {
+  order.userId = '';
+  order.stockId = '';
+  order.quantity = 1;
+  order.price = 0.0;
+  order.orderType = '';
+  order.id = '';
+};
+
+const fetchOrderData = async (id) => {
+  try {
+    if (id) {
+      const orderData = await fetchOrderById(id);
+      if (orderData) {
+        Object.assign(order, orderData);
+        message.value = '';
+      } else {
+        resetForm();
+        message.value = 'Order not found.';
+        messageType.value = 'error';
+      }
+    } else {
+      resetForm();
+      message.value = '';
+    }
+  } catch (error) {
+    resetForm();
+    message.value = `Error fetching order: ${error.message}`;
+    messageType.value = 'error';
+  }
+};
+
+watch(() => order.id, (newId) => {
+  if (newId) {
+    fetchOrderData(newId);
+  } else {
+    resetForm();
+  }
+});
+
+const handleCreate = async () => {
+  try {
+    isSubmitting.value = true;
+    message.value = '';
+    const newOrder = { ...order };
+    delete newOrder.id;
+
+    const createdOrder = await createOrder(newOrder);
+    if (createdOrder && createdOrder.id) {
+      message.value = 'Order created successfully!';
+      messageType.value = 'success';
+      order.id = createdOrder.id;
+    } else {
+      throw new Error('Invalid response from server.');
+    }
+  } catch (error) {
+    message.value = `Error creating order: ${error.message}`;
+    messageType.value = 'error';
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const handleUpdate = async () => {
+  try {
+    isSubmitting.value = true;
+    message.value = '';
+    await updateOrder(order);
+    message.value = 'Order updated successfully!';
+    messageType.value = 'success';
+  } catch (error) {
+    message.value = `Error updating order: ${error.message}`;
+    messageType.value = 'error';
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const handleDelete = async () => {
+  try {
+    isSubmitting.value = true;
+    message.value = '';
+    await deleteOrder(order.id);
+    message.value = 'Order deleted successfully!';
+    messageType.value = 'success';
+    resetForm();
+  } catch (error) {
+    message.value = `Error deleting order: ${error.message}`;
+    messageType.value = 'error';
+  } finally {
+    isSubmitting.value = false;
+  }
+};
 </script>
+
+<style scoped>
+.order-management-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 120px;
+  position: relative;
+  border-radius: 20px;
+}
+
+.order-management-form {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.order-management-form h1 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.form-group input {
+  width: 300px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.button-group {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.create-button,
+.update-button,
+.delete-button {
+  width: 48%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 15px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.create-button {
+  background-color: #28a745;
+}
+
+.update-button {
+  background-color: #007bff;
+}
+
+.delete-button {
+  background-color: #dc3545;
+}
+
+.create-button:hover {
+  background-color: #218838;
+}
+
+.update-button:hover {
+  background-color: #0056b3;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
+</style>

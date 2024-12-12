@@ -1,96 +1,82 @@
 <template>
-  <h1>portfolio example</h1>
-  <div class="portfolio-container">
-    <div class="stock-name">{{ stockSymbol }}</div>
-    <div class="details-container">
-        <div class="values-container">
-            <div class="quantity">Ammount: {{ stockQuantity }}</div>
-            <div class="euro-value">= {{ euroValue }} EUR</div>
-        </div>
-            <router-link :to="{ name: 'dashboard', params: {stockId: stockId} }">
-                <button>Trade</button>
-            </router-link>
+  <div class="portfolio-card" @click="handleClick">
+    <div class="portfolio-info">
+      <div class="portfolio-name">{{ portfolio.stock.name }}</div>
+      <div class="portfolio-symbol">{{ portfolio.stock.symbol }}</div>
     </div>
+    <div class="portfolio-quantity">{{ portfolio.quantity }}</div>
+    <div class="evaluation">EUR {{ evaluatedPrice }}</div>
   </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import {computed} from "vue";
 
-defineProps({
-    stockId: {
-        type: Number,
-        default: 0,
-    },
-    stockSymbol: {
-        type: String,
-        default: 'Undefined s'
-    },
-    stockQuantity: {
-        type: Number,
-        default: 0
-    },
-    euroValue: {
-        type: Number,
-        default: 0
-    },
+const props = defineProps({
+  portfolio: Object,
+  required: true,
 });
 
+const emit = defineEmits(['select']);
+
+const evaluatedPrice = computed(() => {
+  return props.portfolio.quantity * props.portfolio.stock.price;
+});
+
+function handleClick() {
+  emit('select', props.portfolio);
+}
 </script>
 
 <style scoped>
-    .portfolio-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
-        max-width: 500px;
-        border: 3px solid darkgreen;
-        background-color: green;
-        border-radius: 15px;
-        padding-top: 15px;
-        padding-bottom: 15px;
-        height: 150px;
-        font-family: sans-serif;
-    }
-    .stock-name {
-        background-color: lightgreen;
-        border-radius: 15px;
-        width: 220px;
-        text-align: center;
-        line-height: 150px;
-        border: none;
-        font-size: 40px;
-    }
-    .details-container {
-        display: flex;
-        flex-direction: column;
-        justify-content:space-around;
-        width: 220px;
-    }
-    .values-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-evenly;
-        background-color: lightgreen;
-        border-radius: 15px;
-        height: 80px;
-        text-align: center;
-        border: none;
-    }
-    .quantity {
-        font-size: 25px;
-    }
-    button {
-        background-color: white;
-        border-radius: 15px;
-        height: 50px;
-        border: 3px solid dodgerblue;
-        color: dodgerblue;
-        font-size: 25px;
-        width: 220px;
-    }
-    button:hover {
-        background-color: dodgerblue;
-        color: white;
-    }
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  background: #f4f4f9;
+}
+
+.portfolio-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.portfolio-card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.portfolio-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+
+.portfolio-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.portfolio-symbol {
+  font-size: 14px;
+  color: #666;
+}
+
+.portfolio-quantity {
+  font-size: 24px;
+  color: #4CAF50;
+  font-weight: bold;
+}
 </style>

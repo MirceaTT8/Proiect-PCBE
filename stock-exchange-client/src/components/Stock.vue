@@ -6,6 +6,7 @@
     </div>
     <div :class="priceClass" class="stock-value">
       {{ stock.price.toFixed(2) }}
+      <span id="currency">EUR</span>
       <span v-if="priceChange !== null">({{ priceChange.toFixed(2) }}%)</span>
     </div>
   </div>
@@ -115,5 +116,10 @@ body {
 
 .stock-value-neutral {
   color: #000000;
+}
+
+#currency {
+  font-size: 14px;
+  margin-right: 5px;
 }
 </style>

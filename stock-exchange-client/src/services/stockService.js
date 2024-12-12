@@ -14,13 +14,17 @@ const fetchStocks = async () => {
     }
 };
 
-const getDefaultTradingStock = async () => {
+const fetchDefaultTradingStock = async () => {
     const data = await fetch(API);
     const stocks = await data.json();
 
     const stock = stocks.find(stock => stock.symbol.startsWith("$"));
     console.log(stock);
     return stock;
+}
+
+const getDefaultTradingStock = () => {
+    return JSON.parse(localStorage.getItem("user")).defaultTradingStock;
 }
 
 const addDayBeforePriceToStocks = async (stocks) => {
@@ -47,5 +51,6 @@ const addDayBeforePriceToStocks = async (stocks) => {
 
 export {
     fetchStocks,
+    fetchDefaultTradingStock,
     getDefaultTradingStock,
 }

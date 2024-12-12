@@ -38,8 +38,8 @@ public class StockController {
     }
 
     @DeleteMapping("/{stockId}")
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteStock(@PathVariable("stockId") Long stockId) {
-//        stockService.deleteStock(stockId);
+        stockService.deleteStock(stockId);
     }
 }

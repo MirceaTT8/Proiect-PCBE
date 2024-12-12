@@ -60,4 +60,8 @@ public class PortfolioService {
     public void save(Portfolio portfolio) {
         portfolioRepository.save(portfolio);
     }
+
+    public void deletePortfolio(Long portfolioId) {
+        portfolioRepository.deleteById(portfolioId);
+    }
 }

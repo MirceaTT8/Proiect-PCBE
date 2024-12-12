@@ -49,4 +49,8 @@ public class UserService {
         userRepository.save(user);
         return userConverter.toUserDTO(user);
     }
+
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
 }

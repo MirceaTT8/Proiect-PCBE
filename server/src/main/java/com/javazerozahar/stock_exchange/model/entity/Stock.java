@@ -23,4 +23,7 @@ public class Stock {
     @Column(name = "price", nullable = false, precision = 10)
     private Double price;
 
+    @Column(name = "isActive")
+    private Boolean isActive = true;
+
 }

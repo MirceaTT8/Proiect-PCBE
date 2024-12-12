@@ -39,8 +39,8 @@ public class PortfolioController {
     }
 
     @DeleteMapping("/{portfolioId}")
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePortfolio(@PathVariable("portfolioId") Long portfolioId) {
-//        portfolioService.deletePortfolio(portfolioId);
+        portfolioService.deletePortfolio(portfolioId);
     }
 }

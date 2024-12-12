@@ -33,20 +33,14 @@ public class UserController {
         return new ResponseEntity<>(userService.addUser(userDTO), HttpStatus.CREATED);
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
-    public void createUser(@RequestBody UserDTO userDTO) {
-
-    }
-
     @PatchMapping
     public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO) {
         return new ResponseEntity<>(userService.updateUser(userDTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{userId}")
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable("userId") Long userId) {
-//        userService.deleteUser(userId);
+        userService.deleteUser(userId);
     }
 }

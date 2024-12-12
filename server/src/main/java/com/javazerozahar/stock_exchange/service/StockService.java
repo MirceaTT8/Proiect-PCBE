@@ -52,4 +52,10 @@ public class StockService {
         stockRepository.save(stock);
         return stockConverter.toStockDTO(stock);
     }
+
+    public void deleteStock(Long stockId) {
+        Stock stock = getStock(stockId);
+        stock.setIsActive(false);
+        stockRepository.save(stock);
+    }
 }

@@ -27,15 +27,13 @@ public class PortfolioController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
-    public void createPortfolio(@RequestBody PortfolioDTO portfolioDTO) {
-
+    public ResponseEntity<PortfolioDTO> createPortfolio(@RequestBody PortfolioDTO portfolioDTO) {
+        return new ResponseEntity<>(portfolioService.addPortfolio(portfolioDTO), HttpStatus.CREATED);
     }
 
     @PatchMapping
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
-    public void updatePortfolio(@RequestBody PortfolioDTO portfolioDTO) {
-//        return new ResponseEntity<>(portfolioService.updatePortfolioDTO(portfolioDTO), HttpStatus.CREATED);
+    public ResponseEntity<PortfolioDTO> updatePortfolio(@RequestBody PortfolioDTO portfolioDTO) {
+        return new ResponseEntity<>(portfolioService.updatePortfolio(portfolioDTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{portfolioId}")

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Configuration
@@ -74,8 +75,27 @@ public class Initializer {
 
         for (Stock stock : allStocks) {
             int startPrice = (int) (Math.random() * 296) + 5;
-            stockHistoryRepository.saveAll(generateStockHistory(stock, startPrice, 2,1000, 1000));
-            stockHistoryRepository.saveAll(generateStockHistory(stock, startPrice, 0.3,40, 5));
+            stockHistoryRepository.saveAll(generateStockHistory(stock, startPrice, 2, 1000, 1000));
+            stockHistoryRepository.saveAll(generateStockHistory(stock, startPrice, 0.3, 40, 5));
+        }
+
+
+        allStocks = stockRepository.findAll();
+
+        for (Stock stock : allStocks) {
+            long veryEarlyTimestamp = 0;
+
+            List<StockHistory> histories = stockHistoryRepository.findByStockIdAndTimestampAfter(stock.getId(), veryEarlyTimestamp);
+
+            StockHistory latestHistory = histories.stream()
+                    .max(Comparator.comparingLong(StockHistory::getTimestamp))
+                    .orElse(null);
+
+            if (latestHistory != null) {
+                stock.setPrice(latestHistory.getPrice());
+
+                stockRepository.save(stock);
+            }
         }
 
         // Fetch and display stock history for stock1

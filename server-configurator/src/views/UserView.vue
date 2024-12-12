@@ -147,7 +147,7 @@ const handleDelete = async () => {
           >
             Create
           </button>
-          <div v-else>
+          <div v-else class="button-group">
             <button
                 type="button"
                 class="update-button"
@@ -230,8 +230,9 @@ const handleDelete = async () => {
 .button-group {
   width: 100%;
   display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
 .create-button,
@@ -245,6 +246,7 @@ const handleDelete = async () => {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 1.5rem;
 }
 
 .create-button {

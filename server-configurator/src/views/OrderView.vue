@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue';
+import {createCommentVNode, reactive, ref, watch} from 'vue';
 import {
   fetchOrderById,
   createOrder,
@@ -123,6 +123,9 @@ const fetchOrderData = async (id) => {
       if (orderData) {
         Object.assign(order, orderData);
         message.value = '';
+
+        console.log(orderData);
+
       } else {
         resetForm();
         message.value = 'Order not found.';
@@ -155,10 +158,9 @@ const handleCreate = async () => {
     delete newOrder.id;
 
     const createdOrder = await createOrder(newOrder);
-    if (createdOrder && createdOrder.id) {
+    if (createdOrder) {
       message.value = 'Order created successfully!';
       messageType.value = 'success';
-      order.id = createdOrder.id;
     } else {
       throw new Error('Invalid response from server.');
     }
@@ -205,7 +207,7 @@ const handleDelete = async () => {
 <style scoped>
 .order-management-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   background-color: #f9f9f9;
   padding: 120px;
@@ -245,7 +247,8 @@ const handleDelete = async () => {
   color: #555;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
   width: 300px;
   padding: 0.5rem;
   border: 1px solid #ccc;
@@ -256,7 +259,8 @@ const handleDelete = async () => {
 .button-group {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   margin-top: 2rem;
 }
 
@@ -271,6 +275,7 @@ const handleDelete = async () => {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 1.5rem;
 }
 
 .create-button {

@@ -232,7 +232,8 @@ const handleDelete = async () => {
 .button-group {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   margin-top: 2rem;
 }
 
@@ -247,6 +248,7 @@ const handleDelete = async () => {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 1.5rem;
 }
 
 .create-button {

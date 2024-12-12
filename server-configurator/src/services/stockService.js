@@ -72,9 +72,19 @@ const deleteStock = async (id) => {
     }
 };
 
+const getDefaultTradingStock = async () => {
+    const data = await fetch(API);
+    const stocks = await data.json();
+
+    const stock = stocks.find(stock => stock.symbol.startsWith("$"));
+    console.log(stock);
+    return stock;
+}
+
 export {
     createStock,
     deleteStock,
     updateStock,
     fetchStockById,
+    getDefaultTradingStock,
 };

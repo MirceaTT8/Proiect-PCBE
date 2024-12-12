@@ -49,6 +49,28 @@ const placeOrder = async (orderData) => {
     }
 };
 
+const fetchOrdersByUserId = async (userId) => {
+    try {
+        const response = await fetch(`${API}/user/${userId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const orders = await response.json();
+
+        orders.forEach(order => {
+            order.stockId = order.orderType.toUpperCase() === "SELL" ? order.soldStockId : order.boughtStockId;
+            order.orderType = order.orderType.toLowerCase();
+        })
+
+        console.log(orders)
+
+        return orders;
+    } catch (error) {
+        console.error('Error fetching order:', error);
+    }
+};
+
 export {
     placeOrder,
+    fetchOrdersByUserId,
 }

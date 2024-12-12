@@ -13,7 +13,7 @@ const fetchOrderById = async (id) => {
         }
         const order = await response.json();
 
-        order.stockId = order.orderType.toUpperCase() === "SELL" ? order.boughtStockId : order.soldStockId;
+        order.stockId = order.orderType.toUpperCase() === "SELL" ? order.soldStockId : order.boughtStockId;
 
         order.orderType = order.orderType.toLowerCase();
 

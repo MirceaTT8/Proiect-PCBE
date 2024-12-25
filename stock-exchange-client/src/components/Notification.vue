@@ -1,4 +1,4 @@
-<template>
+showAlert<template>
   <div v-if="isVisible"
        :class="['alert', `alert-${type}`]">
     {{ message }}

@@ -1,11 +1,12 @@
 import {BASE_URL} from "@/configs/config.js";
 import {getCurrentUser} from "@/services/userService.js";
+import { getDefaultTradingStock } from "./stockService";
 
 const API = `${BASE_URL}/orders`;
 
 const placeOrder = async (orderData) => {
 
-    const defaultTradingStockId = getCurrentUser().defaultTradingStock.id;
+    const defaultTradingStockId = getDefaultTradingStock().id;
 
     const order = {
         price: orderData.price,

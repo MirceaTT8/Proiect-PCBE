@@ -24,7 +24,7 @@ public class UserConverter {
         return new UserDTO(
                 user.getId(),
                 user.getLastName(),
-                user.getFistName(),
+                user.getFirstName(),
                 user.getEmail(),
                 user.getPhoneNumber(),
                 user.getPortfolios().stream().map(portfolioConverter::toPortfolioDTO).toList());

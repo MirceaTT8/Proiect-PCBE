@@ -23,8 +23,12 @@ const fetchDefaultTradingStock = async () => {
     return stock;
 }
 
+const setDefaultTradingStock = (stock) => {
+    localStorage.setItem("defaultStock", JSON.stringify(stock));
+}
+
 const getDefaultTradingStock = () => {
-    return JSON.parse(localStorage.getItem("user")).defaultTradingStock;
+    return JSON.parse(localStorage.getItem("defaultStock"));
 }
 
 const addDayBeforePriceToStocks = async (stocks) => {
@@ -53,4 +57,5 @@ export {
     fetchStocks,
     fetchDefaultTradingStock,
     getDefaultTradingStock,
+    setDefaultTradingStock
 }

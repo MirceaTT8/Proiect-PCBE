@@ -28,22 +28,22 @@ public class Initializer {
     public void initialize() {
 
         User user1 = User.builder()
-                .lastName("John Doe")
-                .fistName("John")
+                .lastName("Doe")
+                .firstName("John")
                 .email("johndoe@example.com")
                 .phoneNumber("+40712345678")
                 .build();
 
         User user2 = User.builder()
-                .lastName("Jane Smith")
-                .fistName("Jane")
+                .lastName("Smith")
+                .firstName("Jane")
                 .email("janesmith@example.com")
                 .phoneNumber("+40720456789")
                 .build();
 
         User user3 = User.builder()
-                .lastName("Alice Johnson")
-                .fistName("Alice")
+                .lastName("Johnson")
+                .firstName("Alice")
                 .email("alicejohnson@example.com")
                 .phoneNumber("+40730123456")
                 .build();

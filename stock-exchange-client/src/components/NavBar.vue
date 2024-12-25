@@ -1,4 +1,5 @@
 <script>
+import { setCurrentUser, useNameState } from "@/services/userService";
 import { useRouter } from "vue-router";
 
 export default {
@@ -6,21 +7,29 @@ export default {
   setup() {
     const router = useRouter();
     const links = router.options.routes.filter((route) => route.name !== "not-found");
-    const username = "JohnDoe"; // Default username displayed
+    
+    const nameState = useNameState();
 
     const navigateToDashboard = () => {
-      router.push({ name: "DashboardView" }); // Navigate to the DashboardView route
+      router.push({ name: "Dashboard" }); // Navigate to the DashboardView route
     };
 
     const navigateToProfile = () => {
-      router.push({ name: "ProfileView" }); // Navigate to the ProfileView route
+      router.push({ name: "Profile" }); // Navigate to the ProfileView route
     };
+
+    const logOut = () => {
+      setCurrentUser({});
+      nameState.username = "No Account";
+      navigateToDashboard();
+    }
 
     return {
       links,
-      username,
       navigateToDashboard,
       navigateToProfile,
+      logOut,
+      nameState
     };
   },
 };
@@ -48,7 +57,7 @@ export default {
       <div class="dropdown">
         <!-- Clicking on this navigates to the Dashboard -->
         <button class="dropdown-button" @click="navigateToDashboard">
-          {{ username }}
+          {{ nameState.username }}
         </button>
         <!-- Dropdown content -->
         <div class="dropdown-content">

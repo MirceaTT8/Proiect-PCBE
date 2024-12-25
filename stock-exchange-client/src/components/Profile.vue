@@ -79,7 +79,7 @@ const updateProfile = async () => {
   justify-content: center;
   align-items: center;
   background-color: #f9f9f9;
-  padding: 120px;
+  padding: 50px;
   position: relative;
   border-radius: 20px;
 }

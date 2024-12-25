@@ -20,7 +20,7 @@ import {onMounted, ref} from "vue";
 
 import PortfolioList from "@/components/PortfolioList.vue";
 import {fetchPortfolios} from "@/services/portfolioService.js";
-import {getCurrentUser} from "@/services/userService.js";
+import {getCurrentUser, isAuthenticated} from "@/services/userService.js";
 import {fetchStocks, getDefaultTradingStock} from "@/services/stockService.js";
 import OrderPlacer from "@/components/OrderPlacer.vue";
 
@@ -29,29 +29,34 @@ const selectedPortfolio = ref();
 
 const loadedPortfolios = ref(false);
 
+const authenticated = isAuthenticated();
+
 const attachStockData = async (portfolios) => {
-  const stocks = await fetchStocks();
-  portfolios.forEach((portfolio) => {
-    if (portfolio.stockId === getDefaultTradingStock().id) {
-      portfolio.stock = getDefaultTradingStock();
-    } else {
-      portfolio.stock = stocks.find(stock => stock.id === portfolio.stockId);
-    }
-  });
+  if(authenticated) {
+    const stocks = await fetchStocks();
+    portfolios.forEach((portfolio) => {
+      if (portfolio.stockId === getDefaultTradingStock().id) {
+        portfolio.stock = getDefaultTradingStock();
+      } else {
+        portfolio.stock = stocks.find(stock => stock.id === portfolio.stockId);
+      }
+    });
+  }
   return portfolios;
 };
 
 onMounted(async () => {
+  const currentUser = getCurrentUser();
+  if (currentUser && currentUser.id) {
+    const fetchedPortfolios = await fetchPortfolios(currentUser.id);
 
+    portfolios.value = await attachStockData(fetchedPortfolios);
 
-  const fetchedPortfolios = await fetchPortfolios(getCurrentUser().id);
-
-  portfolios.value = await attachStockData(fetchedPortfolios);
-
-  if (portfolios.value.length > 0) {
-    selectedPortfolio.value = portfolios.value[0];
-  } else {
-    selectedPortfolio.value = null;
+    if (portfolios.value.length > 0) {
+      selectedPortfolio.value = portfolios.value[0];
+    } else {
+      selectedPortfolio.value = null;
+    }
   }
 
   loadedPortfolios.value = true;

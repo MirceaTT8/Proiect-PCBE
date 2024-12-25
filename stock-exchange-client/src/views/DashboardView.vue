@@ -1,5 +1,7 @@
 <template>
-  <div class="dashboard">
+
+    <LoginComponent />
+    
     <h1>My Dashboard</h1>
     <div class="content">
       <div class="stock-list-column">
@@ -13,7 +15,6 @@
         <OrderPlacer :stock="selectedStock" />
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -23,14 +24,22 @@ import { fetchStocks } from "@/services/stockService.js";
 import OrderPlacer from "@/components/OrderPlacer.vue";
 import StockList from "@/components/StockList.vue";
 import StockPriceChart from "@/components/StockPriceChart.vue";
+import LoginComponent from "@/components/LoginComponent.vue";
 
 export default {
   components: {
     StockPriceChart,
     StockList,
     OrderPlacer,
+    LoginComponent,
   },
   setup() {
+    const popupTrigger = ref(true);
+
+    const togglePopup = (trigger) => {
+      popupTrigger.value = !popupTrigger.value
+    }
+
     const stocks = ref([]);
 
     const selectedStock = ref();
@@ -58,6 +67,8 @@ export default {
       stocks,
       selectedStock,
       handleStockSelected,
+      popupTrigger,
+      togglePopup
     }
   },
 }
@@ -86,5 +97,30 @@ export default {
 .order-placer-column {
   flex: 1;
   padding-left: 20px;
+}
+
+
+
+.modal-overlay {
+  position: relative;
+}
+
+.modal-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.1);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.modal-content > div {
+    background-color: white;
+    padding: 50px;
+    border-radius: 10px;
 }
 </style>

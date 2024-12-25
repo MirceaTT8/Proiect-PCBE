@@ -1,4 +1,5 @@
 import {BASE_URL} from "@/configs/config.js";
+import { reactive } from "vue";
 
 const API = `${BASE_URL}/users`;
 
@@ -10,6 +11,25 @@ const fetchUserById = async (id) => {
         console.error(error);
     }
 };
+
+const nameState = reactive ({
+    username: "No Account"
+});
+
+const useNameState = () => nameState;
+
+const isAuthenticated = () => {
+    return (localStorage.getItem("user") !== "{}");
+}
+
+const getUserByName = async (firstName, lastName) => {
+    const data = await fetch(API);
+    const users = await data.json();
+
+    var user = users.find(u => (u.firstName === firstName && u.lastName === lastName));
+
+    return user;
+}
 
 const getCurrentUser = () => {
     return JSON.parse(localStorage.getItem("user"));
@@ -48,5 +68,8 @@ export {
     fetchUserById,
     getCurrentUser,
     setCurrentUser,
-    updateUserProfile
+    updateUserProfile,
+    getUserByName,
+    isAuthenticated,
+    useNameState
 };

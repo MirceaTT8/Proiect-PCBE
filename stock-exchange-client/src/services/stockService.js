@@ -3,17 +3,22 @@ import {fetchStockHistory} from "@/services/stockHistoryService.js";
 
 const API = `${BASE_URL}/stocks`;
 
-const fetchStocks = async () => {
+const fetchStocks = async (query = "") => {
     try {
-        const data = await fetch(API);
-        const stocks = await data.json();
+        const url = query
+            ? `${API}?q=${encodeURIComponent(query)}` // Add query parameter if provided
+            : API;
+        const response = await fetch(url);
+        const stocks = await response.json();
 
-        return addDayBeforePriceToStocks(stocks.filter(stock => !stock.symbol.startsWith("$")));
+        return addDayBeforePriceToStocks(
+            stocks.filter(stock => !stock.symbol.startsWith("$"))
+        );
     } catch (error) {
-        console.error(error);
+        console.error("Error fetching stocks:", error);
+        return [];
     }
 };
-
 const fetchDefaultTradingStock = async () => {
     const data = await fetch(API);
     const stocks = await data.json();

@@ -1,20 +1,30 @@
 <template>
+  <LoginComponent />
 
-    <LoginComponent />
-    
-    <h1>My Dashboard</h1>
-    <div class="content">
-      <div class="stock-list-column">
-        <StockList
-            :stocks="stocks"
-            @stockSelected="handleStockSelected"
-        />
-      </div>
-      <div class="order-placer-column">
-        <StockPriceChart :stock="selectedStock" />
-        <OrderPlacer :stock="selectedStock" />
-      </div>
+  <h1>My Dashboard</h1>
+
+  <!-- Search Bar with Button -->
+  <div class="search-bar">
+    <input
+        type="text"
+        v-model="searchQuery"
+        placeholder="Search by stock name or symbol..."
+    />
+    <button @click="searchStocks">Search</button>
+  </div>
+
+  <div class="content">
+    <div class="stock-list-column">
+      <StockList
+          :stocks="stocks"
+          @stockSelected="handleStockSelected"
+      />
     </div>
+    <div class="order-placer-column">
+      <StockPriceChart :stock="selectedStock" />
+      <OrderPlacer :stock="selectedStock" />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -34,44 +44,55 @@ export default {
     LoginComponent,
   },
   setup() {
-    const popupTrigger = ref(true);
+    const stocks = ref([]); // Holds the array of stocks
+    const selectedStock = ref(); // Holds the currently selected stock
+    const searchQuery = ref(""); // Holds the search query
 
-    const togglePopup = (trigger) => {
-      popupTrigger.value = !popupTrigger.value
-    }
+    // Fetch stocks from the API, optionally filtered by a query
+    const fetchFilteredStocks = async (query = "") => {
+      try {
+        console.log("Fetching stocks with query:", query);
+        const response = await fetchStocks(query); // Fetch stocks from the API
+        stocks.value = response; // Update the stocks array
+        console.log("Stocks fetched:", stocks.value);
 
-    const stocks = ref([]);
-
-    const selectedStock = ref();
-
-    onMounted(async () => {
-      console.log("MOUNTED");
-
-      stocks.value = await fetchStocks();
-
-      console.log(stocks.value);
-
-      if (stocks.value.length > 0) {
-        selectedStock.value = stocks.value[0];
-      } else {
-        selectedStock.value = null;
+        // Set the first stock as selected if results are returned
+        if (stocks.value.length > 0) {
+          selectedStock.value = stocks.value[0];
+        } else {
+          selectedStock.value = null;
+        }
+      } catch (error) {
+        console.error("Error fetching stocks:", error);
       }
+    };
+
+    // Fetch all stocks on component mount
+    onMounted(() => {
+      fetchFilteredStocks();
     });
 
+    // Search stocks when the search button is clicked
+    const searchStocks = () => {
+      console.log("Searching stocks with query:", searchQuery.value);
+      fetchFilteredStocks(searchQuery.value); // Fetch filtered stocks
+    };
+
+    // Update selected stock when a stock is clicked
     const handleStockSelected = (stock) => {
-      console.log("Selected Stock", stock);
+      console.log("Selected Stock:", stock);
       selectedStock.value = stock;
-    }
+    };
 
     return {
       stocks,
       selectedStock,
+      searchQuery,
+      searchStocks,
       handleStockSelected,
-      popupTrigger,
-      togglePopup
-    }
+    };
   },
-}
+};
 </script>
 
 <style>
@@ -79,6 +100,34 @@ export default {
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
+}
+
+.search-bar {
+  margin: 20px;
+  text-align: center;
+}
+
+.search-bar input {
+  width: 50%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.search-bar button {
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.search-bar button:hover {
+  background-color: #0056b3;
 }
 
 .content {
@@ -97,30 +146,5 @@ export default {
 .order-placer-column {
   flex: 1;
   padding-left: 20px;
-}
-
-
-
-.modal-overlay {
-  position: relative;
-}
-
-.modal-content {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: rgba(0,0,0,0.1);
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
-}
-
-.modal-content > div {
-    background-color: white;
-    padding: 50px;
-    border-radius: 10px;
 }
 </style>

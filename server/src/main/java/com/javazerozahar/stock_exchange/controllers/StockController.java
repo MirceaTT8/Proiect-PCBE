@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/stocks")
@@ -18,8 +20,20 @@ public class StockController {
     private StockService stockService;
 
     @GetMapping
-    public ResponseEntity<List<StockDTO>> getAllStocks() {
-        return new ResponseEntity<>(stockService.getAllStocks(), HttpStatus.OK);
+    public ResponseEntity<List<StockDTO>> getAllStocks(@RequestParam(value = "q", required = false) String query) {
+        List<StockDTO> stocks;
+
+        if (query != null && !query.isEmpty()) {
+            stocks = stockService.getAllStocks().stream()
+                    .filter(stock -> stock.getName().toLowerCase().contains(query.toLowerCase()) ||
+                            stock.getSymbol().toLowerCase().contains(query.toLowerCase()))
+                    .limit(5)
+                    .collect(Collectors.toList());
+        } else {
+            stocks = new ArrayList<>(stockService.getAllStocks());
+        }
+
+        return new ResponseEntity<>(stocks, HttpStatus.OK);
     }
 
     @GetMapping("/{stockId}")

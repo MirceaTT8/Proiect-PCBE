@@ -25,7 +25,7 @@ public class Initializer {
     private final OrderRepository orderRepository;
     private final LocalContainerEntityManagerFactoryBean entityManagerFactory;
 
-    public void initialize() {
+    public void initialize(boolean testing) {
 
         User user1 = User.builder()
                 .lastName("Doe")
@@ -91,7 +91,7 @@ public class Initializer {
                     .max(Comparator.comparingLong(StockHistory::getTimestamp))
                     .orElse(null);
 
-            if (latestHistory != null) {
+            if (latestHistory != null && !testing) {
                 stock.setPrice(latestHistory.getPrice());
 
                 stockRepository.save(stock);
@@ -226,4 +226,9 @@ public class Initializer {
 
         return stockHistories;
     }
+
+    public void initialize() {
+        initialize(false);
+    }
+
 }

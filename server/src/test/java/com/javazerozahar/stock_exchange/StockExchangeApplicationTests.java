@@ -114,7 +114,7 @@ class StockExchangeApplicationTests {
 
     @BeforeEach
     void setUp() {
-       initializer.initialize();
+       initializer.initialize(true);
     }
 
     @Test

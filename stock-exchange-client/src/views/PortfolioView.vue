@@ -16,13 +16,16 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted, ref, onBeforeUnmount} from "vue";
 
 import PortfolioList from "@/components/PortfolioList.vue";
 import {fetchPortfolios} from "@/services/portfolioService.js";
 import {getCurrentUser, isAuthenticated} from "@/services/userService.js";
 import {fetchStocks, getDefaultTradingStock} from "@/services/stockService.js";
 import OrderPlacer from "@/components/OrderPlacer.vue";
+import { BASE_URL } from "@/configs/config.js";
+
+
 
 const portfolios = ref([]);
 const selectedPortfolio = ref();
@@ -46,6 +49,9 @@ const attachStockData = async (portfolios) => {
 };
 
 onMounted(async () => {
+
+  
+
   const currentUser = getCurrentUser();
   if (currentUser && currentUser.id) {
     const fetchedPortfolios = await fetchPortfolios(currentUser.id);
@@ -61,6 +67,7 @@ onMounted(async () => {
 
   loadedPortfolios.value = true;
 });
+
 
 const handlePortfolioSelected = (portfolio) => {
   selectedPortfolio.value = portfolio;

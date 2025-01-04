@@ -33,7 +33,7 @@ export default {
     };
 
     const logOut = () => {
-      setCurrentUser({},{});
+      setCurrentUser({});
       nameState.username = "No Account";
       navigateToDashboard();
     }

@@ -1,5 +1,6 @@
 package com.javazerozahar.stock_exchange.service;
 
+import com.javazerozahar.stock_exchange.converters.OrderConverter;
 import com.javazerozahar.stock_exchange.exceptions.OrderNotFoundException;
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
 import com.javazerozahar.stock_exchange.model.entity.Order;
@@ -23,9 +24,11 @@ public class OrderMatcher {
 
     private final OrderRepository orderRepository;
     private final CurrencyConverter currencyConverter;
+    private final OrderConverter orderConverter;
     private final TransactionPlacerProducer transactionPlacerProducer;
     private final TransactionService transactionService;
     private final PortfolioService portfolioService;
+    private final OrderService orderService;
 
     /**
      * Best price strategy <br>
@@ -68,22 +71,27 @@ public class OrderMatcher {
                 if (order.getOrderType().equals(OrderType.BUY) && matchingOrder.getPrice() <= order.getPrice() ||
                         order.getOrderType().equals(OrderType.SELL) && matchingOrder.getPrice() >= order.getPrice()) {
 
-                    double matchedQuantity = Math.min(order.getQuantity(), order.getOrderType().equals(OrderType.SELL) ?
-                            matchingOrder.getQuantity() / matchingOrder.getSoldStock().getPrice() :
-                            matchingOrder.getQuantity() / matchingOrder.getBoughtStock().getPrice());
+                    double matchedQuantity = Math.min(order.getQuantity(),
+                            matchingOrder.getQuantity() );
+
+                    log.info("Matched quantity a ajuns la {} /n", matchedQuantity);
 
                     order.setQuantity(order.getQuantity() - matchedQuantity);
-                    matchingOrder.setQuantity(
-                            matchingOrder.getQuantity() - (currencyConverter.convert(order.getPrice(), matchingOrder.getPrice(), matchedQuantity)));
+                    matchingOrder.setQuantity(matchingOrder.getQuantity() - matchedQuantity);
 
+                    log.info("Cantitatea a ajuns la {} /n", matchingOrder.getQuantity());
                     if (matchingOrder.getQuantity() == 0) {
-                        orderRepository.delete(matchingOrder);
+                        log.info("Cantitatea a ajuns la 0 pentru matching order/n");
+                        orderService.placeOrder(orderConverter.toOrderDTO(matchingOrder),"delete");
+                        //orderRepository.delete(matchingOrder);
                     }
 
                     transactionPlacerProducer.sendTransaction(order, matchingOrder, matchedQuantity);
 
+                    log.info("Cantitatea a ajuns la {} /n", order.getQuantity());
                     if (order.getQuantity() == 0) {
-                        orderRepository.delete(order);
+                        log.info("Cantitatea a ajuns la 0 pentru order/n");
+                        orderService.placeOrder(orderConverter.toOrderDTO(order),"delete");
                         break;
                     }
                 } else {

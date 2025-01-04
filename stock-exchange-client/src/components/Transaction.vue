@@ -1,52 +1,71 @@
 <template>
-  <div class="transaction">
-    <h3>Transaction ID: {{ id }}</h3>
-    <p><strong>Amount:</strong> ${{ amount }}</p>
-    <p><strong>Date:</strong> {{ date }}</p>
-    <p><strong>Description:</strong> {{ description }}</p>
+  <div class="transaction-card">
+    <div class="transaction-info">
+      <div class="transaction-stock">
+        <div class="stock-name">{{ transaction.stock.name }}</div>
+        <div class="stock-symbol">{{ transaction.stock.symbol }}</div>
+      </div>
+      <div class="transaction-details">
+        <div class="transaction-quantity">Quantity: {{ transaction.quantity }}</div>
+        <div class="transaction-price">Price: {{ transaction.price.toFixed(2) }} EUR</div>
+        <div class="transaction-date">Date: {{ formattedDate }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: "Transaction",
-  props: {
-    id: {
-      type: String,
-      required: true,
-    },
-    amount: {
-      type: Number,
-      required: true,
-    },
-    date: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      default: "No description provided",
-    },
-  },
-};
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+  transaction: Object,
+});
+
+const formattedDate = computed(() => {
+  const date = new Date(props.transaction.timestamp);
+  return date.toLocaleDateString();
+});
 </script>
 
 <style scoped>
-.transaction {
-  border: 1px solid #ccc;
-  padding: 1rem;
-  margin: 0.5rem 0;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+.transaction-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin: 10px 0;
 }
 
-.transaction h3 {
-  margin: 0;
+.transaction-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-stock {
+  margin-bottom: 10px;
+}
+
+.stock-name {
+  font-size: 18px;
+  font-weight: bold;
   color: #333;
 }
 
-.transaction p {
-  margin: 0.5rem 0;
-  color: #555;
+.stock-symbol {
+  font-size: 14px;
+  color: #666;
+}
+
+.transaction-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-quantity,
+.transaction-price,
+.transaction-date {
+  font-size: 16px;
+  color: #333;
+  margin: 2px 0;
 }
 </style>

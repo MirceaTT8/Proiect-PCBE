@@ -6,12 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners(OrderListener.class)
 @Table(name = "orders")
 public class Order {
     @Id
@@ -42,3 +44,4 @@ public class Order {
     @Column(nullable = false)
     private Long timestamp;
 }
+

@@ -3,7 +3,7 @@
   <div class="container">
     <div class="transactions" v-if="transactions.length">
       <TransactionList v-if="loadedTransactions"
-                 :orders="transactions"
+                 :transactions="transactions"
                  @order-selected="handleTransactionSelected"
       />
     </div>

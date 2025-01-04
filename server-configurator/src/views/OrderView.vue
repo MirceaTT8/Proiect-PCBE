@@ -79,18 +79,29 @@
           </div>
         </div>
       </form>
+      
     </div>
+    
     <Notification v-if="message" :message="message" :type="messageType" />
+    <div class="order-list">
+        <OrderList v-if="loadedOrders"
+                 :orders="orders"       
+        />
+      </div>
   </div>
 </template>
 
 <script setup>
-import {createCommentVNode, reactive, ref, watch} from 'vue';
+import { BASE_URL } from "@/configs/config.js";
+import {createCommentVNode, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
+import OrderList from "@/components/OrderList.vue";
+import {fetchStocks, getDefaultTradingStock} from "@/services/stockService.js";
 import {
   fetchOrderById,
   createOrder,
   updateOrder,
   deleteOrder,
+  fetchAllOrders
 } from '@/services/orderService.js';
 import Notification from '@/components/Notification.vue';
 
@@ -102,6 +113,68 @@ const order = reactive({
   price: 0.0,
   orderType: '',
 });
+
+const orders = ref([]);
+const loadedOrders = ref(false);
+const attachStockData = async (orders) => {
+  const stocks = await fetchStocks();
+  orders.forEach((order) => {
+    order.stock = stocks.find(stock => stock.id === order.stockId);
+  })
+  return orders;
+};
+
+const startListening = () => {
+  const eventSource = new EventSource(`${BASE_URL}/subscribe`);
+
+  eventSource.onmessage = (event) => {
+      console.log('Received message:', event.data);
+  };
+
+  eventSource.addEventListener('DATA_UPDATE', (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Data update:', data);
+      updateUI(data);
+  });
+
+  eventSource.addEventListener('INIT', (event) => {
+      console.log('Connected to stream:', event.data);
+  });
+
+  eventSource.onerror = (error) => {
+      console.error('SSE error:', error);
+      eventSource.close();
+  };
+}
+
+const stopListening = () => {
+  if (this.eventSource) {
+    this.eventSource.close(); // Close the connection
+    console.log('Stopped listening to SSE.');
+  }
+}
+
+const updateUI = async (data) => {
+  const fetchedOrders = await fetchAllOrders();
+  orders.value = await attachStockData(fetchedOrders);
+  loadedOrders.value = true;
+}
+
+onMounted(async () => {
+  
+  startListening();
+
+  const fetchedOrders = await fetchAllOrders();
+
+  orders.value = await attachStockData(fetchedOrders);
+
+  loadedOrders.value = true;
+});
+
+onBeforeUnmount(async () => {
+  stopListening();
+});
+
 
 const isSubmitting = ref(false);
 const message = ref('');
@@ -157,6 +230,12 @@ const handleCreate = async () => {
     const newOrder = { ...order };
     delete newOrder.id;
 
+    if(newOrder.stockId == 3){
+      message.value = "EURO stock order not allowed!";
+      messageType.value = 'error';
+      throw new Error('Invalid trade EURO for EURO');
+    }
+
     const createdOrder = await createOrder(newOrder);
     if (createdOrder) {
       message.value = 'Order created successfully!';
@@ -176,6 +255,11 @@ const handleUpdate = async () => {
   try {
     isSubmitting.value = true;
     message.value = '';
+    if(order.stockId == 3){
+      message.value = "EURO stock order not allowed!";
+      messageType.value = 'error';
+      throw new Error('Invalid trade EURO for EURO');
+    }
     await updateOrder(order);
     message.value = 'Order updated successfully!';
     messageType.value = 'success';
@@ -191,7 +275,7 @@ const handleDelete = async () => {
   try {
     isSubmitting.value = true;
     message.value = '';
-    await deleteOrder(order.id);
+    await deleteOrder(order);
     message.value = 'Order deleted successfully!';
     messageType.value = 'success';
     resetForm();
@@ -213,6 +297,8 @@ const handleDelete = async () => {
   padding: 120px;
   position: relative;
   border-radius: 20px;
+  flex-direction: column;
+  
 }
 
 .order-management-form {
@@ -227,6 +313,12 @@ const handleDelete = async () => {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  
+}
+
+.order-list {
+  margin-top: 20px;
+  height: 200px;
 }
 
 .order-management-form h1 {

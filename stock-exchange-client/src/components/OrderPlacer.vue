@@ -92,6 +92,12 @@ const submitOrder = async () => {
   };
 
   try {
+    if(orderData.stockId == 3){
+      notificationMessage.value = "EURO stock order not allowed!";
+      notificationType.value = 'error';
+      throw new Error('Invalid trade EURO for EURO');
+    }
+
     await placeOrder(orderData);
 
     notificationMessage.value = 'Order placed successfully.';

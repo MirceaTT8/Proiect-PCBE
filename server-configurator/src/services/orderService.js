@@ -30,6 +30,8 @@ const createOrder = async (orderData) => {
         price: orderData.price,
         quantity: orderData.quantity,
         userId: orderData.userId,
+        stockId: orderData.stockId,
+        orderType: orderData.orderType
     };
 
     order = { ...order, ...addBothStocksToOrder(order)};
@@ -72,10 +74,15 @@ const updateOrder = async (order) => {
     }
 };
 
-const deleteOrder = async (id) => {
+const deleteOrder = async (order) => {
     try {
-        const response = await fetch(`${API}/${id}`, {
-            method: 'DELETE'
+        order.orderType = order.orderType.toUpperCase();
+        const response = await fetch(API, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(order)
         });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -107,9 +114,33 @@ const addBothStocksToOrder = orderData => {
     return order;
 };
 
+const fetchAllOrders = async () => {
+    try {
+        const response = await fetch(`${API}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const orders = await response.json();
+
+        orders.forEach(order => {
+            order.stockId = order.orderType.toUpperCase() === "SELL" ? order.soldStockId : order.boughtStockId;
+            order.orderType = order.orderType.toLowerCase();
+        })
+
+        console.log(orders)
+
+        return orders;
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+    }
+};
+
+
+
 export {
     createOrder,
     deleteOrder,
     updateOrder,
     fetchOrderById,
+    fetchAllOrders
 };

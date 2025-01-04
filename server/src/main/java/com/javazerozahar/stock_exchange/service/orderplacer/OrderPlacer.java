@@ -20,6 +20,10 @@ public class OrderPlacer {
      * @throws com.javazerozahar.stock_exchange.exceptions.InsufficientFundsException if the criteria aren't met
      */
     public Order placeOrder(Order order, String orderPlacementStrategy) {
+
+        if(order.getBoughtStock() == order.getSoldStock())
+            return order;
+
         order = orderPlacementStrategyFactory.getOrderPlacementStrategy(orderPlacementStrategy).placeOrder(order);
 
         orderPlacerProducer.sendOrder(order);

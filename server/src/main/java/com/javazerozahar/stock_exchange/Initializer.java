@@ -67,7 +67,7 @@ public class Initializer {
         stockRepository.save(stock6);
 
         // Fetch and display all stocks
-        List<Stock> allStocks = stockRepository.findAll();
+        List<Stock> allStocks = stockRepository.findAll().stream().filter(stock -> stock.getId() != 3).toList();
         //System.out.println("Stocks:");
         //allStocks.forEach(System.out::println);
 

@@ -16,6 +16,28 @@ const fetchPortfolios = async (userId) => {
     }
 };
 
+const createPortfolio = async (portfolioDTO) => {
+    try {
+        const response = await fetch(API, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'cors': 'no-cors',
+            },
+            body: JSON.stringify(portfolioDTO),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Creating portfolio failed:', error);
+    }
+};
+
 export {
     fetchPortfolios,
+    createPortfolio
 }

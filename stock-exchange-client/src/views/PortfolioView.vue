@@ -5,6 +5,8 @@
           v-if="loadedPortfolios"
           :portfolios="portfolios"
           @portfolio-selected="handlePortfolioSelected"
+          @delete-portfolio="handleDeletePortfolio"
+          @update-portfolio="handleUpdatePortfolio"
       />
     </div>
     <div class="create-portfolio">
@@ -31,27 +33,22 @@
 </template>
 
 <script setup>
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import { onMounted, ref } from "vue";
 
 import PortfolioList from "@/components/PortfolioList.vue";
-import { fetchPortfolios, createPortfolio } from "@/services/portfolioService.js";
+import { fetchPortfolios, createPortfolio, deletePortfolio, updatePortfolio } from "@/services/portfolioService.js";
 import { getCurrentUser, isAuthenticated } from "@/services/userService.js";
 import { fetchStocks, getDefaultTradingStock } from "@/services/stockService.js";
 import OrderPlacer from "@/components/OrderPlacer.vue";
-import { BASE_URL } from "@/configs/config.js";
-
-const eventSource = new EventSource(`${BASE_URL}/subscribe`);
 
 const portfolios = ref([]);
 const selectedPortfolio = ref();
-
 const loadedPortfolios = ref(false);
-
 const authenticated = isAuthenticated();
 const newPortfolio = ref({ stockId: "", quantity: 0 });
 
 const attachStockData = async (portfolios) => {
-  if(authenticated) {
+  if (authenticated) {
     const stocks = await fetchStocks();
     portfolios.forEach((portfolio) => {
       if (portfolio.stockId === getDefaultTradingStock().id) {
@@ -64,58 +61,10 @@ const attachStockData = async (portfolios) => {
   return portfolios;
 };
 
-const startListening = () => {
-
-eventSource.onmessage = (event) => {
-    console.log('Received message:', event.data);
-};
-
-eventSource.addEventListener('DATA_UPDATE', (event) => {
-    const data = JSON.parse(event.data);
-    console.log('Data update:', data);
-    updateUI(data);
-});
-
-eventSource.addEventListener('INIT', (event) => {
-    console.log('Connected to stream:', event.data);
-});
-
-eventSource.onerror = (error) => {
-    console.error('SSE error:', error);
-    eventSource.close();
-};
-}
-
-const stopListening = () => {
-if (eventSource) {
-  eventSource.close(); // Close the connection
-  console.log('Stopped listening to SSE.');
-}
-}
-
-const updateUI = async (data) => {
-  const currentUser = getCurrentUser();
-  if (currentUser && currentUser.id) {
-    const fetchedPortfolios = await fetchPortfolios(currentUser.id);
-
-    portfolios.value = await attachStockData(fetchedPortfolios);
-
-    if (portfolios.value.length > 0) {
-      selectedPortfolio.value = portfolios.value[0];
-    } else {
-      selectedPortfolio.value = null;
-    }
-  }
-
-  loadedPortfolios.value = true;
-}
-
 onMounted(async () => {
-  startListening();
   const currentUser = getCurrentUser();
   if (currentUser && currentUser.id) {
     const fetchedPortfolios = await fetchPortfolios(currentUser.id);
-
     portfolios.value = await attachStockData(fetchedPortfolios);
 
     if (portfolios.value.length > 0) {
@@ -126,10 +75,6 @@ onMounted(async () => {
   }
 
   loadedPortfolios.value = true;
-});
-
-onBeforeUnmount(async () => {
-  stopListening();
 });
 
 const handlePortfolioSelected = (portfolio) => {
@@ -157,6 +102,34 @@ const handleCreatePortfolio = async () => {
     }
   } catch (error) {
     console.error("Failed to create portfolio:", error);
+  }
+};
+
+const handleDeletePortfolio = async (portfolioId) => {
+  try {
+    await deletePortfolio(portfolioId);
+    // Remove portfolio from the list
+    portfolios.value = portfolios.value.filter(p => p.id !== portfolioId);
+    if (selectedPortfolio.value?.id === portfolioId) {
+      selectedPortfolio.value = portfolios.value.length > 0 ? portfolios.value[0] : null;
+    }
+  } catch (error) {
+    console.error("Failed to delete portfolio:", error);
+  }
+};
+
+const handleUpdatePortfolio = async (updatedPortfolio) => {
+  try {
+    const result = await updatePortfolio(updatedPortfolio);
+    const index = portfolios.value.findIndex(p => p.id === result.id);
+    if (index !== -1) {
+      portfolios.value[index] = result; // Update the portfolio in the list
+      if (selectedPortfolio.value?.id === result.id) {
+        selectedPortfolio.value = result; // Update selectedPortfolio if it's the same
+      }
+    }
+  } catch (error) {
+    console.error("Failed to update portfolio:", error);
   }
 };
 </script>

@@ -27,7 +27,7 @@ public class PortfolioController {
     }
 
     @GetMapping("/{portfolioId}")
-    public ResponseEntity<PortfolioDTO> getStock(@PathVariable("portfolioId") Long portfolioId) {
+    public ResponseEntity<PortfolioDTO> getPortfolio(@PathVariable("portfolioId") Long portfolioId) {
         return new ResponseEntity<>(portfolioService.getPortfolio(portfolioId), HttpStatus.OK);
     }
 

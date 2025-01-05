@@ -28,9 +28,9 @@
 </template>
 
 <script>
-import { onMounted, ref } from "vue";
+import { onMounted, onBeforeUnmount, ref } from "vue";
 import { fetchStocks } from "@/services/stockService.js";
-
+import { BASE_URL } from "@/configs/config.js";
 import OrderPlacer from "@/components/OrderPlacer.vue";
 import StockList from "@/components/StockList.vue";
 import StockPriceChart from "@/components/StockPriceChart.vue";
@@ -47,6 +47,41 @@ export default {
     const stocks = ref([]); // Holds the array of stocks
     const selectedStock = ref(); // Holds the currently selected stock
     const searchQuery = ref(""); // Holds the search query
+
+    const eventSource = new EventSource(`${BASE_URL}/subscribe`);
+
+    const startListening = () => {
+
+    eventSource.onmessage = (event) => {
+        console.log('Received message:', event.data);
+    };
+
+    eventSource.addEventListener('DATA_UPDATE', (event) => {
+        const data = JSON.parse(event.data);
+        console.log('Data update:', data);
+        updateUI(data);
+    });
+
+    eventSource.addEventListener('INIT', (event) => {
+        console.log('Connected to stream:', event.data);
+    });
+
+    eventSource.onerror = (error) => {
+        console.error('SSE error:', error);
+        eventSource.close();
+    };
+    }
+
+    const stopListening = () => {
+    if (eventSource) {
+      eventSource.close(); // Close the connection
+      console.log('Stopped listening to SSE.');
+    }
+    }
+
+    const updateUI = async (data) => {
+      fetchFilteredStocks();
+    }
 
     // Fetch stocks from the API, optionally filtered by a query
     const fetchFilteredStocks = async (query = "") => {
@@ -69,7 +104,12 @@ export default {
 
     // Fetch all stocks on component mount
     onMounted(() => {
+      startListening();
       fetchFilteredStocks();
+    });
+
+    onBeforeUnmount(async () => {
+      stopListening();
     });
 
     // Search stocks when the search button is clicked
@@ -88,6 +128,9 @@ export default {
       stocks,
       selectedStock,
       searchQuery,
+      startListening,
+      stopListening,
+      updateUI,
       searchStocks,
       handleStockSelected,
     };

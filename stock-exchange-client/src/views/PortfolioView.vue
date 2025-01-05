@@ -25,7 +25,7 @@ import {fetchStocks, getDefaultTradingStock} from "@/services/stockService.js";
 import OrderPlacer from "@/components/OrderPlacer.vue";
 import { BASE_URL } from "@/configs/config.js";
 
-
+const eventSource = new EventSource(`${BASE_URL}/subscribe`);
 
 const portfolios = ref([]);
 const selectedPortfolio = ref();
@@ -48,10 +48,54 @@ const attachStockData = async (portfolios) => {
   return portfolios;
 };
 
+const startListening = () => {
+
+eventSource.onmessage = (event) => {
+    console.log('Received message:', event.data);
+};
+
+eventSource.addEventListener('DATA_UPDATE', (event) => {
+    const data = JSON.parse(event.data);
+    console.log('Data update:', data);
+    updateUI(data);
+});
+
+eventSource.addEventListener('INIT', (event) => {
+    console.log('Connected to stream:', event.data);
+});
+
+eventSource.onerror = (error) => {
+    console.error('SSE error:', error);
+    eventSource.close();
+};
+}
+
+const stopListening = () => {
+if (eventSource) {
+  eventSource.close(); // Close the connection
+  console.log('Stopped listening to SSE.');
+}
+}
+
+const updateUI = async (data) => {
+  const currentUser = getCurrentUser();
+  if (currentUser && currentUser.id) {
+    const fetchedPortfolios = await fetchPortfolios(currentUser.id);
+
+    portfolios.value = await attachStockData(fetchedPortfolios);
+
+    if (portfolios.value.length > 0) {
+      selectedPortfolio.value = portfolios.value[0];
+    } else {
+      selectedPortfolio.value = null;
+    }
+  }
+
+  loadedPortfolios.value = true;
+}
+
 onMounted(async () => {
-
-  
-
+  startListening();
   const currentUser = getCurrentUser();
   if (currentUser && currentUser.id) {
     const fetchedPortfolios = await fetchPortfolios(currentUser.id);
@@ -68,6 +112,9 @@ onMounted(async () => {
   loadedPortfolios.value = true;
 });
 
+onBeforeUnmount(async () => {
+  stopListening();
+});
 
 const handlePortfolioSelected = (portfolio) => {
   selectedPortfolio.value = portfolio;

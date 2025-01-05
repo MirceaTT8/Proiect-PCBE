@@ -16,7 +16,8 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from "vue";
+import { BASE_URL } from "@/configs/config.js";
+import {onMounted, onBeforeUnmount, ref} from "vue";
 import {getCurrentUser} from "@/services/userService.js";
 import {fetchStocks, getDefaultTradingStock} from "@/services/stockService.js";
 import OrderPlacer from "@/components/OrderPlacer.vue";
@@ -28,6 +29,8 @@ const selectedOrder = ref();
 
 const loadedOrders = ref(false);
 
+const eventSource = new EventSource(`${BASE_URL}/subscribe`);
+
 const attachStockData = async (orders) => {
   const stocks = await fetchStocks();
   orders.forEach((order) => {
@@ -36,7 +39,36 @@ const attachStockData = async (orders) => {
   return orders;
 };
 
-onMounted(async () => {
+const startListening = () => {
+
+  eventSource.onmessage = (event) => {
+      console.log('Received message:', event.data);
+  };
+
+  eventSource.addEventListener('DATA_UPDATE', (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Data update:', data);
+      updateUI(data);
+  });
+
+  eventSource.addEventListener('INIT', (event) => {
+      console.log('Connected to stream:', event.data);
+  });
+
+  eventSource.onerror = (error) => {
+      console.error('SSE error:', error);
+      eventSource.close();
+  };
+}
+
+const stopListening = () => {
+  if (eventSource) {
+    eventSource.close(); // Close the connection
+    console.log('Stopped listening to SSE.');
+  }
+}
+
+const updateUI = async (data) => {
   const fetchedOrders = await fetchOrdersByUserId(getCurrentUser().id);
 
   orders.value = await attachStockData(fetchedOrders);
@@ -48,6 +80,25 @@ onMounted(async () => {
   }
 
   loadedOrders.value = true;
+}
+
+onMounted(async () => {
+  startListening();
+  const fetchedOrders = await fetchOrdersByUserId(getCurrentUser().id);
+
+  orders.value = await attachStockData(fetchedOrders);
+
+  if (orders.value.length > 0) {
+    selectedOrder.value = orders.value[0];
+  } else {
+    selectedOrder.value = null;
+  }
+
+  loadedOrders.value = true;
+});
+
+onBeforeUnmount(async () => {
+  stopListening();
 });
 
 const handleOrderSelected = (portfolio) => {

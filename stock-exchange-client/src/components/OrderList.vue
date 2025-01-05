@@ -36,5 +36,6 @@ function handleOrderSelected(order) {
   max-height: 600px;
   overflow-y: auto;
   padding: 20px;
+  max-width: fit-content;
 }
 </style>

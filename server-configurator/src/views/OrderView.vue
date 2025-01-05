@@ -124,9 +124,9 @@ const attachStockData = async (orders) => {
   return orders;
 };
 
-const startListening = () => {
-  const eventSource = new EventSource(`${BASE_URL}/subscribe`);
+const eventSource = new EventSource(`${BASE_URL}/subscribe`);
 
+const startListening = () => {
   eventSource.onmessage = (event) => {
       console.log('Received message:', event.data);
   };

@@ -25,25 +25,54 @@
       <OrderPlacer :stock="selectedStock" />
     </div>
   </div>
+  <div class="order-lists-container">
+    <div class="order-list">
+      <h2>Users are buying...</h2>
+      <OrderList v-if="loadedOrders"
+                :orders="buyOrders"           
+      />
+    </div>
+    <div class="order-list">
+      <h2>Users are selling...</h2>
+      <OrderList v-if="loadedOrders"
+                :orders="sellOrders"           
+      />
+    </div>
+  </div>
 </template>
 
 <script>
 import { onMounted, onBeforeUnmount, ref } from "vue";
 import { fetchStocks } from "@/services/stockService.js";
 import { BASE_URL } from "@/configs/config.js";
+import OrderList from "@/components/OrderList.vue";
 import OrderPlacer from "@/components/OrderPlacer.vue";
 import StockList from "@/components/StockList.vue";
 import StockPriceChart from "@/components/StockPriceChart.vue";
 import LoginComponent from "@/components/LoginComponent.vue";
+import { fetchAllOrders } from "@/services/orderService";
 
 export default {
   components: {
     StockPriceChart,
     StockList,
     OrderPlacer,
+    OrderList,
     LoginComponent,
   },
   setup() {
+    const orders = ref([]);
+    const buyOrders = ref([]);
+    const sellOrders = ref([]);
+    const loadedOrders = ref(false);
+    const attachStockData = async (orders) => {
+      const stocks = await fetchStocks();
+      orders.forEach((order) => {
+        order.stock = stocks.find(stock => stock.id === order.stockId);
+      })
+      return orders;
+    };
+
     const stocks = ref([]); // Holds the array of stocks
     const selectedStock = ref(); // Holds the currently selected stock
     const searchQuery = ref(""); // Holds the search query
@@ -80,7 +109,20 @@ export default {
     }
 
     const updateUI = async (data) => {
-      fetchFilteredStocks();
+      //fetchFilteredStocks();
+      const fetchedOrders = await fetchAllOrders();
+      orders.value = await attachStockData(fetchedOrders);
+      orders.value = orders.value.sort((a,b) => a.price - b.price);
+      
+      buyOrders.value = orders.value.filter(order => order.orderType.toUpperCase() === "BUY");
+      sellOrders.value = orders.value.filter(order => order.orderType.toUpperCase() === "SELL");
+
+      
+      buyOrders.value = buyOrders.value.filter(order => order.boughtStockId === selectedStock.value.id);
+      sellOrders.value = sellOrders.value.filter(order => order.soldStockId === selectedStock.value.id);
+      
+
+      loadedOrders.value = true;
     }
 
     // Fetch stocks from the API, optionally filtered by a query
@@ -94,6 +136,11 @@ export default {
         // Set the first stock as selected if results are returned
         if (stocks.value.length > 0) {
           selectedStock.value = stocks.value[0];
+          buyOrders.value = orders.value.filter(order => order.orderType.toUpperCase() === "BUY");
+          sellOrders.value = orders.value.filter(order => order.orderType.toUpperCase() === "SELL");
+
+          buyOrders.value = buyOrders.value.filter(order => order.boughtStockId === selectedStock.value.id);
+          sellOrders.value = sellOrders.value.filter(order => order.soldStockId === selectedStock.value.id);
         } else {
           selectedStock.value = null;
         }
@@ -103,9 +150,19 @@ export default {
     };
 
     // Fetch all stocks on component mount
-    onMounted(() => {
+    onMounted(async () => {
       startListening();
       fetchFilteredStocks();
+      const fetchedOrders = await fetchAllOrders();
+      orders.value = await attachStockData(fetchedOrders);
+      orders.value = orders.value.sort((a,b) => a.price - b.price);
+      
+      buyOrders.value = orders.value.filter(order => order.orderType.toUpperCase() === "BUY");
+      sellOrders.value = orders.value.filter(order => order.orderType.toUpperCase() === "SELL");
+
+      
+      
+      loadedOrders.value = true;
     });
 
     onBeforeUnmount(async () => {
@@ -122,12 +179,23 @@ export default {
     const handleStockSelected = (stock) => {
       console.log("Selected Stock:", stock);
       selectedStock.value = stock;
+
+      buyOrders.value = orders.value.filter(order => order.orderType.toUpperCase() === "BUY");
+      sellOrders.value = orders.value.filter(order => order.orderType.toUpperCase() === "SELL");
+
+      buyOrders.value = buyOrders.value.filter(order => order.boughtStockId === selectedStock.value.id);
+      sellOrders.value = sellOrders.value.filter(order => order.soldStockId === selectedStock.value.id);
     };
 
     return {
+      orders,
+      buyOrders,
+      sellOrders,
+      loadedOrders,
       stocks,
       selectedStock,
       searchQuery,
+      attachStockData,
       startListening,
       stopListening,
       updateUI,
@@ -189,5 +257,10 @@ export default {
 .order-placer-column {
   flex: 1;
   padding-left: 20px;
+}
+
+.order-lists-container {
+  display: flex;
+  flex-direction: row;
 }
 </style>

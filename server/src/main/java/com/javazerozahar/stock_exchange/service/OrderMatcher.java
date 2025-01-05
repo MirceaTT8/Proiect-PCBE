@@ -82,8 +82,7 @@ public class OrderMatcher {
                     log.info("Cantitatea a ajuns la {} /n", matchingOrder.getQuantity());
                     if (matchingOrder.getQuantity() == 0) {
                         log.info("Cantitatea a ajuns la 0 pentru matching order/n");
-                        orderService.placeOrder(orderConverter.toOrderDTO(matchingOrder),"delete");
-                        //orderRepository.delete(matchingOrder);
+                        orderRepository.delete(matchingOrder);
                     }
 
                     transactionPlacerProducer.sendTransaction(order, matchingOrder, matchedQuantity);
@@ -91,7 +90,7 @@ public class OrderMatcher {
                     log.info("Cantitatea a ajuns la {} /n", order.getQuantity());
                     if (order.getQuantity() == 0) {
                         log.info("Cantitatea a ajuns la 0 pentru order/n");
-                        orderService.placeOrder(orderConverter.toOrderDTO(order),"delete");
+                        orderRepository.delete(order);
                         break;
                     }
                 } else {

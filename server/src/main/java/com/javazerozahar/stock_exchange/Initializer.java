@@ -211,6 +211,8 @@ public class Initializer {
         long oneDayMillis = 24 * 60 * 60 * 1000;
         long totalSpanMillis = days * oneDayMillis;
 
+        double minimumStockValue = 0.5;
+
         double fluctuationLimit = basePrice * fluctuation;
         long timeIncrement = totalSpanMillis / entries;
 
@@ -218,7 +220,7 @@ public class Initializer {
             double priceFluctuation = (Math.random() * 2 * fluctuationLimit) - fluctuationLimit;
             StockHistory history = StockHistory.builder()
                     .stock(stock)
-                    .price(basePrice + priceFluctuation)
+                    .price(Math.abs(basePrice + priceFluctuation) + minimumStockValue)
                     .timestamp(currentTime - (i * timeIncrement))
                     .build();
             stockHistories.add(history);

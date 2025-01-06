@@ -43,4 +43,15 @@ public class UserController {
     public void deleteUser(@PathVariable("userId") Long userId) {
         userService.deleteUser(userId);
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO) {
+        return new ResponseEntity<>(userService.register(userDTO), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void login(@RequestBody UserDTO userDTO) {
+        userService.login(userDTO);
+    }
 }

@@ -27,6 +27,9 @@ public class UserDTO {
     private String email;
 
     @Updatable
+    private String password;
+
+    @Updatable
     private String phoneNumber;
 
     private List<PortfolioDTO> portfolioDTOs = new ArrayList<>();

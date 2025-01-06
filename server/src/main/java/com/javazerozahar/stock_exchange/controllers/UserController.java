@@ -1,6 +1,7 @@
 package com.javazerozahar.stock_exchange.controllers;
 
 
+import com.javazerozahar.stock_exchange.model.dto.LoginCredentialsDTO;
 import com.javazerozahar.stock_exchange.model.dto.UserDTO;
 import com.javazerozahar.stock_exchange.service.UserService;
 import lombok.AllArgsConstructor;
@@ -50,8 +51,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void login(@RequestBody UserDTO userDTO) {
-        userService.login(userDTO);
+    public ResponseEntity<UserDTO> login(@RequestBody LoginCredentialsDTO credentialsDTO) {
+        return new ResponseEntity<>(userService.login(credentialsDTO), HttpStatus.OK);
     }
 }

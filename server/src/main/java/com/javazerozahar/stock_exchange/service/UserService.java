@@ -3,6 +3,7 @@ package com.javazerozahar.stock_exchange.service;
 import com.javazerozahar.stock_exchange.converters.UserConverter;
 import com.javazerozahar.stock_exchange.exceptions.InvalidCredentialsException;
 import com.javazerozahar.stock_exchange.exceptions.UserNotFoundException;
+import com.javazerozahar.stock_exchange.model.dto.LoginCredentialsDTO;
 import com.javazerozahar.stock_exchange.model.dto.UserDTO;
 import com.javazerozahar.stock_exchange.model.entity.User;
 import com.javazerozahar.stock_exchange.repository.UserRepository;
@@ -61,15 +62,22 @@ public class UserService {
     @Transactional
     public UserDTO register(UserDTO userDTO) {
         String hashedPassword = encoder.encode(userDTO.getPassword());
-        userDTO.setPassword(hashedPassword);
-        return addUser(userDTO);
+        User newUser = userConverter.toUser(userDTO);
+        newUser.setPassword(hashedPassword);
+        return userConverter.toUserDTO(userRepository.save(newUser));
     }
 
-    public void login(UserDTO userDTO) {
-        Long userId = userDTO.getId();
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        if (encoder.matches(userDTO.getPassword(), user.getPassword())) {
+    @Transactional
+    public UserDTO login(LoginCredentialsDTO credentialsDTO) {
+        String firstName = credentialsDTO.getFirstName();
+        String lastName = credentialsDTO.getLastName();
+        User user = userRepository.findAll()
+                .stream()
+                .filter(u -> (u.getFirstName().equals(firstName) && u.getLastName().equals(lastName)))
+                .findFirst().orElseThrow(() -> new UserNotFoundException(firstName, lastName));
+        if (!encoder.matches(credentialsDTO.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException();
         }
+        return userConverter.toUserDTO(user);
     }
 }

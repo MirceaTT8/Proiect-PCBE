@@ -58,7 +58,7 @@ export default {
     StockList,
     OrderPlacer,
     OrderList,
-    LoginComponent,
+    LoginComponent
   },
   setup() {
     const orders = ref([]);

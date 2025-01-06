@@ -31,6 +31,70 @@ const getUserByName = async (firstName, lastName) => {
     return user;
 }
 
+const registerUser = async (userData) => {
+    const user = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        password: userData.password,
+        phoneNumber: userData.phoneNumber,
+    };
+
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+    };
+
+    console.log(options);
+
+    try {
+        const response = await fetch(`${API}/register`, options);
+        if (!response.ok) {
+            console.error(response.statusText);
+            throw new Error(response.statusText);
+        }
+        const data = await response.json();
+        console.log('Registration successful:', data);
+        return data;
+    } catch (error) {
+        console.error('Error registering user:', error);
+        throw new Error('Error registering user');
+    }
+}
+
+const loginUser = async (userData) => {
+    const userCredentials = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        password: userData.password,
+    };
+
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userCredentials)
+    };
+
+    try {
+        const response = await fetch(`${API}/login`, options);
+        if (!response.ok) {
+            console.error(response.statusText);
+            throw new Error(response.statusText);
+        }
+        const data = await response.json();
+        console.log('Login successful:', data);
+        return data;
+    } catch (error) {
+        console.error('Error logging in:', error);
+        throw new Error('Error logging in');
+    }
+}
+
 const getCurrentUser = () => {
     return JSON.parse(localStorage.getItem("user"));
 }
@@ -71,5 +135,7 @@ export {
     updateUserProfile,
     getUserByName,
     isAuthenticated,
-    useNameState
+    useNameState,
+    loginUser,
+    registerUser
 };

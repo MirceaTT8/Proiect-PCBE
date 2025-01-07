@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <!-- Existing Portfolio Section -->
     <div class="portfolios">
       <PortfolioList
           v-if="loadedPortfolios"
@@ -9,12 +10,18 @@
           @update-portfolio="handleUpdatePortfolio"
       />
     </div>
-    <div class="create-portfolio">
+
+    <!-- Create Portfolio Form -->
+    <div v-if="authenticated" class="create-portfolio">
       <h3>Create New Portfolio</h3>
       <form @submit.prevent="handleCreatePortfolio">
         <label>
-          Stock ID:
-          <input v-model="newPortfolio.stockId" type="text" required />
+          Select Stock:
+          <select v-model="newPortfolio.stockId" required>
+            <option v-for="stock in stocks" :key="stock.id" :value="stock.id">
+              {{ stock.name }}
+            </option>
+          </select>
         </label>
         <label>
           Quantity:
@@ -23,39 +30,55 @@
         <button type="submit">Create Portfolio</button>
       </form>
     </div>
-    <div class="orders">
-      <OrderPlacer
-          v-if="selectedPortfolio"
-          :stock="selectedPortfolio.stock"
-      />
+
+    <!-- Order Placer Section -->
+    <div v-if="selectedPortfolio" class="orders">
+      <OrderPlacer :stock="selectedPortfolio.stock" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
-
+import { ref, onMounted } from "vue";
+import { fetchStocks } from "@/services/stockService.js";
 import PortfolioList from "@/components/PortfolioList.vue";
 import { fetchPortfolios, createPortfolio, deletePortfolio, updatePortfolio } from "@/services/portfolioService.js";
 import { getCurrentUser, isAuthenticated } from "@/services/userService.js";
-import { fetchStocks, getDefaultTradingStock } from "@/services/stockService.js";
 import OrderPlacer from "@/components/OrderPlacer.vue";
+
+const stocks = ref([]); // Array to hold stocks
+const authenticated = isAuthenticated(); // Check if user is authenticated
+
+// Fetch stocks from the API
+const fetchStocksList = async () => {
+  try {
+    if (!authenticated) {
+      console.warn("User not authenticated, cannot fetch stocks.");
+      return;
+    }
+    const response = await fetchStocks(); // Fetch all stocks
+    stocks.value = response; // Update the stocks array
+  } catch (error) {
+    console.error("Error fetching stocks:", error);
+  }
+};
+
+onMounted(async () => {
+  if (authenticated) {
+    await fetchStocksList(); // Fetch stocks on mount if authenticated
+  }
+});
 
 const portfolios = ref([]);
 const selectedPortfolio = ref();
 const loadedPortfolios = ref(false);
-const authenticated = isAuthenticated();
 const newPortfolio = ref({ stockId: "", quantity: 0 });
 
 const attachStockData = async (portfolios) => {
   if (authenticated) {
-    const stocks = await fetchStocks();
+    const fetchedStocks = await fetchStocks();
     portfolios.forEach((portfolio) => {
-      if (portfolio.stockId === getDefaultTradingStock().id) {
-        portfolio.stock = getDefaultTradingStock();
-      } else {
-        portfolio.stock = stocks.find(stock => stock.id === portfolio.stockId);
-      }
+      portfolio.stock = fetchedStocks.find(stock => stock.id === portfolio.stockId);
     });
   }
   return portfolios;
@@ -73,7 +96,6 @@ onMounted(async () => {
       selectedPortfolio.value = null;
     }
   }
-
   loadedPortfolios.value = true;
 });
 
@@ -88,6 +110,7 @@ const handleCreatePortfolio = async () => {
       throw new Error("User not authenticated");
     }
 
+    // Create a new portfolio
     const createdPortfolio = await createPortfolio({
       userId: currentUser.id,
       stockId: newPortfolio.value.stockId,
@@ -95,10 +118,21 @@ const handleCreatePortfolio = async () => {
     });
 
     if (createdPortfolio) {
-      // Update the portfolio list dynamically
+      // Fetch the latest stocks to ensure data is fresh
+      await fetchStocksList();
+
+      // Attach stock data dynamically
+      const stock = stocks.value.find(stock => stock.id === createdPortfolio.stockId);
+      createdPortfolio.stock = stock;
+
+      // Add the updated portfolio to the list
       portfolios.value.push(createdPortfolio);
+
+      // Reset the newPortfolio form
+      newPortfolio.value = { stockId: "", quantity: 0 };
+
+      // Set the newly created portfolio as the selected one
       selectedPortfolio.value = createdPortfolio;
-      newPortfolio.value = { stockId: "", quantity: 0 }; // Reset form
     }
   } catch (error) {
     console.error("Failed to create portfolio:", error);
@@ -108,7 +142,6 @@ const handleCreatePortfolio = async () => {
 const handleDeletePortfolio = async (portfolioId) => {
   try {
     await deletePortfolio(portfolioId);
-    // Remove portfolio from the list
     portfolios.value = portfolios.value.filter(p => p.id !== portfolioId);
     if (selectedPortfolio.value?.id === portfolioId) {
       selectedPortfolio.value = portfolios.value.length > 0 ? portfolios.value[0] : null;
@@ -123,9 +156,9 @@ const handleUpdatePortfolio = async (updatedPortfolio) => {
     const result = await updatePortfolio(updatedPortfolio);
     const index = portfolios.value.findIndex(p => p.id === result.id);
     if (index !== -1) {
-      portfolios.value[index] = result; // Update the portfolio in the list
+      portfolios.value[index] = result;
       if (selectedPortfolio.value?.id === result.id) {
-        selectedPortfolio.value = result; // Update selectedPortfolio if it's the same
+        selectedPortfolio.value = result;
       }
     }
   } catch (error) {
@@ -156,9 +189,18 @@ const handleUpdatePortfolio = async (updatedPortfolio) => {
   margin-bottom: 10px;
 }
 
+.create-portfolio select {
+  padding: 5px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
 .create-portfolio input {
   padding: 5px;
   margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .create-portfolio button {
@@ -167,7 +209,7 @@ const handleUpdatePortfolio = async (updatedPortfolio) => {
   color: white;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .create-portfolio button:hover {

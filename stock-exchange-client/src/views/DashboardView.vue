@@ -3,7 +3,6 @@
 
   <h1>My Dashboard</h1>
 
-  <!-- Search Bar with Button -->
   <div class="search-bar">
     <input
         type="text"

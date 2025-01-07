@@ -1,34 +1,50 @@
 <template>
-  <div class="portfolio-card" :id="isCurrency ? 'currency' : null" @click="handleClick">
+  <div
+      class="portfolio-card"
+      :id="isCurrency ? 'currency' : null"
+      @click="handleClick"
+  >
     <div class="portfolio-info">
-      <div class="portfolio-name">{{ portfolio.stock.name }}</div>
-      <div v-if="!isCurrency" class="portfolio-symbol">{{ portfolio.stock.symbol }}</div>
+      <div class="portfolio-name">
+        {{ portfolio.stock?.name || "Unknown Stock" }}
+      </div>
+      <div v-if="!isCurrency && portfolio.stock" class="portfolio-symbol">
+        {{ portfolio.stock.symbol }}
+      </div>
     </div>
     <div class="portfolio-quantity">{{ portfolio.quantity }}</div>
-    <div class="evaluation">EUR {{ evaluatedPrice }}</div>
+    <div class="evaluation">
+      EUR {{ evaluatedPrice || "0.00" }}
+    </div>
   </div>
 </template>
 
 <script setup>
-import {computed} from "vue";
+import { computed } from "vue";
 
 const props = defineProps({
-  portfolio: Object,
-  required: true,
+  portfolio: {
+    type: Object,
+    required: true,
+  },
 });
 
-const emit = defineEmits(['select']);
+const emit = defineEmits(["select"]);
 
+// Check if the portfolio stock is a currency
 const isCurrency = computed(() => {
-  return props.portfolio.stock.symbol.startsWith("$");
+  return props.portfolio.stock?.symbol?.startsWith("$") || false;
 });
 
+// Calculate the evaluated price, fallback to 0 if stock price is missing
 const evaluatedPrice = computed(() => {
-  return props.portfolio.quantity * props.portfolio.stock.price;
+  return (
+      props.portfolio.quantity * (props.portfolio.stock?.price || 0)
+  );
 });
 
 function handleClick() {
-  emit('select', props.portfolio);
+  emit("select", props.portfolio);
 }
 </script>
 
@@ -45,7 +61,7 @@ body {
 .portfolio-card {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -66,7 +82,7 @@ body {
 }
 
 .portfolio-card:hover {
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
   cursor: pointer;
 }
 
@@ -89,7 +105,7 @@ body {
 
 .portfolio-quantity {
   font-size: 24px;
-  color: #4CAF50;
+  color: #4caf50;
   font-weight: bold;
 }
 </style>

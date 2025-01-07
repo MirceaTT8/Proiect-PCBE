@@ -2,9 +2,9 @@
     <div class="popup" v-if="popupTrigger && !authenticated">
           <div class="login-popup-inner">
               <button class="popup-close" @click="togglePopup()">X</button>
-              <TextField label-title="First Name" default-value="" v-model="userData.firstName"/>
-              <TextField label-title="Last Name" default-value="" v-model="userData.lastName"/>
-              <TextField v-if="!isLoginForm" label-title="Email" default-value="" v-model="userData.email"/>
+              <TextField v-if="!isLoginForm" label-title="First Name" default-value="" v-model="userData.firstName"/>
+              <TextField v-if="!isLoginForm" label-title="Last Name" default-value="" v-model="userData.lastName"/>
+              <TextField label-title="Email" default-value="" v-model="userData.email"/>
               <TextField label-title="Password" default-value="" v-model="userData.password"/>
               <TextField v-if="!isLoginForm" label-title="Phone Number" default-value="" v-model="userData.phoneNumber"/>
               <div class="login-container">
@@ -48,7 +48,6 @@
   
           const tryLogin = async () => {
               const currentUser = ref([]);
-              //currentUser.value = await getUserByName(userCredentialsData.firstName,userCredentialsData.lastName);
               currentUser.value = await loginUser(userData)
               
               if (currentUser.value !== undefined) {
@@ -56,7 +55,7 @@
                   //const defaultTradingStock = await fetchDefaultTradingStock();
                   //setDefaultTradingStock(defaultTradingStock.value);
                   const state = useNameState();
-                  state.username = userData.firstName;
+                  state.username = currentUser.value.firstName;
                   notificationMessage.value = 'Logged in successfully!';
                   notificationType.value = 'success';
                   togglePopup();

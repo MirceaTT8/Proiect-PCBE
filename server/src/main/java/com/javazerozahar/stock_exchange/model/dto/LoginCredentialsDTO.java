@@ -17,10 +17,7 @@ public class LoginCredentialsDTO {
     private Long id;
 
     @Updatable
-    private String firstName;
-
-    @Updatable
-    private String lastName;
+    private String email;
 
     @Updatable
     private String password;

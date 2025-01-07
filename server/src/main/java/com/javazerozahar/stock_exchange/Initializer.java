@@ -5,6 +5,7 @@ import com.javazerozahar.stock_exchange.model.entity.Stock;
 import com.javazerozahar.stock_exchange.model.entity.StockHistory;
 import com.javazerozahar.stock_exchange.model.entity.User;
 import com.javazerozahar.stock_exchange.repository.*;
+import com.javazerozahar.stock_exchange.utils.PasswordHasher;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -24,6 +25,7 @@ public class Initializer {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final LocalContainerEntityManagerFactoryBean entityManagerFactory;
+    private final PasswordHasher passwordHasher;
 
     public void initialize(boolean testing) {
 
@@ -31,6 +33,7 @@ public class Initializer {
                 .lastName("Doe")
                 .firstName("John")
                 .email("johndoe@example.com")
+                .password(passwordHasher.getHash("abc"))
                 .phoneNumber("+40712345678")
                 .build();
 
@@ -38,6 +41,7 @@ public class Initializer {
                 .lastName("Smith")
                 .firstName("Jane")
                 .email("janesmith@example.com")
+                .password(passwordHasher.getHash("def"))
                 .phoneNumber("+40720456789")
                 .build();
 
@@ -45,6 +49,7 @@ public class Initializer {
                 .lastName("Johnson")
                 .firstName("Alice")
                 .email("alicejohnson@example.com")
+                .password(passwordHasher.getHash("ghi"))
                 .phoneNumber("+40730123456")
                 .build();
 

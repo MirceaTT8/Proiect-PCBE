@@ -67,8 +67,7 @@ const registerUser = async (userData) => {
 
 const loginUser = async (userData) => {
     const userCredentials = {
-        firstName: userData.firstName,
-        lastName: userData.lastName,
+        email: userData.email,
         password: userData.password,
     };
 

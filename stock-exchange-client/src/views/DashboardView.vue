@@ -109,7 +109,16 @@ export default {
     }
 
     const updateUI = async (data) => {
-      //fetchFilteredStocks();
+      console.log('UpdateUI se aplica.');
+
+      const DEF_DELAY = 1000;
+
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms || DEF_DELAY));
+      }
+
+      await sleep(100);
+
       const fetchedOrders = await fetchAllOrders();
       orders.value = await attachStockData(fetchedOrders);
       orders.value = orders.value.sort((a,b) => a.price - b.price);

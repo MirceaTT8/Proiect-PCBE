@@ -40,7 +40,7 @@
       <div class="total-amount">
         Total Order Amount: € {{ totalAmount.toFixed(2) }}
       </div>
-      <button @click="submitOrder" type="submit" :disabled="isSubmitting">
+      <button type="submit" :disabled="isSubmitting">
         {{ isSubmitting ? 'Submitting...' : 'Place Order' }}
       </button>
     </form>

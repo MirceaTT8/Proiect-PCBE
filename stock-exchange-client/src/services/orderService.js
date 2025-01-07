@@ -63,7 +63,7 @@ const fetchOrdersByUserId = async (userId) => {
             order.orderType = order.orderType.toLowerCase();
         })
 
-        console.log(orders)
+        console.log(orders);
 
         return orders;
     } catch (error) {
@@ -84,7 +84,7 @@ const fetchAllOrders = async () => {
             order.orderType = order.orderType.toLowerCase();
         })
 
-        console.log(orders)
+        console.log(orders);
 
         return orders;
     } catch (error) {

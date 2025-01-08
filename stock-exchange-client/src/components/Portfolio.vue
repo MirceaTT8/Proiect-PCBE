@@ -6,15 +6,18 @@
   >
     <div class="portfolio-info">
       <div class="portfolio-name">
-        {{ portfolio.stock?.name || "Euro"}}
+        {{ portfolio.stock?.name || "Euro "}}
       </div>
       <div v-if="!isCurrency && portfolio.stock" class="portfolio-symbol">
         {{ portfolio.stock.symbol }}
       </div>
     </div>
     <div class="portfolio-quantity">{{ portfolio.quantity }}</div>
-    <div class="evaluation">
+    <div v-if="isNormalStock" class="evaluation">
       EUR {{ evaluatedPrice || "0.00" }}
+    </div>
+    <div v-if="!isNormalStock" class="evaluation">
+      EURO
     </div>
   </div>
 </template>
@@ -43,8 +46,13 @@ const evaluatedPrice = computed(() => {
   );
 });
 
+const isNormalStock = computed(() => {
+  return props.portfolio.stock;
+});
+
 function handleClick() {
   emit("select", props.portfolio);
+  console.log(props.portfolio)
 }
 </script>
 

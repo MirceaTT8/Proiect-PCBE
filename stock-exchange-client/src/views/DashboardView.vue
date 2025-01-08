@@ -1,44 +1,49 @@
 <template>
   <LoginComponent />
 
-  <h1>My Dashboard</h1>
+  <div class="dashboard-container">
+    <!-- Left Section -->
+    <div class="left-section">
+      <div class="search-bar">
+        <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search by stock name or symbol..."
+        />
+        <button @click="searchStocks">Search</button>
+      </div>
 
-  <div class="search-bar">
-    <input
-        type="text"
-        v-model="searchQuery"
-        placeholder="Search by stock name or symbol..."
-    />
-    <button @click="searchStocks">Search</button>
-  </div>
+      <div class="main-content">
+        <!-- Stock List -->
+        <div class="stock-list-column">
+          <StockList
+              :stocks="stocks"
+              @stockSelected="handleStockSelected"
+          />
+        </div>
 
-  <div class="content">
-    <div class="stock-list-column">
-      <StockList
-          :stocks="stocks"
-          @stockSelected="handleStockSelected"
-      />
+        <!-- Order Placer -->
+        <div class="order-placer-column">
+          <StockPriceChart :stock="selectedStock" />
+          <OrderPlacer :stock="selectedStock" />
+        </div>
+      </div>
     </div>
-    <div class="order-placer-column">
-      <StockPriceChart :stock="selectedStock" />
-      <OrderPlacer :stock="selectedStock" />
-    </div>
-  </div>
-  <div class="order-lists-container">
-    <div class="order-list">
-      <h2>Users are buying...</h2>
-      <OrderList v-if="loadedOrders"
-                :orders="buyOrders"           
-      />
-    </div>
-    <div class="order-list">
-      <h2>Users are selling...</h2>
-      <OrderList v-if="loadedOrders"
-                :orders="sellOrders"           
-      />
+
+    <!-- Right Section: Order Lists -->
+    <div class="right-section">
+      <div v-if="buyOrders.length > 0" class="order-list">
+        <h2>Users are buying...</h2>
+        <OrderList :orders="buyOrders" />
+      </div>
+      <div v-if="sellOrders.length > 0" class="order-list">
+        <h2>Users are selling...</h2>
+        <OrderList :orders="sellOrders" />
+      </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import { onMounted, onBeforeUnmount, ref } from "vue";
@@ -213,31 +218,44 @@ export default {
   },
 };
 </script>
-
-<style>
-.dashboard {
+<style scoped>
+.dashboard-container {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
+  height: 100vh;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Left Section */
+.left-section {
+  flex: 2;
+  display: flex;
   flex-direction: column;
+  margin-right: 20px;
 }
 
 .search-bar {
-  margin: 20px;
-  text-align: center;
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .search-bar input {
+  height: 30px;
   width: 50%;
-  padding: 10px;
-  font-size: 16px;
+  padding: 5px;
+  font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  margin-right: 10px;
 }
 
 .search-bar button {
-  padding: 10px 15px;
-  font-size: 16px;
+  height: 30px;
+  padding: 5px 10px;
+  font-size: 14px;
   background-color: #007bff;
   color: white;
   border: none;
@@ -249,26 +267,47 @@ export default {
   background-color: #0056b3;
 }
 
-.content {
+.main-content {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   flex: 1;
 }
 
 .stock-list-column {
-  flex: 0 0 33%;
+  flex: 1;
+  margin-bottom: 20px;
   overflow-y: auto;
-  margin-left: 70px;
 }
 
 .order-placer-column {
-  flex: 1;
-  padding-left: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
 }
 
-.order-lists-container {
+/* Right Section: Order Lists */
+.right-section {
+  flex: 1;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 400px;
+}
+
+.order-list {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+}
+
+.order-list h2 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
 }
 </style>

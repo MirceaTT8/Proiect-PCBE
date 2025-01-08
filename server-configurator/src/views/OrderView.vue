@@ -155,6 +155,15 @@ const stopListening = () => {
 }
 
 const updateUI = async (data) => {
+
+  const DEF_DELAY = 1000;
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms || DEF_DELAY));
+  }
+
+  await sleep(100);
+
   const fetchedOrders = await fetchAllOrders();
   orders.value = await attachStockData(fetchedOrders);
   loadedOrders.value = true;

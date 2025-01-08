@@ -1,10 +1,10 @@
-package com.javazerozahar.stock_exchange.model.entity;
+package com.javazerozahar.stock_exchange.model.listeners;
 
 import com.javazerozahar.stock_exchange.controllers.OrderSubscriberController;
+import com.javazerozahar.stock_exchange.model.entity.Order;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

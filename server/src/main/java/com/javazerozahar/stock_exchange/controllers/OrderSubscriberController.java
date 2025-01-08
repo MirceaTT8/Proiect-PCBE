@@ -56,7 +56,6 @@ public class OrderSubscriberController {
     }
 
     // Example: Trigger event when database changes
-    @PostMapping("/update-data")
     public void updateData(Order order) {
         // Process data/update database
         broadcastEvent("DATA_UPDATE", new OrderDTO(

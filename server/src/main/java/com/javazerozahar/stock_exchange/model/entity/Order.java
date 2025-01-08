@@ -1,12 +1,12 @@
 package com.javazerozahar.stock_exchange.model.entity;
 
 import com.javazerozahar.stock_exchange.model.dto.OrderType;
+import com.javazerozahar.stock_exchange.model.listeners.OrderListener;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @Data
 @Builder

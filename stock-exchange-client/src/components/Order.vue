@@ -4,6 +4,7 @@
     <div class="order-info">
       <div class="order-data">Quantity: {{ order.quantity }}</div>
       <div class="order-data">Unit price: {{ order.price }}</div>
+      <div class="order-data">Order type: {{ order.orderType }}</div>
     </div>
     <div class="total-price">
       {{ totalPrice.toFixed(2) }} <span id="currency">EUR</span>

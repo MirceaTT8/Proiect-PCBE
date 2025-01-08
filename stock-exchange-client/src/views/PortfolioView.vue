@@ -23,10 +23,6 @@
             </option>
           </select>
         </label>
-        <label>
-          Quantity:
-          <input v-model="newPortfolio.quantity" type="number" required />
-        </label>
         <button type="submit">Create Portfolio</button>
       </form>
     </div>
@@ -114,7 +110,7 @@ const handleCreatePortfolio = async () => {
     const createdPortfolio = await createPortfolio({
       userId: currentUser.id,
       stockId: newPortfolio.value.stockId,
-      quantity: newPortfolio.value.quantity,
+      quantity: newPortfolio.value.quantity, // User-specified quantity
     });
 
     if (createdPortfolio) {
@@ -123,7 +119,12 @@ const handleCreatePortfolio = async () => {
 
       // Attach stock data dynamically
       const stock = stocks.value.find(stock => stock.id === createdPortfolio.stockId);
-      createdPortfolio.stock = stock;
+      if (stock) {
+        createdPortfolio.stock = stock; // Attach the stock details
+        createdPortfolio.evaluation = stock.price * createdPortfolio.quantity; // Calculate evaluation
+      } else {
+        createdPortfolio.evaluation = 0; // Fallback if stock is not found
+      }
 
       // Add the updated portfolio to the list
       portfolios.value.push(createdPortfolio);
@@ -133,11 +134,14 @@ const handleCreatePortfolio = async () => {
 
       // Set the newly created portfolio as the selected one
       selectedPortfolio.value = createdPortfolio;
+
+      console.log("Created Portfolio:", createdPortfolio); // Debug log
     }
   } catch (error) {
     console.error("Failed to create portfolio:", error);
   }
 };
+
 
 const handleDeletePortfolio = async (portfolioId) => {
   try {

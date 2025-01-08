@@ -6,7 +6,7 @@
   >
     <div class="portfolio-info">
       <div class="portfolio-name">
-        {{ portfolio.stock?.name || "Unknown Stock" }}
+        {{ portfolio.stock?.name || "Euro"}}
       </div>
       <div v-if="!isCurrency && portfolio.stock" class="portfolio-symbol">
         {{ portfolio.stock.symbol }}

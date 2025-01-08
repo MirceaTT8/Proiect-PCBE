@@ -19,7 +19,7 @@ const nameState = reactive ({
 const useNameState = () => nameState;
 
 const isAuthenticated = () => {
-    return (localStorage.getItem("user") !== "{}");
+    return (sessionStorage.getItem("user") !== "{}");
 }
 
 const getUserByName = async (firstName, lastName) => {
@@ -95,11 +95,11 @@ const loginUser = async (userData) => {
 }
 
 const getCurrentUser = () => {
-    return JSON.parse(localStorage.getItem("user"));
+    return JSON.parse(sessionStorage.getItem("user"));
 }
 
 const setCurrentUser = (user) => {
-    localStorage.setItem("user", JSON.stringify(user));
+    sessionStorage.setItem("user", JSON.stringify(user));
 }
 
 const updateUserProfile = async (user) => {

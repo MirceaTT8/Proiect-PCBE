@@ -29,7 +29,10 @@
 
     <!-- Order Placer Section -->
     <div v-if="selectedPortfolio" class="orders">
-      <OrderPlacer :stock="selectedPortfolio.stock" />
+      <OrderPlacer
+          :stock="selectedPortfolio.stock"
+          @placed-order="initialise"
+      />
     </div>
   </div>
 </template>
@@ -81,6 +84,10 @@ const attachStockData = async (portfolios) => {
 };
 
 onMounted(async () => {
+  await initialise();
+});
+
+const initialise = async () => {
   const currentUser = getCurrentUser();
   if (currentUser && currentUser.id) {
     const fetchedPortfolios = await fetchPortfolios(currentUser.id);
@@ -93,7 +100,7 @@ onMounted(async () => {
     }
   }
   loadedPortfolios.value = true;
-});
+}
 
 const handlePortfolioSelected = (portfolio) => {
   selectedPortfolio.value = portfolio;

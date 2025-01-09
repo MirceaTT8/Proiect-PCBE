@@ -1,6 +1,6 @@
 <template>
   <div class="stock-order-card">
-    <h2>Place Stock Order</h2>
+    <h2>{{ props.order ? 'Manage Order' : 'Place Stock Order' }}</h2>
     <div class="header">
       <div class="toggle-group">
         <label class="switch">
@@ -40,23 +40,31 @@
       <div class="total-amount">
         Total Order Amount: € {{ totalAmount.toFixed(2) }}
       </div>
-      <button type="submit" :disabled="isSubmitting">
-        {{ isSubmitting ? 'Submitting...' : 'Place Order' }}
-      </button>
+      <div class="button-group">
+        <button v-if="!props.order" type="submit" :disabled="isSubmitting">
+          {{ isSubmitting ? 'Submitting...' : 'Place Order' }}
+        </button>
+        <div v-else class="manage-order-buttons">
+          <button type="button" @click="updateExistingOrder" :disabled="isSubmitting">
+            {{ isSubmitting ? 'Updating...' : 'Update Order' }}
+          </button>
+          <button type="button" @click="cancelExistingOrder" :disabled="isSubmitting">
+            {{ isSubmitting ? 'Canceling...' : 'Cancel Order' }}
+          </button>
+        </div>
+      </div>
     </form>
   </div>
   <Notification v-if="notificationMessage"
                 :message="notificationMessage"
                 :type="notificationType"
   />
-
-
 </template>
 
 <script setup>
-import {ref, computed} from 'vue';
+import { ref, computed, watch } from 'vue';
 import Notification from "@/components/Notification.vue";
-import {placeOrder} from "@/services/orderService.js";
+import { placeOrder, updateOrder, cancelOrder } from "@/services/orderService.js";
 
 const props = defineProps({
   stock: {
@@ -64,7 +72,12 @@ const props = defineProps({
     required: true,
     default: () => ({})
   },
+  order: {
+    type: Object,
+  }
 });
+
+const emit = defineEmits(['placed-order']);
 
 const isSellOrder = ref(false);
 const orderTypeLabel = computed(() => (isSellOrder.value ? 'Sell' : 'Buy'));
@@ -72,12 +85,33 @@ const quantity = ref(null);
 const price = ref(null);
 const isSubmitting = ref(false);
 
+const orderId = ref(null);
+
 const notificationMessage = ref('');
 const notificationType = ref('');
 
 const totalAmount = computed(() => {
   return quantity.value * price.value || 0;
 });
+
+// Watch for changes in the 'order' prop
+watch(
+    () => props.order,
+    (newOrder) => {
+      if (newOrder) {
+        quantity.value = newOrder.quantity;
+        price.value = newOrder.price;
+        isSellOrder.value = (newOrder.orderType === 'Sell');
+        orderId.value = newOrder.orderId;
+      } else {
+        // Reset the fields if no order is provided
+        quantity.value = null;
+        price.value = null;
+        isSellOrder.value = false;
+      }
+    },
+    { immediate: true } // Execute the watcher immediately with the current value
+);
 
 const submitOrder = async () => {
   if (isSubmitting.value) return;
@@ -102,6 +136,9 @@ const submitOrder = async () => {
 
     notificationMessage.value = 'Order placed successfully.';
     notificationType.value = 'success';
+
+    emit('placed-order');
+
   } catch (error) {
     console.error('Error submitting order:', error);
     notificationMessage.value = 'Failed to place order.';
@@ -110,6 +147,71 @@ const submitOrder = async () => {
     isSubmitting.value = false;
     quantity.value = null;
     price.value = null;
+  }
+};
+
+const updateExistingOrder = async () => {
+  if (isSubmitting.value) return;
+
+  isSubmitting.value = true;
+
+  console.log(orderId)
+
+  const orderData = {
+    orderId: orderId.value,
+    orderType: orderTypeLabel.value,
+    stockId: props.stock.id,
+    quantity: quantity.value,
+    price: price.value,
+  };
+
+  try {
+    await updateOrder(orderData);
+
+    notificationMessage.value = 'Order updated successfully.';
+    notificationType.value = 'success';
+
+    emit('placed-order');
+
+  } catch (error) {
+    console.error('Error updating order:', error);
+    notificationMessage.value = 'Failed to update order.';
+    notificationType.value = 'error';
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const cancelExistingOrder = async () => {
+  if (isSubmitting.value) return;
+
+  isSubmitting.value = true;
+
+  console.log(orderId.value)
+
+
+  const orderData = {
+    orderId: orderId.value,
+    orderType: orderTypeLabel.value,
+    stockId: props.stock.id,
+    quantity: quantity.value,
+    price: price.value,
+  };
+
+  try {
+    await cancelOrder(orderData);
+
+    notificationMessage.value = 'Order canceled successfully.';
+    notificationType.value = 'success';
+
+    emit('placed-order');
+
+  } catch (error) {
+    console.error('Error canceling order:', error);
+    notificationMessage.value = 'Failed to cancel order.';
+    notificationType.value = 'error';
+  } finally {
+    isSubmitting.value = false;
   }
 };
 </script>
@@ -245,6 +347,13 @@ input:checked + .slider:before {
   font-weight: 600;
 }
 
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
 button {
   padding: 14px 20px;
   background-color: #006eff;
@@ -253,8 +362,6 @@ button {
   border-radius: 8px;
   cursor: pointer;
   font-size: 17px;
-  align-self: center;
-  margin-top: 10px;
   width: 200px;
 }
 
@@ -265,6 +372,46 @@ button:disabled {
 
 button:hover:not(:disabled) {
   background-color: #0056d2;
+}
+
+.manage-order-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.manage-order-buttons button {
+  /* Style for update and cancel buttons */
+  padding: 14px 20px;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 17px;
+  width: 150px;
+}
+
+.manage-order-buttons button:nth-child(1) {
+  /* Update Order button */
+  background-color: #28a745;
+}
+
+.manage-order-buttons button:nth-child(1):hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.manage-order-buttons button:nth-child(2) {
+  /* Cancel Order button */
+  background-color: #dc3545;
+}
+
+.manage-order-buttons button:nth-child(2):hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.manage-order-buttons button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 .total-amount {

@@ -10,6 +10,8 @@
     <div class="order-placer">
       <OrderPlacer v-if="selectedOrder"
                    :stock="selectedOrder.stock"
+                   :order="selectedOrder"
+                   @placed-order="updateUI"
       />
     </div>
   </div>
@@ -101,8 +103,8 @@ onBeforeUnmount(async () => {
   stopListening();
 });
 
-const handleOrderSelected = (portfolio) => {
-  selectedOrder.value = portfolio;
+const handleOrderSelected = (order) => {
+  selectedOrder.value = order;
 }
 
 </script>

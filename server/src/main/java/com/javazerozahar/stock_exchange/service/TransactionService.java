@@ -40,17 +40,14 @@ public class TransactionService {
             portfolioService.updatePortfolio(order, convertedMatchedQuantity);
         }
 
-        double transitionedQuantity;
         Stock stock;
         User seller, buyer;
 
         if (order.getOrderType().equals(OrderType.BUY)) {
-            transitionedQuantity = matchedQuantity;
             stock = order.getBoughtStock();
             seller = matchingOrder.getUser();
             buyer = order.getUser();
         } else {
-            transitionedQuantity = convertedMatchedQuantity;
             stock = matchingOrder.getBoughtStock();
             seller = matchingOrder.getUser();
             buyer = order.getUser();
@@ -58,7 +55,7 @@ public class TransactionService {
 
         Transaction transaction = new Transaction();
         transaction.setPrice(order.getPrice());
-        transaction.setQuantity(transitionedQuantity);
+        transaction.setQuantity(matchedQuantity);
         transaction.setStock(stock);
         transaction.setTimestamp(System.currentTimeMillis());
         transaction.setSeller(seller);

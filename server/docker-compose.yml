@@ -4,7 +4,7 @@ services:
     build: .
     container_name: stock-exchange-app
     ports:
-      - "8080:8080"
+      - "8443:8443"
     depends_on:
       - postgres
       - rabbitmq

@@ -21,6 +21,8 @@ public class SecurityConfig {
                 .securityMatcher("/**")
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure())
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 );

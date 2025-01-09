@@ -1,47 +1,44 @@
 <template>
   <LoginComponent />
 
+
   <div class="dashboard-container">
-    <!-- Left Section -->
-    <div class="left-section">
-      <div class="search-bar">
-        <input
-            type="text"
-            v-model="searchQuery"
-            placeholder="Search by stock name or symbol..."
+    <h1>My Dashboard</h1>
+    <div class="search-bar">
+      <input
+          type="text"
+          v-model="searchQuery"
+          placeholder="Search by stock name or symbol..."
+      />
+      <button @click="searchStocks">Search</button>
+    </div>
+
+    <div class="main-content">
+      <div class="stock-list-column">
+        <StockList
+            :stocks="stocks"
+            @stockSelected="handleStockSelected"
         />
-        <button @click="searchStocks">Search</button>
       </div>
 
-      <div class="main-content">
-        <!-- Stock List -->
-        <div class="stock-list-column">
-          <StockList
-              :stocks="stocks"
-              @stockSelected="handleStockSelected"
-          />
-        </div>
-
-        <!-- Order Placer -->
-        <div class="order-placer-column">
+      <div class="order-placer-column">
+        <div class="stock-price-chart">
           <StockPriceChart :stock="selectedStock" />
-          <OrderPlacer :stock="selectedStock" />
+        </div>
+        <OrderPlacer :stock="selectedStock" />
+      </div>
+      <div class="live-orders">
+        <div v-if="buyOrders.length > 0" class="order-list">
+          <h2>Users are buying...</h2>
+          <OrderList :orders="buyOrders" />
+        </div>
+        <div v-if="sellOrders.length > 0" class="order-list">
+          <h2>Users are selling...</h2>
+          <OrderList :orders="sellOrders" />
         </div>
       </div>
     </div>
-
-    <!-- Right Section: Order Lists -->
-    <div class="right-section">
-      <div v-if="buyOrders.length > 0" class="order-list">
-        <h2>Users are buying...</h2>
-        <OrderList :orders="buyOrders" />
-      </div>
-      <div v-if="sellOrders.length > 0" class="order-list">
-        <h2>Users are selling...</h2>
-        <OrderList :orders="sellOrders" />
-      </div>
     </div>
-  </div>
 </template>
 
 
@@ -211,19 +208,11 @@ export default {
 <style scoped>
 .dashboard-container {
   display: flex;
-  flex-direction: row;
-  height: 100vh;
+  flex-direction: column;
   width: 100%;
   padding: 20px;
   box-sizing: border-box;
-}
-
-/* Left Section */
-.left-section {
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  margin-right: 20px;
+  align-items: center;
 }
 
 .search-bar {
@@ -231,15 +220,16 @@ export default {
   display: flex;
   gap: 10px;
   align-items: center;
+  align-self: center;
 }
 
 .search-bar input {
   height: 30px;
-  width: 50%;
   padding: 5px;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  width: 300px;
 }
 
 .search-bar button {
@@ -259,38 +249,41 @@ export default {
 
 .main-content {
   display: flex;
-  flex-direction: column;
-  flex: 1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.stock-price-chart {
+  width: 1000px;
 }
 
 .stock-list-column {
   flex: 1;
   margin-bottom: 20px;
   overflow-y: auto;
+  width: 600px;
+  min-width: 500px;
 }
 
 .order-placer-column {
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
 }
 
-/* Right Section: Order Lists */
-.right-section {
+.live-orders {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 400px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
 }
 
 .order-list {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ccc;
   border-radius: 8px;
-  background-color: #f9f9f9;
   overflow-y: auto;
 }
 

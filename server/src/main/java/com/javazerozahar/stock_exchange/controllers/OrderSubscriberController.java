@@ -10,11 +10,11 @@ import java.io.IOException;
 import java.util.*;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class OrderSubscriberController {
     // For managing client connections
     private final Set<SseEmitter> emitters = Collections.synchronizedSet(new HashSet<>());
 
-    @CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174"})
     @GetMapping(path = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe() {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);

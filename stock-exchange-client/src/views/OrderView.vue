@@ -45,10 +45,10 @@ const startListening = () => {
       console.log('Received message:', event.data);
   };
 
-  eventSource.addEventListener('DATA_UPDATE', (event) => {
+  eventSource.addEventListener('DATA_UPDATE', async (event) => {
       const data = JSON.parse(event.data);
       console.log('Data update:', data);
-      updateUI(data);
+      await updateUI(data);
   });
 
   eventSource.addEventListener('INIT', (event) => {
@@ -69,15 +69,6 @@ const stopListening = () => {
 }
 
 const updateUI = async (data) => {
-
-  const DEF_DELAY = 1000;
-
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms || DEF_DELAY));
-  }
-
-  await sleep(100);
-
   const fetchedOrders = await fetchOrdersByUserId(getCurrentUser().id);
 
   orders.value = await attachStockData(fetchedOrders);
